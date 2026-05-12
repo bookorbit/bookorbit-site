@@ -294,7 +294,7 @@ onUnmounted(() => {
       <nav class="sh-nav">
         <a href="/what-is-bookorbit" class="sh-nav-link">Docs</a>
         <a href="/installation" class="sh-nav-link">Installation</a>
-        <a href="https://github.com/neonsolstice/bookorbit" target="_blank" rel="noreferrer" class="sh-nav-link sh-nav-gh">
+        <a href="https://github.com/bookorbit/bookorbit" target="_blank" rel="noreferrer" class="sh-nav-link sh-nav-gh">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.09.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.091-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
           </svg>
@@ -319,7 +319,10 @@ onUnmounted(() => {
             Get started
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="/installation" class="sh-btn sh-btn-alt">Installation</a>
+          <a href="https://demo.bookorbit.app/magic?token=2d92cb900e184cf0eb8b11f72cffc6011673d1016e1b300d750eb3d76abc1572" class="sh-btn sh-btn-alt">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex-shrink:0"><path d="M12 1l2.5 8.5L23 12l-8.5 2.5L12 23l-2.5-8.5L1 12l8.5-2.5Z"/></svg>
+            Try it live
+          </a>
         </div>
 
         <div class="sh-feats">
@@ -347,22 +350,22 @@ onUnmounted(() => {
           <div class="sh-feat sh-feat-priority">
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
-              <span class="sh-feat-name">Metadata automation</span>
-              <span class="sh-feat-detail">9 providers, field-level rules, and confidence scoring.</span>
+              <span class="sh-feat-name">Powerful metadata management</span>
+              <span class="sh-feat-detail">9 providers, bulk editing, field-level rules, and confidence scoring.</span>
             </div>
           </div>
           <div class="sh-feat">
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
-              <span class="sh-feat-name">Kobo sync</span>
-              <span class="sh-feat-detail">Send books to Kobo with optional two-way progress sync.</span>
+              <span class="sh-feat-name">Kobo + KOReader sync</span>
+              <span class="sh-feat-detail">Send books to kobo and koreader with two-way progress sync</span>
             </div>
           </div>
           <div class="sh-feat">
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
               <span class="sh-feat-name">Book Dock</span>
-              <span class="sh-feat-detail">Stage uploads, review metadata, then finalize to a library.</span>
+              <span class="sh-feat-detail">Stage book uploads, review metadata, then finalize to a library.</span>
             </div>
           </div>
           <div class="sh-feat">
@@ -375,8 +378,8 @@ onUnmounted(() => {
           <div class="sh-feat">
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
-              <span class="sh-feat-name">Reading analytics</span>
-              <span class="sh-feat-detail">Session timeline, streaks, goals, pace, and reading DNA.</span>
+              <span class="sh-feat-name">Reading analytics + Widgets</span>
+              <span class="sh-feat-detail">Rich, beautiful charts and widgets for exploring library insights and reading habits.</span>
             </div>
           </div>
         </div>
@@ -397,9 +400,7 @@ onUnmounted(() => {
     </main>
 
     <footer class="sh-footer">
-      <span>BookOrbit &copy; {{ new Date().getFullYear() }}</span>
-      <a href="/what-is-bookorbit">Documentation</a>
-      <a href="https://github.com/neonsolstice/bookorbit" target="_blank" rel="noreferrer">GitHub</a>
+      <span>BookOrbit &copy; 2025 - {{ new Date().getFullYear() }}</span>
     </footer>
   </div>
 </template>
@@ -563,7 +564,7 @@ onUnmounted(() => {
   flex-direction: column;
   position: relative;
   z-index: 2;
-  padding-right: 32px;
+  padding-right: 24 px;
 }
 .sh-eyebrow {
   font-size: 11px;
@@ -624,14 +625,27 @@ onUnmounted(() => {
   color: var(--sh-white);
 }
 .sh-btn-alt {
-  background: var(--sh-white-05);
-  border: 1px solid var(--sh-white-10);
-  color: var(--sh-text-btn-alt);
+  background:
+    linear-gradient(var(--sh-bg), var(--sh-bg)) padding-box,
+    linear-gradient(118deg, var(--sh-accent-blue), var(--sh-accent-cyan)) border-box;
+  border: 1px solid transparent;
+  color: var(--sh-accent-cyan);
+  font-weight: 600;
+  box-shadow: 0 0 14px rgba(34,211,238,0.18);
+  animation: sh-demo-glow 2.6s ease-in-out infinite;
 }
 .sh-btn-alt:hover {
-  background: var(--sh-white-09);
+  animation: none;
+  background:
+    linear-gradient(rgba(34,211,238,0.07), rgba(34,211,238,0.07)) padding-box,
+    linear-gradient(118deg, var(--sh-accent-blue), var(--sh-accent-cyan)) border-box;
   color: var(--sh-text-main);
+  box-shadow: 0 0 26px rgba(34,211,238,0.38);
   transform: translateY(-1px);
+}
+@keyframes sh-demo-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(34,211,238,0.15); }
+  50%       { box-shadow: 0 0 22px rgba(34,211,238,0.32); }
 }
 
 /* ── Feature grid with glowing orbit dots ── */
@@ -721,7 +735,7 @@ onUnmounted(() => {
 }
 .sh-app-frame img {
   display: block;
-  width: 100%;
+  width: 105%;
 }
 
 /* ── Footer ── */

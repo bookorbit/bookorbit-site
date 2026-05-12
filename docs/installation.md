@@ -24,8 +24,8 @@ Pick a location on your server for BookOrbit to live. Everything: config, databa
 ```bash
 mkdir bookorbit && cd bookorbit
 mkdir -p books data/app data/postgres
-curl -fsSLo .env https://raw.githubusercontent.com/neonsolstice/bookorbit/main/.env.example
-curl -fsSLo docker-compose.yml https://raw.githubusercontent.com/neonsolstice/bookorbit/main/docker-compose.yml
+curl -fsSLo .env https://raw.githubusercontent.com/bookorbit/bookorbit/main/.env.example
+curl -fsSLo docker-compose.yml https://raw.githubusercontent.com/bookorbit/bookorbit/main/docker-compose.yml
 ```
 
 Edit `.env` before starting. At minimum, set these values:
