@@ -14,21 +14,21 @@ Library creation requires the `manage_libraries` permission. Users without that 
 
 ## Ways to create a library
 
-There are three places to open the same creation wizard.
+The same creation wizard is available from three places.
 
-### Dashboard empty state
+### 1. Dashboard empty state {#dashboard-empty-state}
 
 On a fresh instance, the dashboard shows a **Create your first library** button after the admin account is created.
 
 <img src="/images/getting-started/dashboard-empty-state.webp" alt="Dashboard empty state showing Create your first library" class="img-md img-bordered" />
 
-### Sidebar
+### 2. Sidebar {#sidebar}
 
 Open the `...` menu beside **Libraries** in the sidebar and choose **New Library**.
 
 <img src="/images/getting-started/sidebar-new-library-menu.webp" alt="Sidebar Libraries menu showing New Library" class="img-xs img-bordered" />
 
-### Settings > Libraries
+### 3. Settings > Libraries {#settings-libraries}
 
 Open **Settings > Libraries** and click **Add Library**. On an empty instance, the empty state button reads **Add your first library**.
 
