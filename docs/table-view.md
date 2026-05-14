@@ -4,7 +4,7 @@ The table view is a different way to look at your library - less visual, more st
 
 Switch to it from the view toggle in the top-right of any library, Smart Scope, or collection page.
 
-<img src="/images/table-view/table-overview.png" alt="Table view showing 195 books with columns for title, authors, rating, genres, status, and format" class="img-lg img-bordered" />
+<img src="/images/table-view/table-overview.webp" alt="Table view showing 195 books with columns for title, authors, rating, genres, status, and format" class="img-lg img-bordered" />
 
 ## Reading the table
 
@@ -22,7 +22,7 @@ At the bottom, a status bar shows the loaded count, a "Filtered" indicator when 
 
 The table isn't read-only. Click any editable cell to open an in-place editor - no drawer, no navigation. Text fields get a text input. Chip fields like authors, genres, and tags get a tokenized editor with typeahead search against your existing library data. Rating cells open a star picker. Status cells open the same dropdown you'd find in the grid view. Series index accepts decimal values.
 
-<img src="/images/table-view/table-inline-edit.png" alt="Title cell open for inline editing with the field value selected and lock icons on each side" class="img-lg img-bordered" />
+<img src="/images/table-view/table-inline-edit.webp" alt="Title cell open for inline editing with the field value selected and lock icons on each side" class="img-lg img-bordered" />
 
 When a cell is active, **Tab** moves to the next editable cell in the row, **Shift+Tab** moves back, and **Up/Down arrows** move to the same column in the adjacent row - so you can sweep through a column of empty fields rapidly without reaching for the mouse.
 
@@ -46,7 +46,7 @@ Columns are first-class objects in the table - you can resize, reorder, and pin 
 
 **Right-click any column header** to open its context menu:
 
-<img src="/images/table-view/table-column-context-menu.png" alt="Column header context menu showing sort, filter, pin, and auto-fit options" class="img-xs img-bordered" />
+<img src="/images/table-view/table-column-context-menu.webp" alt="Column header context menu showing sort, filter, pin, and auto-fit options" class="img-xs img-bordered" />
 
 | Action | What it does |
 |--------|-------------|
@@ -68,7 +68,7 @@ Click a column header to sort by it, click again to reverse direction. When more
 
 Right-click any row (or use the `...` button in the actions cell on the right) to open the row context menu:
 
-<img src="/images/table-view/table-row-context-menu.png" alt="Row context menu showing Quick View, Book Details, Edit Metadata, Refresh Metadata, Add to Collection, Send to Device, and Delete" class="img-xs img-bordered" />
+<img src="/images/table-view/table-row-context-menu.webp" alt="Row context menu showing Quick View, Book Details, Edit Metadata, Refresh Metadata, Add to Collection, Send to Device, and Delete" class="img-xs img-bordered" />
 
 - **Quick View** - opens the book's detail panel without navigating away
 - **Book Details** - navigates to the full book detail page
@@ -86,7 +86,7 @@ When series collapse is turned on via the toolbar toggle, all books in a series 
 
 The table is fully keyboard-navigable. Click anywhere on the table surface to give it focus, then use the keys below.
 
-<img src="/images/table-view/table-keyboard-shortcuts.png" alt="Keyboard shortcuts overlay showing navigation, action, and general shortcut groups" class="img-sm img-bordered" />
+<img src="/images/table-view/table-keyboard-shortcuts.webp" alt="Keyboard shortcuts overlay showing navigation, action, and general shortcut groups" class="img-sm img-bordered" />
 
 **NAVIGATION**
 
@@ -119,7 +119,7 @@ Enter selection mode by clicking **SELECT** in the toolbar or by clicking any ro
 
 Whenever one or more books are selected, a pill-shaped **action bar** rises from the bottom of the screen:
 
-<img src="/images/table-view/table-selection-bar.png" alt="Selection action bar showing count badge and action icons for email, download, collection, edit, status, rating, more, delete, and exit" class="img-md img-bordered" />
+<img src="/images/table-view/table-selection-bar.webp" alt="Selection action bar showing count badge and action icons for email, download, collection, edit, status, rating, more, delete, and exit" class="img-md img-bordered" />
 
 The count badge on the left shows how many books are selected. The icons trigger bulk actions - permissions gate what's visible:
 
@@ -142,7 +142,7 @@ The count badge on the left shows how many books are selected. The icons trigger
 
 The **display panel** is where you shape the table to fit your workflow. Open it from the columns icon in the toolbar.
 
-<img src="/images/table-view/table-display-panel.png" alt="Display panel showing table density options, presets, saved views, and column toggles" class="img-sm img-bordered" />
+<img src="/images/table-view/table-display-panel.webp" alt="Display panel showing table density options, presets, saved views, and column toggles" class="img-sm img-bordered" />
 
 ### Density
 
@@ -207,7 +207,7 @@ Enable **Zebra striping** in **Settings > Appearance** to alternate the backgrou
 
 Open the **Export Metadata** dialog from the export icon in the toolbar, or from the action bar when books are selected.
 
-<img src="/images/table-view/table-export-dialog.png" alt="Export Metadata dialog showing scope, format, columns, and options with preflight summary" class="img-md img-bordered" />
+<img src="/images/table-view/table-export-dialog.webp" alt="Export Metadata dialog showing scope, format, columns, and options with preflight summary" class="img-md img-bordered" />
 
 **Scope** - export either your current selection or all rows matching the current filter, regardless of what's selected.
 

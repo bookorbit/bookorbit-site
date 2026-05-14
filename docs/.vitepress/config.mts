@@ -63,6 +63,12 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Import & Migration',
+        items: [
+          { text: 'Migration', link: '/migration' },
+        ]
+      },
+      {
         text: 'Settings',
         items: [
           { text: 'Metadata', link: '/metadata' },
