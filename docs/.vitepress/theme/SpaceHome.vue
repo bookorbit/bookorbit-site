@@ -767,7 +767,18 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     padding: 32px 24px 0;
     overflow-y: auto;
+    overflow-x: hidden;
     align-items: flex-start;
+  }
+  .sh-nav {
+    gap: 14px;
+  }
+  .sh-nav-link {
+    font-size: 12.5px;
+  }
+  .sh-nav-gh {
+    gap: 5px;
+    padding: 6px 10px;
   }
   .sh-visual {
     height: 240px;
@@ -782,5 +793,18 @@ onUnmounted(() => {
   .sh-header { padding: 0 24px; }
   .sh-h1 { font-size: clamp(32px, 8vw, 50px); }
   .sh-text { padding-right: 0; }
+}
+
+@media (max-width: 640px) {
+  .sh-header {
+    padding: 0 14px;
+  }
+  .sh-nav {
+    gap: 10px;
+  }
+  .sh-nav-gh {
+    padding: 5px 8px;
+    font-size: 0;
+  }
 }
 </style>
