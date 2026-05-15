@@ -315,7 +315,7 @@ onUnmounted(() => {
           Automate metadata at scale, sync with Kobo, track reading analytics, and support multiple users.
         </p>
         <div class="sh-ctas">
-          <a href="/what-is-bookorbit" class="sh-btn sh-btn-primary">
+          <a href="/installation" class="sh-btn sh-btn-primary">
             Get started
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
