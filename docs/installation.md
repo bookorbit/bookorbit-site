@@ -31,14 +31,20 @@ curl -fsSLo docker-compose.yml https://raw.githubusercontent.com/bookorbit/booko
 Edit `.env` before starting. At minimum, set these values:
 
 ```dotenv
+# Docker image to run. The default in the downloaded template is fine for most installs.
+APP_IMAGE=ghcr.io/bookorbit/bookorbit:latest
+
 # The address you will use to open BookOrbit.
-# Use your domain if you have one, otherwise use your server IP and port.
+# Direct LAN access: http://your-server-ip:3000
+# Behind a reverse proxy with a domain: https://books.example.com
 APP_URL=http://your-server-ip:3000
 
 # The folder on your server where your book files live.
 # This folder appears as /books inside BookOrbit.
 BOOKS_HOST_PATH=./books
 
+# POSTGRES_USER and POSTGRES_DB default to "bookorbit" in the downloaded template.
+# Change POSTGRES_PASSWORD to something strong.
 POSTGRES_PASSWORD=use-a-strong-random-password
 JWT_SECRET=use-a-long-random-secret
 SETUP_BOOTSTRAP_TOKEN=use-a-random-setup-token
@@ -164,14 +170,20 @@ docker compose up -d
 | `POSTGRES_DB` | Yes | - | Database name |
 | `JWT_SECRET` | Yes | - | Secret for signing login tokens |
 | `SETUP_BOOTSTRAP_TOKEN` | Yes | - | One-time token for initial setup |
-| `APP_PORT` | No | `3000` | Host port BookOrbit listens on |
+| `APP_PORT` | No | `3000` | Host port mapped to the container |
+| `PORT` | No | `3000` | Internal container port. Only change if `APP_PORT` and `PORT` need to differ |
 | `BOOKS_HOST_PATH` | No | `./books` | Host folder mounted as `/books` in the container |
 | `PUID` | No | `1000` | UID for files written by the app (useful on NAS) |
 | `PGID` | No | `1000` | GID for files written by the app (useful on NAS) |
-| `NODE_MAX_OLD_SPACE_SIZE` | No | `2048` | Node.js heap limit in MB |
+| `BOOKORBIT_FIX_PERMISSIONS` | No | `true` | Set to `false` if your platform manages `/data` ownership externally |
+| `NODE_MAX_OLD_SPACE_SIZE` | No | `2048` | Node.js heap limit in MB. Raise for very large libraries |
 | `DATABASE_URL` | No | Built from bundled Postgres settings | Full PostgreSQL connection string for an external database |
-| `POSTGRES_HOST` | No | `postgres` | Database hostname (only for external DB) |
-| `POSTGRES_PORT` | No | `5432` | Database port (only for external DB) |
+| `POSTGRES_HOST` | No | `postgres` | Database hostname. Override when using an external DB |
+| `POSTGRES_PORT` | No | `5432` | Database port |
+| `CLIENT_URL` | No | Same as `APP_URL` | Frontend URL when the client is served from a different domain |
+| `EMAIL_ENCRYPTION_KEY` | No | - | Encrypts stored SMTP credentials at rest. Recommended if you configure email |
+| `MIGRATION_ENCRYPTION_KEY` | No | - | Encrypts stored migration source credentials. Recommended if you use migrations |
+| `LOG_LEVEL` | No | `info` | Log verbosity. Set to `debug` for detailed output |
 
 ### Reverse proxy
 
