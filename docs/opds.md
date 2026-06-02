@@ -2,6 +2,8 @@
 
 **Settings > OPDS** exposes your BookOrbit library as a private OPDS catalog for reader apps such as KOReader, Thorium Reader, Moon+ Reader, and similar OPDS-compatible clients.
 
+KOReader can use OPDS for browsing and downloads, but BookOrbit's dedicated [KOReader Sync](./koreader) page handles progress sync and device pairing.
+
 <img src="/images/opds/settings.webp" alt="OPDS settings page with server toggle endpoint URL and OPDS accounts" class="img-lg img-bordered" />
 
 ## Setup Checklist
