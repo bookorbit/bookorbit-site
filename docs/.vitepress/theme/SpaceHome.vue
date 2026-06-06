@@ -315,13 +315,13 @@ onUnmounted(() => {
           Automate metadata at scale, sync with Kobo, track reading analytics, and support multiple users.
         </p>
         <div class="sh-ctas">
-          <a href="/installation" class="sh-btn sh-btn-primary">
-            Get started
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
           <a href="https://demo.bookorbit.app/magic?token=2d92cb900e184cf0eb8b11f72cffc6011673d1016e1b300d750eb3d76abc1572" class="sh-btn sh-btn-alt">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex-shrink:0"><path d="M12 1l2.5 8.5L23 12l-8.5 2.5L12 23l-2.5-8.5L1 12l8.5-2.5Z"/></svg>
             Try it live
+          </a>
+          <a href="/installation" class="sh-btn sh-btn-primary">
+            Get started
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
 

@@ -76,6 +76,7 @@ export default defineConfig({
           { text: 'Reader', link: '/reader' },
           { text: 'Kobo Sync', link: '/kobo' },
           { text: 'KOReader Sync', link: '/koreader' },
+          { text: 'Hardcover Sync', link: '/hardcover' },
           { text: 'Email', link: '/email' },
           { text: 'OPDS', link: '/opds' },
           { text: 'OIDC / SSO', link: '/oidc' },

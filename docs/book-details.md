@@ -152,7 +152,7 @@ There are two ways provider IDs get applied:
 This lets you copy provider IDs one by one. For example, you can keep all visible metadata from Goodreads, select only the Amazon ID from Amazon, select only the Open Library ID from Open Library, then choose an iTunes cover. Applying the selection sends the combined patch back to the edit form.
 
 ::: tip
-Provider IDs improve future searches. After you verify that a provider result is the correct edition, keep its ID even if you only use one field from that provider.
+Provider IDs improve future searches. After you verify that a provider result is the correct edition, keep its ID even if you only use one field from that provider. The Hardcover ID is especially useful for [Hardcover Sync](./hardcover), where reliable matching is needed before status, progress, or rating can be pushed.
 :::
 
 ## Field Locks
