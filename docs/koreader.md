@@ -42,9 +42,13 @@ If the server cannot build the plugin package, the BookOrbit server likely canno
 
 <img src="/images/koreader/koreader-tools-menu.webp" alt="KOReader tools menu showing BookOrbit sync" class="img-md img-bordered" />
 
-The plugin does not ask BookOrbit for a reading list. When you sync the open book or run a full sync, it computes file hashes and asks BookOrbit which hashes match files in libraries the user can access. That hash match is why the same EPUB file matters: BookOrbit syncs against the stored file hash, with hash history used when BookOrbit has rewritten or rescanned a file.
+The plugin does not ask BookOrbit for a reading list. When you sync the open book or run a full sync, it computes the same KOReader document fingerprint BookOrbit stores for scanned files and asks which fingerprints match files in libraries the user can access. That fingerprint match is why the same EPUB file matters: BookOrbit syncs against the stored file identity, including previous identities kept after BookOrbit has rewritten or rescanned a file.
 
 When a book matches, the plugin can send progress, page statistics, book state, rating, and annotation changes for that file. Unmatched files are skipped instead of creating new library entries.
+
+::: warning
+For reliable sync, put the BookOrbit-managed copy of the book on the KOReader device. A manually copied file can still match if it produces the same KOReader fingerprint BookOrbit scanned, but a converted, edited, re-zipped, or metadata-rewritten copy will usually have a different identity and will not sync to that BookOrbit book.
+:::
 
 <img src="/images/koreader/koreader-plugin-settings.webp" alt="KOReader BookOrbit plugin panel with auto sync, two-way highlight sync, periodic sync, and manual sync actions" class="img-md img-bordered" />
 
@@ -55,9 +59,11 @@ The device-side panel is where you control live sync for the open book and start
 | **Auto sync this book** | Pulls progress when a book opens. On close or suspend, uploads the open book's progress, highlights, status, rating, and reading time. |
 | **Two-way highlight sync** | Also applies BookOrbit highlight, note, and delete changes back to KOReader. When off, local KOReader highlight changes still upload. |
 | **Periodically sync every # pages** | Pushes progress after the configured number of page turns, once reading has been idle briefly. Set it to `0` to disable page-turn progress pushes. |
-| **Sync behavior** | Controls what KOReader does when BookOrbit has a newer or older reading position: apply automatically, ask first, or never move. |
+| **Sync behavior** | Sets separate choices for **Sync to a newer state** and **Sync to an older state**: apply silently, prompt first, or never move. |
 | **Sync this book now** | Runs the full open-book sync immediately: progress, reading events, highlights, status, and rating. |
 | **Sync all books now** | Runs a manual device sweep across matched books from KOReader history, statistics, and sidecar files. |
+
+Full-library sweeps are manual. They are useful after installing the plugin on a device that already has reading history, but they still only upload files KOReader can fingerprint and BookOrbit can match. If an old sidecar file reports stale progress, BookOrbit records the device state without rolling the shared book progress backward.
 
 ## Three-Way Sync
 
@@ -81,8 +87,8 @@ BookOrbit stores several kinds of KOReader state:
 | Reading events | Converts KOReader page-stat events into reading sessions, reading-log rows, daily stats, and achievement activity. |
 | Highlights and notes | Creates or updates BookOrbit annotations with KOReader text, note, style, color, chapter, page, and device position. |
 | Annotation deletes | Soft-deletes the matching BookOrbit annotation and tracks whether other devices still need to acknowledge the delete. |
-| Book status | Maps KOReader `reading`, `complete`, and `abandoned` states to BookOrbit Reading, Finished, and Abandoned. |
-| Rating | Writes the KOReader rating to the user's BookOrbit rating when the device change is newer. |
+| Book status | Maps KOReader `reading`, `complete`, and `abandoned` states to BookOrbit Reading, Finished, and Abandoned when the device change is newer. |
+| Rating | Writes a KOReader 1-5 rating to the user's BookOrbit rating when the device change is newer. A missing device rating does not clear the BookOrbit rating. |
 
 Reading sessions are derived from page-stat clusters. Events within a 30 minute gap stay in one session; a longer gap starts another session. Very short sessions under 10 seconds are ignored. If an older sync later fills a gap, BookOrbit can recompute the sessions for that device and file so the reading log stays consistent.
 
@@ -123,7 +129,8 @@ Deleting credentials removes the KOReader account and disconnects paired devices
 |---------|-------|
 | Device cannot log in | Confirm the BookOrbit user has `koreader_sync`, the KOReader account exists, sync is enabled, and the device can reach the public `/api/v1/koreader` URL. |
 | Plugin download fails | Confirm the server has access to the BookOrbit KOReader plugin source, or set `KOREADER_PLUGIN_PATH`. |
-| No books match | Confirm the same book files exist in BookOrbit, the user can access their libraries, and the device copy has not been modified into a different file hash. |
+| No books match | Confirm the same book files exist in BookOrbit, the user can access their libraries, and the device copy has not been modified into a different document fingerprint. |
+| Auto sync cannot be enabled | On KOReader devices with seamless Wi-Fi control, set **Network > Action when Wi-Fi is off** to turn Wi-Fi on. KOReader blocks auto sync when that setting is not enabled. |
 | Progress appears but no reading sessions appear | Confirm the BookOrbit KOReader plugin is installed and has uploaded page statistics. |
 | Highlights do not move both ways | Enable **Two-way highlight sync** in the KOReader BookOrbit sync panel and run another sync for the book. |
 | Deleted highlights remain pending | Sync the KOReader device again so it can acknowledge the delete. Pending deletes are kept until the device reports that it applied them. |
