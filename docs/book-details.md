@@ -1,6 +1,6 @@
 # Book Details, Editing, and Viewer
 
-Each book opens into a focused viewer workspace with three tabs: **Details**, **Edit Metadata**, and **Files**. Use **Details** to read, inspect, rate, and review the book. Use **Edit Metadata** to clean up the record and cover. Use **Files** when a book has more than one attached format and you want to choose exactly what to open or download.
+Each book opens into a focused viewer workspace with tabs for **Details**, **Edit Metadata**, **Files**, **Reading Log**, and **Highlights**. Use **Details** to read, inspect, rate, and review the book. Use **Edit Metadata** to clean up the record and cover. Use **Files** when a book has more than one attached format and you want to choose exactly what to open or download.
 
 ## Details
 
@@ -39,6 +39,12 @@ The **Files** tab lists every file attached to the book. It is the best place to
 | **View sync log** | Appears when metadata has been written back to files and shows recent write results. |
 
 BookOrbit chooses the reader by file type: eBook formats open in the eBook reader, PDFs in the PDF reader, comics in the comics reader, and audio files in the audiobook player. Reader defaults and per-book reader settings are covered in [Reader](./reader).
+
+## Highlights
+
+The **Highlights** tab collects annotations for the current book. It can search, filter by color, filter by chapter or date, sort by reading position or creation date, edit notes and highlight styles, export the current page, and jump back into the reader at the saved position.
+
+For the full annotation workflow across the whole library, see [Annotations & Highlights](./annotations).
 
 ## Edit Metadata
 

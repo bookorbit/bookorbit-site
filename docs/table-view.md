@@ -200,7 +200,7 @@ A saved view goes further than a preset - it also stores the sort order and acti
 Both presets and saved views live in your browser's local storage. They persist across sessions on the same device but are not synced to your account.
 
 ::: tip
-Enable **Zebra striping** in **Settings > Appearance** to alternate the background on even rows - useful when scanning wide layouts with many columns.
+Enable **Zebra striping** in [Settings > Display](./appearance#series-authors-lists-and-tables) to alternate row backgrounds - useful when scanning wide layouts with many columns.
 :::
 
 ## Exporting metadata

@@ -6,6 +6,8 @@ Reader settings do not control library scanning or file import. Libraries decide
 
 To choose a specific file or format from a book page, use the **Read** menu or **Files** tab described in [Book Details & Viewer](./book-details).
 
+The eBook reader also creates web-reader highlights and notes from selected text. Those annotations can be reviewed per book or across the whole library in [Annotations & Highlights](./annotations).
+
 | Reader tab | Formats covered |
 |------------|-----------------|
 | **eBook** | EPUB, MOBI, AZW, AZW3, FB2 |

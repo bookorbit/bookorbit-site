@@ -77,7 +77,7 @@ Progress updates automatically as you read.
 
 <img src="/images/dashboard/widget-highlight-of-the-day.webp" alt="Highlight of the Day widget showing a quote from a book with the title and chapter" class="img-sm img-bordered" />
 
-A random annotation from your reading history, shown with the book title and the chapter where it appears. Clicking the widget opens the book at that annotation. The selection rotates daily.
+A random annotation from your reading history, shown with the book title and the chapter where it appears. Clicking the widget opens the book at that annotation. The selection rotates daily. See [Annotations & Highlights](./annotations) for the full annotation workspace.
 
 If you have no annotations yet, this widget stays empty until you make your first highlight.
 
