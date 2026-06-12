@@ -41,44 +41,50 @@ export default defineConfig({
           { text: 'What is BookOrbit?', link: '/what-is-bookorbit' },
           { text: 'Installation', link: '/installation' },
           { text: 'Creating a Library', link: '/creating-a-library' },
-          { text: 'Dashboard', link: '/dashboard' },
           { text: 'Users & Permissions', link: '/users' },
+          { text: 'Dashboard', link: '/dashboard' },
         ]
       },
       {
-        text: 'Book Management',
+        text: 'Building Your Library',
         items: [
           { text: 'Library File Structure', link: '/library-file-structure' },
           { text: 'Adding Books', link: '/adding-books' },
-          { text: 'Book Details & Viewer', link: '/book-details' },
           { text: 'Book Dock', link: '/book-dock' },
-        ]
-      },
-      {
-        text: 'Organizing Your Library',
-        items: [
-          { text: 'Collections', link: '/collections' },
-          { text: 'Smart Scopes', link: '/smart-scopes' },
-          { text: 'Table View', link: '/table-view' },
-        ]
-      },
-      {
-        text: 'Import & Migration',
-        items: [
           { text: 'Migration', link: '/migration' },
         ]
       },
       {
-        text: 'Settings',
+        text: 'Browsing & Reading',
         items: [
-          { text: 'Metadata', link: '/metadata' },
-          { text: 'Appearance', link: '/appearance' },
+          { text: 'Book Details & Viewer', link: '/book-details' },
+          { text: 'Table View', link: '/table-view' },
           { text: 'Reader', link: '/reader' },
+          { text: 'Annotations & Highlights', link: '/annotations' },
+          { text: 'Display', link: '/appearance' },
+        ]
+      },
+      {
+        text: 'Organizing',
+        items: [
+          { text: 'Collections', link: '/collections' },
+          { text: 'Smart Scopes', link: '/smart-scopes' },
+          { text: 'Metadata', link: '/metadata' },
+        ]
+      },
+      {
+        text: 'Sync & Integrations',
+        items: [
           { text: 'Kobo Sync', link: '/kobo' },
           { text: 'KOReader Sync', link: '/koreader' },
           { text: 'Hardcover Sync', link: '/hardcover' },
-          { text: 'Email', link: '/email' },
           { text: 'OPDS', link: '/opds' },
+          { text: 'Email', link: '/email' },
+        ]
+      },
+      {
+        text: 'Admin & Security',
+        items: [
           { text: 'OIDC / SSO', link: '/oidc' },
         ]
       },
