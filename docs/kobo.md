@@ -45,10 +45,15 @@ A book is eligible only when all of these are true:
 
 - The user has access to the book's library.
 - The book is `present`.
+- The user's content filters do not exclude it.
 - The book is in at least one collection with **Sync to Kobo** enabled.
 - The book's primary file is EPUB.
 
 If a book has an EPUB file but a different primary file, Kobo sync will skip it. Set the EPUB as the primary file before expecting it on the device.
+
+::: warning
+Use the copy delivered by the BookOrbit Kobo account, not a sideloaded copy of the same title. BookOrbit ties Kobo sync state to the entitlement and file it served, and precise progress restore or outbound highlight placement depends on the BookOrbit-delivered KEPUB.
+:::
 
 BookOrbit keeps a per-user library snapshot so the Kobo receives deltas instead of the whole library every time.
 
@@ -62,6 +67,8 @@ BookOrbit keeps a per-user library snapshot so the Kobo receives deltas instead 
 
 Sync responses are paged, so a large change set may take several device sync passes in the same Kobo sync operation.
 
+Removing a book on the Kobo does not delete it from BookOrbit. If the book still belongs to a synced collection, BookOrbit can offer it again on a later sync.
+
 ## Sync Preferences
 
 <img src="/images/kobo/sync-preferences.webp" alt="Kobo Sync preferences with progress sync, highlight sync, KEPUB conversion, and thresholds" class="img-lg img-bordered" />
@@ -70,9 +77,9 @@ Preferences apply to the current BookOrbit user and must be saved before they ch
 
 | Setting | Behavior |
 |---------|----------|
-| **Two-way progress sync** | Lets Kobo progress update BookOrbit's reader position, and lets newer BookOrbit or KOReader progress update the Kobo bookmark. Precise restore requires KEPUB delivery. |
+| **Two-way progress sync** | Lets Kobo progress update BookOrbit's shared reader position, and lets newer BookOrbit or KOReader progress update the Kobo bookmark. Kobo reading state and status thresholds are still stored when this is off. Precise restore requires KEPUB delivery. |
 | **Sync BookOrbit highlights to Kobo** | Sends BookOrbit and KOReader highlights to Kobo when they can be placed in the KEPUB. Kobo highlights still import into BookOrbit when this is off. |
-| **Convert to KEPUB** | Serves eligible EPUBs as KEPUB downloads. This is forced on when two-way progress sync or BookOrbit-to-Kobo highlight sync is enabled. |
+| **Convert to KEPUB** | Serves eligible EPUBs as KEPUB downloads. This is on by default and is forced on when two-way progress sync or BookOrbit-to-Kobo highlight sync is enabled. |
 | **Force hyphenation** | Regenerates KEPUBs with kepubify hyphenation enabled. |
 | **Mark as Reading** | Kobo progress at or above this percentage can move the BookOrbit book status to Reading. |
 | **Mark as Finished** | Kobo progress at or above this percentage can move the BookOrbit book status to Finished. |
@@ -82,7 +89,7 @@ The reading threshold must be lower than the finished threshold. These threshold
 
 ## KEPUB Delivery
 
-BookOrbit uses KEPUB as the bridge format for Kobo-specific positions. When conversion is enabled and the EPUB is under the configured size limit, the first Kobo download creates a cached `.kepub.epub` using kepubify. Later downloads reuse the cache until the source file, size limit, or hyphenation setting changes.
+BookOrbit uses KEPUB as the bridge format for Kobo-specific positions. When conversion is enabled and the EPUB is under the configured size limit, the first Kobo download creates a cached `.kepub.epub` using kepubify. Later downloads reuse the cache until the source file identity or hyphenation setting changes.
 
 If conversion fails, BookOrbit falls back to the original EPUB so the book can still download. That fallback is readable on Kobo, but precise BookOrbit-to-Kobo progress restore and BookOrbit-to-Kobo highlights depend on the KEPUB path.
 
@@ -94,16 +101,16 @@ With **Two-way progress sync** enabled, BookOrbit connects the Kobo reader to th
 
 | Direction | Behavior |
 |-----------|----------|
-| Kobo to BookOrbit | Kobo reading state is stored. If the bookmark includes a KoboSpan location, BookOrbit converts it to the canonical web-reader and KOReader position when a matching KEPUB context is available. |
+| Kobo to BookOrbit | Kobo reading state is stored. If two-way progress sync is enabled and the bookmark includes a KoboSpan location, BookOrbit converts it to the canonical web-reader and KOReader position when a matching KEPUB context is available. |
 | BookOrbit to Kobo | Newer web-reader progress can be converted back into a KoboSpan bookmark when the Kobo asks for reading state. |
 | KOReader to Kobo | KOReader progress lands in BookOrbit first. If Kobo two-way progress sync is enabled, that progress can advance the Kobo bookmark on the next Kobo sync. |
 | Status updates | Kobo progress can update the BookOrbit book status using the Reading and Finished thresholds. |
 
-That is the powerful part of the feature: Kobo, KOReader, and the BookOrbit web reader do not have to be separate progress islands. Read on the Kobo, sync, and BookOrbit can move KOReader forward later. Read in KOReader, sync, then let Kobo pick up the newer position during its next sync. KEPUB delivery is what makes the Kobo side precise instead of percent-only.
+That is the powerful part of the feature: Kobo, KOReader, and the BookOrbit web reader do not have to be separate progress islands. Read on the Kobo, sync, and BookOrbit can move KOReader forward later. Read in KOReader, sync, then let Kobo pick up the newer position during its next sync. BookOrbit keeps newer state from being overwritten by older device state, and KEPUB delivery is what makes the Kobo side precise instead of percent-only.
 
 ## Highlights And Notes
 
-Kobo highlight import is always accepted for synced books. Highlights and notes made on the Kobo are written into [BookOrbit annotations](./annotations), with Kobo positions converted into BookOrbit and KOReader-friendly positions when the KEPUB context is available.
+Kobo highlight import is accepted for synced books. Highlights and notes made on the Kobo are written into [BookOrbit annotations](./annotations), with Kobo positions converted into BookOrbit and KOReader-friendly positions when the KEPUB context is available.
 
 The **Sync BookOrbit highlights to Kobo** switch controls the opposite direction. When it is on, highlights made in BookOrbit or KOReader can be offered to Kobo. When it is off, BookOrbit still imports Kobo highlights, and annotations already linked to Kobo can continue syncing edits and deletes instead of becoming duplicates.
 
@@ -120,14 +127,17 @@ Kobo sends more than bookmarks. BookOrbit ingests Kobo analytics events for sync
 
 Reading sessions use the active reading time Kobo reports. If Kobo reports idle time, BookOrbit subtracts it before saving the session.
 
+Analytics are tied back to the synced EPUB-primary BookOrbit book. If a device event cannot be resolved to a BookOrbit-served book the user can access, BookOrbit skips that event instead of guessing.
+
 ## Troubleshooting
 
 | Symptom | Check |
 |---------|-------|
 | The Kobo cannot add the account | Confirm the full sync URL is reachable from the Kobo and includes `/api/v1/kobo/{deviceToken}`. |
 | The sync URL was lost | Revoke the device and add it again. BookOrbit intentionally shows the token once. |
-| No books appear | Confirm the user has `kobo_sync`, the books are in a **Sync to Kobo** collection, the books are `present`, and the primary file is EPUB. |
+| No books appear | Confirm the user has `kobo_sync`, the books are in a **Sync to Kobo** collection, the books are `present`, content filters allow them, and the primary file is EPUB. |
 | A shelf is missing or incomplete | Confirm that collection has **Sync to Kobo** enabled and contains eligible EPUB-primary books. |
+| Deleted books keep returning | Remove the book from synced collections in BookOrbit, or disable **Sync to Kobo** for that collection. Deleting the local Kobo copy does not delete the BookOrbit book. |
 | Kobo progress stores status but does not move reader position | Enable **Two-way progress sync** and make sure the book is delivered as KEPUB. |
 | BookOrbit or KOReader progress does not reach Kobo | Enable **Two-way progress sync**, download the BookOrbit KEPUB on the Kobo, then run another Kobo sync. |
 | Kobo highlights import but BookOrbit highlights do not appear on Kobo | Enable **Sync BookOrbit highlights to Kobo** and use the BookOrbit KEPUB copy of the book. |
