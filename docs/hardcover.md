@@ -1,6 +1,6 @@
 # Hardcover Sync
 
-Hardcover sync pushes BookOrbit reading data into a user's Hardcover account. It can update read status, reading dates, progress, rating, and privacy for books that BookOrbit can match to Hardcover.
+Hardcover sync pushes BookOrbit reading data into a user's Hardcover account. It can update read status, reading dates, progress, rating, and privacy for books that BookOrbit can match to Hardcover. You can also pull read status back from Hardcover to fill in blank BookOrbit entries.
 
 The integration is user-scoped. Each BookOrbit user connects their own Hardcover API token, chooses which changes should trigger sync, and gets their own cached match state.
 
@@ -10,12 +10,13 @@ The integration is user-scoped. Each BookOrbit user connects their own Hardcover
 
 Start by giving the user the `hardcover_sync` permission. That permission opens **Settings > Integrations > Hardcover** and allows that user to call the Hardcover sync endpoints.
 
-<img src="/images/hardcover/settings-connection.webp" alt="Hardcover connection settings with a configured account" class="img-lg img-bordered" />
+<img src="/images/hardcover/settings-connection.webp" alt="Hardcover settings page showing connection status, API token, book sync scope, and sync trigger toggles" class="img-lg img-bordered" />
 
 Paste the user's Hardcover API token from `hardcover.app/account/api`, optionally validate it, then save. BookOrbit strips a leading `Bearer` prefix if you paste one. The token is stored for that user and is not shown back in the UI.
 
 | Setting | Behavior |
 |---------|----------|
+| **Book sync scope** | **All eligible books** syncs everything unless a book is individually excluded. **Selected books only** opts in per book and skips everything else. |
 | **Enable sync** | Pauses or resumes this user's Hardcover integration without deleting the token. |
 | **Sync on status change** | Queues sync when a book status changes. |
 | **Sync on progress update** | Queues sync when BookOrbit progress changes or a reading session is saved. KOReader progress enters through this path after it updates BookOrbit. |
@@ -70,13 +71,35 @@ Changes for the same user and book are debounced briefly, then serialized per us
 
 ## Manual Sync
 
-<img src="/images/hardcover/manual-sync.webp" alt="Hardcover manual sync card showing pending count and last synced time" class="img-lg img-bordered" />
+<img src="/images/hardcover/manual-sync.webp" alt="Hardcover manual sync card showing pending count and Sync now button" class="img-lg img-bordered" />
 
 Manual sync is the catch-up button. Use it after first setup, after importing a library, after fixing metadata matches, or after turning sync back on.
 
 The pending count is local: it counts eligible books whose BookOrbit status, progress, rating, or dates differ from the last recorded sync attempt. It is not a matching report. A book can fail with `no_match`, stop appearing as pending because nothing changed afterward, then become pending again after you save a correct Hardcover ID.
 
 Manual sync streams progress while it runs and can be cancelled from the settings page.
+
+## Pull Read Status
+
+<img src="/images/hardcover/pull-read-status.webp" alt="Pull read status card showing preview summary with Ready, Review, Conflicts, Unmatched, and Skipped counts and Import ready button" class="img-lg img-bordered" />
+
+Pull read status is the reverse direction: it reads your Hardcover library and fills in **blank or Unread** BookOrbit statuses. Books that already have a non-Unread BookOrbit status are never overwritten.
+
+Tap **Preview** to run a dry-run match against Hardcover. BookOrbit shows a summary of how many books fall into each category before anything is imported.
+
+| Category | Meaning |
+|----------|---------|
+| **Ready** | Exact match found. Safe to import without review. |
+| **Review** | Title and author match found. Confirm the match before importing. |
+| **Conflicts** | A matching BookOrbit book was found but already has a non-Unread status. The existing status is kept. |
+| **Unmatched** | No matching BookOrbit book found for this Hardcover entry. |
+| **Skipped** | Hardcover book has a status BookOrbit does not import (such as Ignored), or multiple BookOrbit books matched the same Hardcover entry. |
+
+After the preview, **Import ready** applies all Ready matches immediately. **Review matches** opens the full import dialog where you can inspect each match, filter by category, and select individual books before importing.
+
+<img src="/images/hardcover/pull-read-status-review.webp" alt="Hardcover import review dialog showing matched books with Hardcover status, BookOrbit status, and progress columns" class="img-lg img-bordered" />
+
+The review dialog shows each book's title and author, the Hardcover status that would be applied, the current BookOrbit status, and how much progress would be imported. The **Import progress** checkbox controls whether reading progress is pulled alongside status. Select the books you want, then tap **Import selected**.
 
 ## KOReader Progress
 
@@ -101,3 +124,6 @@ After KOReader updates BookOrbit, Hardcover uses the same matching rules, progre
 | Book logs or stores `no_match` | Save the correct Hardcover provider ID from metadata search, then sync again. |
 | Wrong Hardcover book is used | Replace the saved Hardcover provider ID with the correct result and run manual sync. |
 | Pending count looks wrong | Pending means local data differs from the last sync attempt, not every book that ever failed. |
+| A book syncs when it should not | If **Book sync scope** is set to Selected books only, confirm the book is not individually included. If set to All eligible books, exclude it from the book's settings. |
+| Pull read status preview shows no Ready books | Most books may already have a non-Unread status in BookOrbit (Conflicts) or no Hardcover match (Unmatched). Check the Conflicts and Unmatched tabs for details. |
+| Pull read status imports wrong status | Use **Review matches** before importing to confirm each match. Conflicts are never imported automatically. |
