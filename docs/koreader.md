@@ -2,11 +2,11 @@
 
 KOReader sync starts with a small account in BookOrbit, then becomes a background conversation between the reader and the library. The device reports where you are, what you read, and which highlights changed. BookOrbit matches that back to the book file, updates the book page, and keeps enough state to send newer changes back on the next sync.
 
-Use the BookOrbit KOReader plugin when you want progress, reading sessions, highlights, annotation deletes, ratings, and read status.
+Use the BookOrbit KOReader plugin when you want progress, reading sessions, highlights, annotation deletes, ratings, read status, and catalog browsing directly on the device.
 
 ## The Account
 
-<img src="/images/koreader/settings-status.webp" alt="KOReader Sync status card with enabled progress sync and synced device counts" class="img-lg img-bordered" />
+<img src="/images/koreader/settings-status.webp" alt="KOReader Sync settings page showing progress sync toggle, credentials, sync server URL, plugin download, and paired device" class="img-lg img-bordered" />
 
 The KOReader account is separate from the normal BookOrbit login. A user with `koreader_sync` creates one username and password in **Settings > Integrations > KOReader**. That account belongs to the same BookOrbit user, so every sync request is still scoped to that user's accessible libraries and permissions.
 
@@ -20,9 +20,7 @@ If the BookOrbit user is disabled or loses `koreader_sync`, the KOReader credent
 
 ## Installing The Plugin
 
-<img src="/images/koreader/settings-setup.webp" alt="KOReader Sync setup area with sync server URL, plugin download, and synced device" class="img-lg img-bordered" />
-
-After credentials exist, BookOrbit shows the sync server URL and a **Download Plugin** button. The download is a preconfigured `bookorbit.koplugin.zip`; it includes the BookOrbit origin, username, and KOReader-compatible password key so you do not have to type them on the device.
+After credentials exist, the KOReader Sync page shows the sync server URL and a **Download Plugin** button. The download is a preconfigured `bookorbit.koplugin.zip`; it includes the BookOrbit origin, username, and KOReader-compatible password key so you do not have to type them on the device. The page also shows the latest available plugin version and notes that device-side updates can be applied from within KOReader once the plugin is installed.
 
 Install it like a normal KOReader plugin:
 
@@ -50,20 +48,47 @@ When a book matches, the plugin can send progress, page statistics, book state, 
 For reliable sync, put the BookOrbit-managed copy of the book on the KOReader device. A manually copied file can still match if it produces the same KOReader fingerprint BookOrbit scanned, but a converted, edited, re-zipped, or metadata-rewritten copy will usually have a different identity and will not sync to that BookOrbit book.
 :::
 
-<img src="/images/koreader/koreader-plugin-settings.webp" alt="KOReader BookOrbit plugin panel with auto sync, two-way highlight sync, periodic sync, and manual sync actions" class="img-md img-bordered" />
+<img src="/images/koreader/koreader-plugin-settings.webp" alt="KOReader BookOrbit plugin menu showing Browse library, auto sync, highlight sync, periodic sync, manual sync actions, and plugin version" class="img-md img-bordered" />
 
-The device-side panel is where you control live sync for the open book and start manual syncs.
+The device-side panel controls both sync behavior and catalog access. The top of the menu has account-level actions; the sync options below apply to the currently open book.
 
 | Option | Behavior |
 |--------|----------|
+| **Browse library** | Opens the catalog browser to navigate, search, and download books from your BookOrbit library without leaving KOReader. |
 | **Auto sync this book** | Pulls progress when a book opens. On close or suspend, uploads the open book's progress, highlights, status, rating, and reading time. |
 | **Two-way highlight sync** | Also applies BookOrbit highlight, note, and delete changes back to KOReader. When off, local KOReader highlight changes still upload. |
 | **Periodically sync every # pages** | Pushes progress after the configured number of page turns, once reading has been idle briefly. Set it to `0` to disable page-turn progress pushes. |
 | **Sync behavior** | Sets separate choices for **Sync to a newer state** and **Sync to an older state**: apply silently, prompt first, or never move. |
 | **Sync this book now** | Runs the full open-book sync immediately: progress, reading events, highlights, status, and rating. |
 | **Sync all books now** | Runs a manual device sweep across matched books from KOReader history, statistics, and sidecar files. |
+| **Installed plugin: vX.X.X (Check for update)** | Shows the installed version and checks BookOrbit for a newer plugin package. A tap downloads and applies the update in place. |
 
 Full-library sweeps are manual. They are useful after installing the plugin on a device that already has reading history, but they still only upload files KOReader can fingerprint and BookOrbit can match. If an old sidecar file reports stale progress, BookOrbit records the device state without rolling the shared book progress backward.
+
+## Library Browser
+
+<img src="/images/koreader/catalog-root.webp" alt="KOReader BookOrbit catalog browser showing Continue reading, Recently added, Libraries, Collections, SmartScopes, Authors, Series, All Books, and On device" class="img-md img-bordered" />
+
+**Browse library** opens a native catalog browser connected to your BookOrbit library. It authenticates with the same KOReader credentials and lets you navigate, search, and download books entirely from within KOReader.
+
+The root view lists entry points: Continue reading, Recently added, Libraries, Collections, SmartScopes, Authors, Series, All Books, and On device. Tap any row to open that section. The magnifier in the title bar opens a search box for full-text title and author search across your library.
+
+<img src="/images/koreader/catalog-books.webp" alt="KOReader BookOrbit catalog mosaic grid showing book covers with sort and view options menu open" class="img-md img-bordered" />
+
+Tap the menu icon in the title bar of a book list to open view and sort controls.
+
+| Control | What it does |
+|---------|--------------|
+| **Sort** | Choose from Title, Author, Recently added, Recently updated, Recently read, or Series order. |
+| **Reverse** | Flip the sort direction. |
+| **Read status** | Filter by reading, finished, abandoned, or unread. |
+| **Format** | Filter by file format. |
+| **View: Mosaic / List** | Switch between cover grid and compact list. |
+| **Grid size** | Adjust the number of columns and rows in the mosaic. |
+
+<img src="/images/koreader/catalog-detail.webp" alt="KOReader BookOrbit catalog book detail page showing cover, metadata, and Download button" class="img-md img-bordered" />
+
+Tap a book to open its detail page with the cover, author, series, year, publisher, page count, library, genres, and description. Tap **Download** to save the file to the device. The title-bar menu on the detail page also lets you set the read status without opening a browser. The **On device** category in the root menu lists books already downloaded so you can find local files at a glance.
 
 ## Three-Way Sync
 
@@ -75,9 +100,9 @@ Kobo-side return sync depends on Kobo settings and KEPUB delivery. If Kobo is se
 
 ## What Comes Back To BookOrbit
 
-<img src="/images/koreader/settings-activity.webp" alt="KOReader Plugin Activity section with matched books, reading events, highlights, and pending delete count" class="img-lg img-bordered" />
+<img src="/images/koreader/settings-activity.webp" alt="KOReader Plugin Activity section showing device with up-to-date version badge, matched books, reading events, highlights, and synced totals" class="img-lg img-bordered" />
 
-The settings page becomes useful after the first book sync or full sweep. **Devices** shows the last device progress update and the last book title seen from that device. **Plugin Activity** shows the richer plugin path: matched books, reading events, highlights, trashed highlights, pending deletes, failed positions, and the plugin version that reported the last full sweep.
+The settings page becomes useful after the first book sync or full sweep. **Devices** shows the last device progress update and the last book title seen from that device. **Plugin Activity** shows the richer plugin path: for each device, the plugin version with an up-to-date or update-available badge, the last full sync time, matched books, reading events, and highlights. A **Synced totals** summary below that shows aggregate counts across all devices. A **Setup Guide** section at the bottom walks through pairing steps for new users.
 
 BookOrbit stores several kinds of KOReader state:
 
@@ -105,7 +130,11 @@ KOReader-to-BookOrbit restore is usually the most exact path because it starts w
 
 ## Highlight Sync
 
+<img src="/images/koreader/koreader-highlights.webp" alt="BookOrbit Highlights tab showing KOReader annotations with source badge, Approximate flag, color filter panel, and date range filter" class="img-lg img-bordered" />
+
 Highlight sync is bidirectional with the BookOrbit plugin. Highlights, notes, style changes, and deletes made in KOReader can appear in [BookOrbit annotations](./annotations), and BookOrbit annotation changes can return to KOReader on the next sync.
+
+KOReader annotations appear in the Highlights tab with a **KOReader** source badge. Highlights that BookOrbit could not place at an exact text position are tagged **Approximate** - the text is preserved, but the anchor is best-effort. The Highlights tab lets you filter by color, highlight style, and date range so you can work with large annotation sets from multiple sources.
 
 BookOrbit keeps enough device state to avoid turning edits or moved highlights into duplicates. Deletes are also tracked until the device confirms that it applied them, which is why the settings page can show pending deleted highlights.
 
@@ -113,7 +142,9 @@ Colors and highlight styles are mapped between KOReader and BookOrbit palettes. 
 
 ## Reading Log And Book Pages
 
-KOReader sessions appear in the same reading log as manual and web-reader sessions, with `KOReader` as the source. Progress from KOReader also appears on book details as a KOReader progress source when the user has `koreader_sync`.
+<img src="/images/koreader/koreader-reading-log.webp" alt="BookOrbit Reading Log showing reading sessions with KOReader and Web source badges, progress journey chart, and activity heatmap" class="img-lg img-bordered" />
+
+KOReader sessions appear in the same reading log as manual and web-reader sessions, with `KOReader` as the source. The Reading Log tab shows a **Where you read this book** breakdown bar that splits total reading time across BookOrbit, KOReader, and Kobo sources, so you can see at a glance how much of a book came from the device. Progress from KOReader also appears on book details as a KOReader progress source when the user has `koreader_sync`.
 
 On a book page, BookOrbit keeps the canonical progress source by timestamp. If KOReader has the newest update, the KOReader percentage and chapter are shown. If the web reader is newer, the web-reader progress remains canonical. BookOrbit also records when a file was modified after the last KOReader sync so stale device state can be surfaced.
 
@@ -135,3 +166,6 @@ Deleting credentials removes the KOReader account and disconnects paired devices
 | Highlights do not move both ways | Enable **Two-way highlight sync** in the KOReader BookOrbit sync panel and run another sync for the book. |
 | Deleted highlights remain pending | Sync the KOReader device again so it can acknowledge the delete. Pending deletes are kept until the device reports that it applied them. |
 | Restore lands near the chapter, not the exact line | BookOrbit may only have an approximate translated position for that direction. Open and sync the book once from KOReader to store a native KOReader position. |
+| Catalog browser shows no books | Confirm the device can reach the BookOrbit server and the user can access at least one library. The catalog uses the same KOReader credentials as sync. |
+| Catalog download fails | Check available storage on the KOReader device and confirm the file format is supported. |
+| Plugin update check finds nothing | The check runs against the BookOrbit server the plugin is configured against. Confirm the server is reachable and is running a version that ships the newer plugin. |
