@@ -444,7 +444,7 @@ onUnmounted(() => {
   overflow: hidden;
   background: var(--sh-bg);
   color: var(--sh-text-main);
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   display: flex;
   flex-direction: column;
 }
