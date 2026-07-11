@@ -1,0 +1,27 @@
+---
+import SpaceHome from '../components/SpaceHome.vue'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="description"
+      content="BookOrbit is a self-hosted library and reading platform for ebooks, audiobooks, and comics."
+    />
+    <title>BookOrbit - Your reading space</title>
+  </head>
+  <body>
+    <SpaceHome client:load />
+  </body>
+</html>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    background: #050914;
+  }
+</style>

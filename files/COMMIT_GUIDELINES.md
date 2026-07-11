@@ -1,6 +1,6 @@
 # Commit Message Guidelines
 
-This repository is a **VitePress documentation site** for BookOrbit, not the main application codebase. Commit messages should reflect this repo's structure: docs pages, theme/config, image assets, build tooling, Docker packaging, and CI workflows.
+This repository is an **Astro and Starlight documentation site** for BookOrbit, not the main application codebase. Commit messages should reflect this repo's structure: docs pages, site configuration, components, image assets, build tooling, Docker packaging, and CI workflows.
 
 ## Format
 
@@ -37,13 +37,13 @@ Use one of these types:
 
 | Type       | When to use |
 | ---------- | ----------- |
-| `docs`     | Markdown content changes in `docs/*.md`, copy updates, screenshots tied to docs content |
-| `feat`     | New site behavior in VitePress theme/layout/components/scripts |
+| `docs`     | Markdown content changes in `src/content/docs/*.md`, copy updates, screenshots tied to docs content |
+| `feat`     | New site behavior in Astro pages, components, or scripts |
 | `fix`      | Correct broken behavior (bad links, wrong instructions, rendering bugs, script defects) |
 | `style`    | Visual-only changes (CSS/theme styles, spacing, colors) with no behavior change |
 | `perf`     | Performance improvements (build speed, image processing, runtime rendering) |
 | `refactor` | Internal restructuring with no behavior change |
-| `build`    | Tooling/build/packaging changes (`package.json`, VitePress config, Docker) |
+| `build`    | Tooling/build/packaging changes (`package.json`, Astro config, Docker) |
 | `ci`       | Workflow/automation changes in `.github/workflows/` |
 | `chore`    | General maintenance that does not fit the above |
 | `revert`   | Revert a prior commit |
@@ -56,22 +56,21 @@ Use a scope that matches the area changed. Prefer one dominant scope.
 
 | Scope | What it covers |
 | ----- | -------------- |
-| `docs` | Multi-page or broad content edits across `docs/*.md` |
+| `docs` | Multi-page or broad content edits across `src/content/docs/*.md` |
 | `<page-slug>` | A single docs page using its filename slug (for example `installation`, `book-details`, `oidc`) |
 
 For single-page updates, derive the scope from the filename directly:
 
-- `docs/installation.md` -> `docs(installation): ...`
-- `docs/book-details.md` -> `docs(book-details): ...`
-- `docs/index.md` -> `docs(index): ...`
+- `src/content/docs/installation.md` -> `docs(installation): ...`
+- `src/content/docs/book-details.md` -> `docs(book-details): ...`
 
 ### Platform scopes (repo structure)
 
 | Scope | What it covers |
 | ----- | -------------- |
-| `vitepress` | `docs/.vitepress/config.mts` (nav, sidebar, search, site config) |
-| `theme` | `docs/.vitepress/theme/*` (`.vue`, `.ts`, `.css`) |
-| `images` | `docs/public/images/*` and screenshot asset updates |
+| `starlight` | `astro.config.mjs` (sidebar, search, and site configuration) |
+| `theme` | `src/components/*`, `src/pages/*`, and `src/styles/*` |
+| `images` | `public/images/*` and screenshot asset updates |
 | `scripts` | `scripts/*` (for example `optimize-images.js`) |
 | `docker` | `Dockerfile`, `docker/nginx.conf` |
 | `ci` | `.github/workflows/*` |
@@ -84,9 +83,9 @@ If a commit spans many docs pages, use `docs` or the most impacted page scope.
 ## Project-Specific Rules
 
 - Keep one logical change per commit.
-- For screenshot updates, commit optimized outputs in `docs/public/images/*`.
-- Do not commit `docs/public/images/_originals/` (it is intentionally ignored).
-- If renaming a docs page file, update VitePress sidebar/nav links in the same commit.
+- For screenshot updates, commit optimized outputs in `public/images/*`.
+- Do not commit `public/images/_originals/` (it is intentionally ignored).
+- If renaming a docs page file, update Starlight sidebar links in the same commit.
 - Use `revert` for rollbacks; include the reverted SHA in the body.
 
 ## Body
@@ -135,10 +134,10 @@ docs(installation): clarify ghcr login step for vps deploy
 docs(creating-a-library): add scanner schedule screenshot and guidance
 ```
 
-### VitePress config and theme
+### Starlight config and theme
 
 ```text
-fix(vitepress): correct sidebar link for book details page
+fix(starlight): correct sidebar link for book details page
 ```
 
 ```text
@@ -170,7 +169,7 @@ ci(docker): publish branch and tag images to ghcr
 ```
 
 ```text
-chore(deps): bump @nolebase plugin to latest patch
+chore(deps): bump Starlight to latest patch
 ```
 
 ### Revert

@@ -6,13 +6,15 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY docs ./docs
+COPY astro.config.mjs ./
+COPY public ./public
+COPY src ./src
 COPY scripts ./scripts
-RUN npm run docs:build
+RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.27-alpine
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/docs/.vitepress/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 8080
 
