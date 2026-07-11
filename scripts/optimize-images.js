@@ -5,8 +5,8 @@ import { readdir, stat, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 
-const ORIGINALS_DIR = 'docs/public/images/_originals'
-const OUTPUT_DIR = 'docs/public/images'
+const ORIGINALS_DIR = 'public/images/_originals'
+const OUTPUT_DIR = 'public/images'
 const MAX_WIDTH = 1200
 const QUALITY = 85
 const FORCE = process.argv.includes('--force')

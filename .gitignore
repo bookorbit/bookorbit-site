@@ -36,12 +36,11 @@ dist/
 build/
 .cache/
 
-# VitePress
-docs/.vitepress/cache/
-docs/.vitepress/dist/
+# Astro
+.astro/
 
 # Images - originals are not committed, only optimized outputs
-docs/public/images/_originals/
+public/images/_originals/
 
 # Editors/IDEs
 .vscode/
