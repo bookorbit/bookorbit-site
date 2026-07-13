@@ -77,7 +77,11 @@ export default defineConfig({
         },
         {
           label: 'Admin & Security',
-          items: [{ label: 'OIDC / SSO', slug: 'oidc' }],
+          items: [
+            { label: 'Users & Permissions', slug: 'users' },
+            { label: 'Account Activity', slug: 'account-activity' },
+            { label: 'OIDC / SSO', slug: 'oidc' },
+          ],
         },
       ],
     }),
