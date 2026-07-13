@@ -2,242 +2,135 @@
 title: "Creating a Library"
 ---
 
+A library is the bridge between the folders that hold your files and the books you see in BookOrbit. You tell BookOrbit where to look, how to group the files it finds, and how much automation you want. It takes care of the scan from there.
 
-A library tells BookOrbit where your book files live and how that folder tree should be interpreted. Each library has its own folders, scanner rules, format priority, metadata import preferences, file-write settings, reading thresholds, and automation settings.
+The seven-step wizard is deliberately front-loaded with the two decisions that matter most: a name and at least one folder. The remaining steps let you shape the result for ebooks, comics, audiobooks, or a mixed collection.
 
-Create separate libraries when collections need different rules. For example, an ebook library usually uses portrait covers and ebook formats first, while an audiobook library usually uses square covers and audio formats first.
+## Before You Start
+
+Library creation requires the `manage_libraries` permission. Users without it can still use libraries they can access, but they will not see the creation controls.
+
+Most importantly, choose the folder from BookOrbit's point of view. Paths are resolved on the BookOrbit server, not on the computer running your browser. In Docker, use the mounted path inside the container, such as `/books/audiobooks`, rather than the Finder or Explorer path on the host.
 
 :::tip
-Folder paths are resolved on the BookOrbit server, not on the computer running your browser. In Docker, use the path inside the container, such as `/books/audiobooks`, not the host path from Finder or Explorer.
+Create separate libraries when groups of books need different rules. An ebook library might prefer portrait covers and EPUBs, while an audiobook library can use square covers and place audio formats first.
 :::
 
-## Who can create libraries
+## Open The Wizard
 
-Library creation requires the `manage_libraries` permission. Users without that permission can use libraries they have access to, but they will not see the create controls.
+You can begin wherever you happen to be working. Each route opens the same seven-step wizard.
 
-## Ways to create a library
+On a new installation, select **Create your first library** on the dashboard.
 
-The same creation wizard is available from three places.
+<img src="/images/getting-started/dashboard-empty-state.webp" alt="Dashboard empty state prompting the user to create their first library" class="img-md img-bordered" />
 
-### 1. Dashboard empty state
+From anywhere in the app, open the `...` menu beside **Libraries** in the sidebar and select **New Library**.
 
-On a fresh instance, the dashboard shows a **Create your first library** button after the admin account is created.
+<img src="/images/getting-started/sidebar-new-library-menu.webp" alt="Libraries sidebar menu with New Library and Reorder options" class="img-xs img-bordered" />
 
-<img src="/images/getting-started/dashboard-empty-state.webp" alt="Dashboard empty state showing Create your first library" class="img-md img-bordered" />
+Or open **Settings > Libraries** and select **Add Library**. On an empty instance, the page also offers **Add your first library**.
 
-### 2. Sidebar
+<img src="/images/getting-started/settings-libraries-empty.webp" alt="Settings Libraries page showing an empty state and Add your first library button" class="img-lg img-bordered" />
 
-Open the `...` menu beside **Libraries** in the sidebar and choose **New Library**.
+## Walk Through The Setup
 
-<img src="/images/getting-started/sidebar-new-library-menu.webp" alt="Sidebar Libraries menu showing New Library" class="img-xs img-bordered" />
+### 1. Give The Library A Name
 
-### 3. Settings > Libraries
+<img src="/images/getting-started/create-library-details-step.webp" alt="Create a library Details step with name, icon picker, and cover appearance settings" class="img-lg img-bordered" />
 
-Open **Settings > Libraries** and click **Add Library**. On an empty instance, the empty state button reads **Add your first library**.
+Start with a name that will still make sense in the sidebar a year from now: `Ebooks`, `Audiobooks`, `Comics`, or `Kids Books` are all good examples. The name must be unique. Pick an icon at the same time, because BookOrbit uses it anywhere the library is represented.
 
-<img src="/images/getting-started/settings-libraries-empty.webp" alt="Settings Libraries empty state" class="img-lg img-bordered" />
+Choose **Portrait** covers for ebooks and most mixed libraries. Choose **Square** for audiobook-only libraries with square artwork. You cannot continue until the library has both a name and an icon.
 
-All three paths open the same seven-step wizard.
+### 2. Show BookOrbit Where The Books Live
 
-## Step 1: Details
+<img src="/images/getting-started/create-library-folders-step.webp" alt="Create a library Folders step showing selected folders, manual path entry, and folder checks" class="img-lg img-bordered" />
 
-<img src="/images/getting-started/create-library-details-step.webp" alt="Create Library details step" class="img-lg img-bordered" />
+Add one or more server-accessible folders. Use **Add folders** to browse the server filesystem, or expand **Enter a path manually** and enter a path such as `/books/audiobooks`. All folders in the library share the scanner rules you choose next.
 
-Use this step to set how the library appears in navigation and book lists.
-
-| Field | How to choose |
-|-------|---------------|
-| **Library name** | Required and must be unique. Use a name that matches the collection, such as `Ebooks`, `Audiobooks`, `Comics`, or `Kids Books`. |
-| **Cover style** | Choose **Portrait** for ebooks and mixed libraries. Choose **Square** for audiobook-only libraries where covers are usually square. |
-| **Icon** | Required. Search the icon grid and pick an icon that makes the library easy to identify in the sidebar and settings pages. |
-
-The **Next** button stays disabled until both a name and icon are selected.
-
-## Step 2: Folders
-
-<img src="/images/getting-started/create-library-folders-step.webp" alt="Create Library folders step" class="img-lg img-bordered" />
-
-Add one or more server-accessible directories for BookOrbit to scan. A library can include multiple folders, and all of them use the same scan rules from later steps.
-
-The **Next** button stays disabled until at least one folder is added.
-
-### Adding folders
-
-| Control | What it does |
-|---------|--------------|
-| **Browse and add a folder** | Opens a server-side folder picker. Navigate the filesystem BookOrbit can see and select the current folder. |
-| **Manual path** | Lets you type a path directly, such as `/books/audiobooks`. |
-| **Test** | Checks whether the typed path is accessible on the server. |
-| **Add** | Adds the typed path to the library's folder list. |
-| **Prescan** | Validates all added folders and counts supported book files before the library is created. |
-
-### Prescan results
-
-Prescan is worth running before you save the library because it catches the common setup problems early:
-
-- **Accessibility**: Shows whether BookOrbit can read the folder.
-- **File count**: Counts supported content files under the folder.
-- **Overlap warning**: Warns when the folder overlaps with a folder already assigned to another library.
+Run **Check folders** before creating the library. The prescan reports whether BookOrbit can access each folder, the number of matching files, and whether the folder overlaps a folder already used by another library.
 
 :::tip
-Prescan reports files, not final book records. A folder containing `Book.epub` and `Book.pdf` may show two files but become one book when **Folder as Book** is used.
+The prescan counts files, not final book records. For example, `Book.epub` and `Book.pdf` can count as two files but become one book when you use **Folder as Book**.
 :::
 
 :::caution
-Avoid overlapping library folders unless you deliberately want the same physical files to be visible in more than one library. Overlap can make scans and missing-file states harder to reason about.
+Avoid overlapping folders unless you intentionally want the same physical files in more than one library. Overlap makes scans and missing-file states harder to interpret.
 :::
 
-## Step 3: Scanner
+### 3. Decide What A Book Looks Like On Disk
 
-<img src="/images/getting-started/create-library-scanner-step.webp" alt="Create Library scanner step" class="img-lg img-bordered" />
+<img src="/images/getting-started/create-library-scanner-step.webp" alt="Create a library Scanning step showing scan mode, allowed formats, and exclude patterns" class="img-lg img-bordered" />
 
-The scanner step decides what becomes a book and which file formats are allowed into the library.
+This is where a folder of files becomes a library of books. **Folder as Book** is the default and usually the right choice: files in one book folder stay together, including alternate formats, sidecar metadata, covers, and audiobook tracks. Root-level book files still become individual books.
 
-### Scan mode
+Choose **File as Book** only for a flat folder where each supported file is a separate title. It does not associate sidecars or folder-level extras with a book. For audiobooks, use **Folder as Book** so multi-file titles stay together; BookOrbit also handles common disc-folder names such as `CD 1` and `Disc 2`.
 
-| Mode | What BookOrbit creates | Best for |
-|------|------------------------|----------|
-| **Folder as Book** | Groups the files in a book folder into one book. Multiple formats, sidecar metadata files, covers, and audiobook tracks in the same folder stay together. Root-level book files still become individual books. | Most libraries, especially audiobooks, comics, and collections with more than one format per title. |
-| **File as Book** | Treats each supported content file as its own book. Sidecar files and folder-level extras are not associated because there is no reliable book folder to attach them to. | Flat ebook folders where every file is a separate title. |
+Leave **Allowed formats** empty to accept every supported format. Selecting one or more formats turns the list into a filter.
 
-For audiobooks, use **Folder as Book**. The scanner keeps multi-file audiobooks together, flattens common disc folders such as `CD 1` or `Disc 2`, and sorts audio files naturally by filename.
-
-### Allowed formats
-
-Leaving **Allowed formats** empty means every supported content format is allowed. Selecting formats turns the list into a filter, so only selected content formats are imported.
-
-| Type | Supported formats |
-|------|-------------------|
+| Type | Formats |
+|------|---------|
 | Ebooks | EPUB, KEPUB, PDF, MOBI, AZW3, AZW, FB2 |
 | Comics | CBZ, CBR, CB7 |
 | Audiobooks | M4B, MP3, M4A, OPUS, OGG, FLAC |
 
-Use format filtering when a folder contains files you do not want in this library. For example, an audiobook library can allow only `M4B`, `MP3`, `M4A`, `OPUS`, `OGG`, and `FLAC`.
+If you later restrict formats, books whose files are no longer allowed can be marked missing on the next scan. Use **Exclude patterns** for paths you never want the scanner to consider. Literal names and simple `*` wildcards are the safest choices: `samples`, `node_modules`, `*.tmp`, and `*_sample.*` are typical examples. Files and folders whose names begin with `.` are skipped automatically.
 
-:::caution
-If you restrict formats after books already exist, files in now-excluded formats can be marked missing on the next scan.
-:::
+### 4. Choose Which File Wins
 
-### Exclude patterns
+<img src="/images/getting-started/create-library-metadata-step.webp" alt="Create a library Metadata step showing source precedence and format priority" class="img-lg img-bordered" />
 
-Exclude patterns skip files or folders while the scanner walks the library tree. Patterns are matched against each file or folder name, so literal names and simple `*` wildcards are the safest choices.
+When more than one file can describe the same book, this step establishes a predictable order. Put the metadata source you trust most at the top: **Embedded metadata** reads the book file itself, while **OPF files** uses a separate `.opf` file kept beside the book.
 
-Useful examples:
-
-- `samples`: Skips folders or files named `samples`.
-- `node_modules`: Skips folders named `node_modules` if a non-book directory is mounted by mistake.
-- `*.tmp`: Skips temporary files ending in `.tmp`.
-- `*_sample.*`: Skips sample files that follow a consistent naming pattern.
-
-Hidden files and folders whose names start with `.` are skipped automatically.
-
-## Step 4: Metadata
-
-<img src="/images/getting-started/create-library-metadata-step.webp" alt="Create Library metadata step" class="img-lg img-bordered" />
-
-This step controls which local metadata source is trusted first and which file format becomes the book's primary file when multiple formats are present.
-
-### Source precedence
-
-Drag sources so the one you trust most is first.
-
-| Source | What it means |
-|--------|---------------|
-| **Embedded metadata** | Metadata stored inside the book file, such as EPUB OPF data, PDF info fields, comic metadata, or audio tags. |
-| **OPF files** | Separate `.opf` files kept next to the book files. Use this first if your collection maintains curated sidecar OPF metadata. |
-
-### Format priority
-
-BookOrbit registers all allowed content files for a book, then picks the primary file by walking the format priority list from top to bottom. The primary file is the preferred file for reading, downloads, and normal embedded metadata extraction during import.
-
-The default format order for a new library is:
+The format list answers a different question: which file is primary? BookOrbit registers every allowed file, then selects the first available format in the priority list for normal reading, downloads, and embedded-metadata import. New libraries start with this order:
 
 `EPUB`, `KEPUB`, `PDF`, `CBZ`, `CBR`, `CB7`, `MOBI`, `AZW3`, `AZW`, `FB2`, `M4B`, `MP3`, `M4A`, `OPUS`, `OGG`, `FLAC`
 
-For an audiobook library, move audio formats such as `M4B`, `M4A`, and `MP3` above ebook and comic formats. For an ebook library, the default order is usually a good starting point.
+For audiobooks, move `M4B`, `M4A`, or `MP3` toward the top. Format priority does not exclude anything; return to **Scanning** and use **Allowed formats** when you want a format excluded entirely.
 
-:::tip
-Format priority does not filter files. Use **Allowed formats** on the Scanner step when you want to exclude formats from the library entirely.
-:::
+### 5. Set The Reading Milestones
 
-## Step 5: File Write
+<img src="/images/getting-started/create-library-reading-step.webp" alt="Create a library Reading step with reading-start and finished thresholds" class="img-lg img-bordered" />
 
-<img src="/images/getting-started/create-library-file-write-step.webp" alt="Create Library file write step" class="img-lg img-bordered" />
+BookOrbit uses progress to move a book through your reading states. The defaults are intentionally forgiving: a book becomes **Reading** at 0.25%, and becomes **Finished** at 98%. The finish threshold avoids treating appendices, indexes, credits, or trailing blank pages as required reading.
 
-File Write controls whether BookOrbit is allowed to write metadata changes back into the physical files on disk. It is disabled by default for new libraries.
+| Setting | Range | Default |
+|---------|-------|---------|
+| **Reading start** | 0.05% to 5% | 0.25% |
+| **Mark as finished** | 90% to 100%, whole numbers | 98% |
 
-Enable it only when you want BookOrbit changes, such as title, author, series, publisher, description, genres, tags, rating, or cover changes, to be embedded into supported files.
+### 6. Decide How The Library Stays Current
 
-| Option | Default | Effect |
-|--------|---------|--------|
-| **Write metadata to files** | Off | Master toggle. When off, BookOrbit keeps metadata changes in its database only. |
-| **Include cover image** | On | Allows cover artwork to be written for formats that support it. |
-| **EPUB** | On, 100 MB max | Writes metadata into the OPF inside the EPUB archive. |
-| **PDF** | On, 100 MB max | Writes PDF info and XMP metadata. |
-| **Comic archives (CBX)** | Off, 500 MB max | Writes `ComicInfo.xml` into CBZ and CB7 archives. CBR is imported but is not written by this option. |
+<img src="/images/getting-started/create-library-schedule-step.webp" alt="Create a library Automation step with folder watching and scan schedule options" class="img-lg img-bordered" />
 
-The size limit prevents large files from being rewritten accidentally. Each limit can be set from 1 MB to 10,000 MB.
+Turn on **Watch folders** when the storage backing the library provides reliable filesystem events. BookOrbit then schedules targeted scan work as files are added, changed, moved, or removed. For a network mount that does not report events reliably, leave watching off and use a manual or scheduled scan instead.
 
-:::caution
-File Write changes files on disk. Keep backups before enabling it for a library you care about preserving exactly as imported.
-:::
+Choose a schedule if you want a regular safety net. The built-in choices are hourly, every 6 or 12 hours, daily, weekly, or a custom five-field cron expression. For example, `*/30 * * * *` runs every 30 minutes. **Never** stores no schedule.
 
-After the library exists, **Settings > Libraries** also provides **Sync metadata to files** for a full-library write pass. That action is disabled unless File Write is enabled for the library.
+### 7. Decide Whether BookOrbit May Change Files
 
-## Step 6: Reading
+<img src="/images/getting-started/create-library-file-write-step.webp" alt="Create a library File updates step with file renaming and metadata-writing options" class="img-lg img-bordered" />
 
-<img src="/images/getting-started/create-library-reading-step.webp" alt="Create Library reading step" class="img-lg img-bordered" />
+The final step is optional and is off by default. Leave it that way if you want BookOrbit to keep its metadata changes in the database only. Enable it when BookOrbit should write changes such as titles, authors, series, descriptions, tags, ratings, or covers back to the files themselves.
 
-Reading thresholds decide how progress is classified.
+| Option | Default | What it changes |
+|--------|---------|-----------------|
+| **Rename files after metadata changes** | Off | Renames physical files when relevant metadata changes, using the library naming pattern. |
+| **Write metadata to files** | Off | Enables writing metadata to supported files. |
+| **Include cover image** | On | Includes the stored cover when the target format supports it. |
+| **EPUB** | On, 100 MB | Writes metadata into the OPF inside the EPUB archive. |
+| **PDF** | On, 100 MB | Writes PDF Info and XMP metadata. |
+| **Comic archives (CBX)** | Off, 500 MB | Writes `ComicInfo.xml` into CBZ and CB7 archives. CBR is imported but not written by this option. |
+| **Audio** | On, 500 MB | Embeds the stored cover into M4B, M4A, MP3, and FLAC files. |
 
-| Setting | Default | Allowed range | Behavior |
-|---------|---------|---------------|----------|
-| **Reading start threshold** | 0.25% | 0.05% to 5% | Progress at or above this value changes a book from unstarted to reading. |
-| **Mark as finished** | 98% | 90% to 100% | Progress at or above this value marks the book as finished. |
+Each file-size limit can be set from 1 MB to 10,000 MB. Keep backups before enabling file updates for a collection you want to preserve exactly as imported.
 
-The 98% finish default avoids forcing users to read through appendices, indexes, credits, or trailing blank pages before a book counts as complete.
+## Create It, Then Let It Scan
 
-## Step 7: Schedule
+Once **Details** and **Folders** are complete, **Create now** is available from the later wizard steps if you are happy with the defaults. Otherwise, finish the walkthrough and select **Create library** on the final step.
 
-<img src="/images/getting-started/create-library-schedule-step.webp" alt="Create Library schedule step" class="img-lg img-bordered" />
+BookOrbit saves the library, adds its folders, starts a watcher when **Watch folders** is on, and immediately begins the first scan. The initial scan may take seconds or minutes, depending on the number of files and the storage speed.
 
-Schedule settings control scan automation for the library.
+<img src="/images/getting-started/settings-libraries-list.webp" alt="Settings Libraries page with libraries, scan controls, watch status, and schedules" class="img-lg img-bordered" />
 
-### File watching
-
-**Watch folders** starts a filesystem watcher for the library folders. When files are added, changed, moved, or removed, BookOrbit schedules targeted scan work instead of waiting for you to run a full manual scan.
-
-Use watching when your storage supports filesystem events reliably. If your library is on a network mount that does not emit stable events, leave watching off and use manual scans or an auto-scan schedule.
-
-### Auto-scan schedule
-
-Choose the library's auto-scan cadence. Presets are saved as standard five-field cron expressions.
-
-| Option | Stored cron expression |
-|--------|------------------------|
-| **Never** | No cron expression |
-| **Every hour** | `0 * * * *` |
-| **Every 6 hours** | `0 */6 * * *` |
-| **Every 12 hours** | `0 */12 * * *` |
-| **Daily** | `0 0 * * *` |
-| **Weekly** | `0 0 * * 1` |
-| **Custom** | A custom five-field cron expression |
-
-Custom cron uses the format `minute hour day month weekday`. For example, `*/30 * * * *` means every 30 minutes.
-
-## After creation
-
-Click **Create library** on the Schedule step. BookOrbit saves the library, adds the folders, starts a watcher if **Watch folders** is enabled, redirects you to the new library, and immediately starts the initial scan.
-
-The first scan can take seconds or minutes depending on the number of files and the storage speed. Progress appears in **Settings > Libraries**, and books appear as the scanner imports them.
-
-<img src="/images/getting-started/settings-libraries-list.webp" alt="Settings Libraries page with multiple libraries and scan controls" class="img-lg img-bordered" />
-
-The Libraries settings page becomes the main control panel after creation:
-
-- **Scan All** starts scans for every library.
-- **Scan** starts a scan for one library.
-- **Watching** shows that folder watching is enabled for that library.
-- The `...` menu opens library actions such as edit, refresh covers, sync metadata to files, and delete.
-
-You can edit the same settings later from **Settings > Libraries > Edit library**. The edit flow also includes **Access**, which is not shown during creation because user access is only meaningful after the library exists.
+Afterward, **Settings > Libraries** is the library's control room. Use **Scan All** to scan every library, **Scan** to scan one, and the `...` menu to edit the library, refresh covers, sync metadata to files, or delete it. The edit flow also adds an **Access** section, because access rules only become meaningful after the library exists.

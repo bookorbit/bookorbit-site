@@ -163,6 +163,20 @@ body {
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
+/* Match the home-page brand lockup: 32px mark, 17px wordmark, and 9px gap. */
+.header .site-title {
+  gap: 9px;
+  font-size: 17px;
+  font-weight: 640;
+  letter-spacing: -0.015em;
+}
+
+.header .site-title img {
+  width: 32px;
+  height: 32px;
+  max-width: none;
+}
+
 h1#_top,
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6):not(:where(.not-content *)) {
   letter-spacing: -0.022em;
