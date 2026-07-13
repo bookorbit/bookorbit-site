@@ -512,9 +512,14 @@ onUnmounted(() => {
   gap: 9px;
   text-decoration: none;
   color: var(--sh-text-main);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 640;
   letter-spacing: -0.015em;
+}
+
+.sh-brand svg {
+  width: 32px;
+  height: 32px;
 }
 .sh-nav {
   display: flex;
