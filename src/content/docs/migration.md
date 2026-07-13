@@ -1,5 +1,6 @@
 ---
 title: "Migration"
+description: "Import matched metadata, covers, and user data from another library application."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "OIDC / SSO"
+description: "Connect one or more OpenID Connect providers and control automatic user provisioning."
 ---
 
 

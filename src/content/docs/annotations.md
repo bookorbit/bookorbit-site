@@ -1,5 +1,6 @@
 ---
 title: "Annotations & Highlights"
+description: "Review, search, edit, export, and sync highlights and notes from BookOrbit and connected readers."
 ---
 
 

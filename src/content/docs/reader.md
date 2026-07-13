@@ -1,5 +1,6 @@
 ---
 title: "Reader"
+description: "Set personal defaults for BookOrbit ebook, PDF, comic, and audiobook readers."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "Book Details, Editing, and Viewer"
+description: "Inspect book details, edit metadata and covers, manage files, and open the built-in viewer."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "Creating a Library"
+description: "Connect book folders, choose scanning behavior, and create your first BookOrbit library."
 ---
 
 A library is the bridge between the folders that hold your files and the books you see in BookOrbit. You tell BookOrbit where to look, how to group the files it finds, and how much automation you want. It takes care of the scan from there.

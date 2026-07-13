@@ -6,6 +6,7 @@ import starlightImageZoom from 'starlight-image-zoom'
 import starlightLinksValidator from 'starlight-links-validator'
 
 export default defineConfig({
+  site: 'https://bookorbit.app',
   markdown: {
     processor: unified(),
   },
@@ -13,7 +14,12 @@ export default defineConfig({
     vue(),
     starlight({
       title: 'BookOrbit',
-      description: 'Self-hostable book and library management with Kobo support.',
+      description: 'Documentation for the self-hosted library and reading platform.',
+      favicon: '/favicon.svg',
+      editLink: {
+        baseUrl: 'https://github.com/bookorbit/bookorbit-site/edit/main/',
+      },
+      lastUpdated: true,
       plugins: [starlightLinksValidator(), starlightImageZoom()],
       logo: {
         src: './src/assets/bookorbit-mark.svg',
@@ -23,7 +29,7 @@ export default defineConfig({
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/neonsolstice/bookorbit',
+          href: 'https://github.com/bookorbit/bookorbit',
         },
       ],
       sidebar: [
@@ -33,15 +39,13 @@ export default defineConfig({
             { label: 'What is BookOrbit?', slug: 'what-is-bookorbit' },
             { label: 'Installation', slug: 'installation' },
             { label: 'Creating a Library', slug: 'creating-a-library' },
-            { label: 'Users & Permissions', slug: 'users' },
-            { label: 'Dashboard', slug: 'dashboard' },
+            { label: 'Adding Books', slug: 'adding-books' },
           ],
         },
         {
           label: 'Building Your Library',
           items: [
             { label: 'Library File Structure', slug: 'library-file-structure' },
-            { label: 'Adding Books', slug: 'adding-books' },
             { label: 'Book Dock', slug: 'book-dock' },
             { label: 'Migration', slug: 'migration' },
           ],
@@ -49,6 +53,7 @@ export default defineConfig({
         {
           label: 'Browsing & Reading',
           items: [
+            { label: 'Dashboard', slug: 'dashboard' },
             { label: 'Book Details & Viewer', slug: 'book-details' },
             { label: 'Table View', slug: 'table-view' },
             { label: 'Reader', slug: 'reader' },

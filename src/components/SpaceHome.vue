@@ -38,6 +38,7 @@ onMounted(() => {
   const el = starCanvas.value
   if (!el) return
   const ctx = el.getContext('2d')!
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const stars: Star[] = []
   const shootingStars: ShootingStar[] = []
   let nextShootingStarAt = 0
@@ -244,15 +245,26 @@ onMounted(() => {
       ctx.restore()
     }
 
-    frameId = requestAnimationFrame(render)
+    if (!reducedMotion) {
+      frameId = requestAnimationFrame(render)
+    }
   }
 
-  seedStars()
-  frameId = requestAnimationFrame(render)
-  window.addEventListener('resize', seedStars)
+  const handleResize = () => {
+    seedStars()
+    if (reducedMotion) {
+      render(performance.now())
+    }
+  }
+
+  handleResize()
+  if (!reducedMotion) {
+    frameId = requestAnimationFrame(render)
+  }
+  window.addEventListener('resize', handleResize)
   cleanupFn = () => {
     cancelAnimationFrame(frameId)
-    window.removeEventListener('resize', seedStars)
+    window.removeEventListener('resize', handleResize)
   }
 })
 
@@ -265,7 +277,7 @@ onUnmounted(() => {
 
 <template>
   <div class="sh">
-    <canvas ref="starCanvas" class="sh-bg" />
+    <canvas ref="starCanvas" class="sh-bg" aria-hidden="true" />
     <div class="sh-nb sh-nb-1" />
     <div class="sh-nb sh-nb-2" />
     <div class="sh-nb sh-nb-3" />
@@ -330,7 +342,7 @@ onUnmounted(() => {
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
               <span class="sh-feat-name">Self-hosted</span>
-              <span class="sh-feat-detail">One Docker container, local files, no subscription or third-party account.</span>
+              <span class="sh-feat-detail">Simple Docker Compose deployment, local files, and no subscription.</span>
             </div>
           </div>
           <div class="sh-feat sh-feat-priority">
@@ -358,7 +370,7 @@ onUnmounted(() => {
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
               <span class="sh-feat-name">Kobo + KOReader sync</span>
-              <span class="sh-feat-detail">Send books to kobo and koreader with two-way progress sync</span>
+              <span class="sh-feat-detail">Send books to Kobo and KOReader with two-way progress sync.</span>
             </div>
           </div>
           <div class="sh-feat">
@@ -378,7 +390,7 @@ onUnmounted(() => {
           <div class="sh-feat">
             <span class="sh-feat-dot" />
             <div class="sh-feat-body">
-              <span class="sh-feat-name">Reading analytics + Widgets</span>
+              <span class="sh-feat-name">Reading analytics + widgets</span>
               <span class="sh-feat-detail">Rich, beautiful charts and widgets for exploring library insights and reading habits.</span>
             </div>
           </div>
@@ -569,7 +581,7 @@ onUnmounted(() => {
   flex-direction: column;
   position: relative;
   z-index: 2;
-  padding-right: 24 px;
+  padding-right: 24px;
 }
 .sh-eyebrow {
   font-size: 11px;
@@ -810,6 +822,17 @@ onUnmounted(() => {
   .sh-nav-gh {
     padding: 5px 8px;
     font-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-btn-alt {
+    animation: none;
+  }
+
+  .sh-nav-link,
+  .sh-btn {
+    transition: none;
   }
 }
 </style>

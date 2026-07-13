@@ -1,5 +1,6 @@
 ---
 title: "Kobo Sync"
+description: "Pair a Kobo, sync books and reading progress, and manage device-specific preferences."
 ---
 
 

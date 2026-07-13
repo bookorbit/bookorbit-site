@@ -1,7 +1,11 @@
 {
   "name": "bookorbit-site",
+  "description": "Documentation and product site for BookOrbit",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "astro dev --port 5174",
     "build": "astro build",

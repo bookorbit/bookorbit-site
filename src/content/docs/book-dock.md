@@ -1,5 +1,6 @@
 ---
 title: "Book Dock"
+description: "Stage incoming books, review extracted metadata, and finalize files into a library."
 ---
 
 
@@ -47,7 +48,7 @@ Browser uploads are limited to **500 MB per file**. Larger files should be copie
 
 | Type | Formats |
 |------|---------|
-| Ebooks | EPUB, KEPUB, PDF, MOBI, AZW, AZW3, FB2 |
+| Ebooks | EPUB, KEPUB, PDF, MOBI, AZW3, FB2 |
 | Comics | CBZ, CBR, CB7 |
 | Audiobooks | M4B, MP3, M4A, OPUS, OGG, FLAC |
 

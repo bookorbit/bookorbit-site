@@ -1,5 +1,6 @@
 ---
 title: "Library File Structure"
+description: "Organize ebooks, audiobooks, comics, and sidecar files so BookOrbit imports them correctly."
 ---
 
 

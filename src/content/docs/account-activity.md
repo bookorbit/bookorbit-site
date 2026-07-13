@@ -1,5 +1,6 @@
 ---
 title: "Account Activity"
+description: "Review account health, authentication activity, and privacy-aware reading insight sharing."
 ---
 
 Account Activity answers the practical questions an administrator has when keeping an instance healthy: *Has this account ever signed in? Is a former member still active? Is the new SSO connection working?* It deliberately does **not** turn BookOrbit into a reading-surveillance dashboard. By default, you can see account and authentication signals, not what somebody is reading.

@@ -1,5 +1,6 @@
 ---
 title: "Smart Scopes"
+description: "Build saved rule-based filters that update automatically as your library changes."
 ---
 
 

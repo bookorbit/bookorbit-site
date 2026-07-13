@@ -1,5 +1,6 @@
 ---
 title: "What is BookOrbit?"
+description: "Learn how BookOrbit manages self-hosted libraries, readers, users, metadata, and integrations."
 ---
 
 

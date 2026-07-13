@@ -1,5 +1,6 @@
 ---
 title: "Display"
+description: "Customize BookOrbit themes, covers, layouts, card details, and interaction behavior."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "OPDS"
+description: "Connect compatible reader apps to BookOrbit through a private OPDS catalog."
 ---
 
 
