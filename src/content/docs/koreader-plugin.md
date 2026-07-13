@@ -1,5 +1,6 @@
 ---
 title: "KOReader Plugin"
+description: "Install the BookOrbit KOReader plugin to browse, download, and sync books from a device."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "Table View"
+description: "Sort, filter, edit, select, and export library metadata in a configurable table."
 ---
 
 

@@ -1,5 +1,6 @@
 ---
 title: "Hardcover Sync"
+description: "Connect Hardcover to sync reading status, dates, progress, ratings, and privacy."
 ---
 
 

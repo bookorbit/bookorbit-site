@@ -1,5 +1,6 @@
 ---
 title: "Email"
+description: "Configure SMTP providers, recipients, templates, and book delivery by email."
 ---
 
 

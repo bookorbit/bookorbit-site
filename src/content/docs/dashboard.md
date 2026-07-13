@@ -1,5 +1,6 @@
 ---
 title: "Dashboard"
+description: "Customize personal reading widgets, shelves, goals, streaks, and library insights."
 ---
 
 

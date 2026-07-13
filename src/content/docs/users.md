@@ -1,5 +1,6 @@
 ---
 title: "Users & Permissions"
+description: "Manage accounts, library access, permissions, restrictions, and secure shared-device links."
 ---
 
 BookOrbit can be a private library for one person, a carefully shared family shelf, or a service for an entire group. The Admin workspace is where those very different arrangements stay understandable: give a person their own account, give a shared device a deliberately limited account, and decide exactly which libraries and actions each account gets.

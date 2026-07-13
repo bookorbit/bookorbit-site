@@ -1,9 +1,9 @@
 ---
 title: "Installation"
+description: "Install BookOrbit with Docker Compose, configure storage and permissions, and keep it updated."
 ---
 
-
-BookOrbit runs in Docker. The only local dependency is Docker itself. A standard Compose file gets you running in under five minutes.
+BookOrbit runs in Docker. The only host dependency is Docker itself. The bundled Compose stack starts BookOrbit and PostgreSQL with persistent storage on your server.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Any modern browser works - Chrome, Firefox, Safari, Edge.
 
 ### Create the install folder
 
-Pick a location on your server for BookOrbit to live. Everything: config, database, and app data, stays inside this folder.
+Pick a location on your server for BookOrbit to live. The Compose file and default persistent data paths stay inside this folder. You can point `BOOKS_HOST_PATH` elsewhere if your library already exists in another location.
 
 ```bash
 mkdir bookorbit && cd bookorbit
@@ -133,7 +133,7 @@ If you already have a PostgreSQL server running (like on a NAS or a managed serv
 ### 1. Requirements
 
 - **PostgreSQL 16 or newer**
-- **Three extensions** installed on your database: `uuid-ossp`, `pg_trgm`, and `vector` (pgvector)
+- **Four extensions** installed on your database: `uuid-ossp`, `pg_trgm`, `unaccent`, and `vector` (pgvector)
 - A dedicated database and user for BookOrbit
 
 ### 2. Update your environment file
@@ -164,13 +164,13 @@ docker compose up -d
 
 ### Environment variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `APP_IMAGE` | Yes | - | Docker image to run |
+| Variable | Required | Template/default | Description |
+|----------|----------|------------------|-------------|
+| `APP_IMAGE` | Yes | `ghcr.io/bookorbit/bookorbit:latest` | Docker image to run |
 | `APP_URL` | Yes | - | Full URL where BookOrbit is accessible |
-| `POSTGRES_USER` | Yes | - | Database username |
+| `POSTGRES_USER` | Yes | `bookorbit` | Database username |
 | `POSTGRES_PASSWORD` | Yes | - | Database password |
-| `POSTGRES_DB` | Yes | - | Database name |
+| `POSTGRES_DB` | Yes | `bookorbit` | Database name |
 | `JWT_SECRET` | Yes | - | Secret for signing login tokens |
 | `SETUP_BOOTSTRAP_TOKEN` | Yes | - | One-time token for initial setup |
 | `APP_PORT` | No | `3000` | Host port mapped to the container |
@@ -179,7 +179,9 @@ docker compose up -d
 | `PUID` | No | `1000` | UID for files written by the app (useful on NAS) |
 | `PGID` | No | `1000` | GID for files written by the app (useful on NAS) |
 | `BOOKORBIT_FIX_PERMISSIONS` | No | `true` | Set to `false` if your platform manages `/data` ownership externally |
-| `NODE_MAX_OLD_SPACE_SIZE` | No | `2048` | Node.js heap limit in MB. Raise for very large libraries |
+| `NODE_MAX_OLD_SPACE_SIZE` | No | `2048` in `.env` | Node.js heap limit in MB. Use `auto` for container-aware detection or raise it for very large libraries |
+| `LIBRARY_BROWSE_ROOT` | No | `/` | Root shown by the library folder picker. Set to `/books` to hide other container folders |
+| `BOOK_DOCK_PATH` | No | `/data/book-dock` | Book Dock staging folder inside the container |
 | `DATABASE_URL` | No | Built from bundled Postgres settings | Full PostgreSQL connection string for an external database |
 | `POSTGRES_HOST` | No | `postgres` | Database hostname. Override when using an external DB |
 | `POSTGRES_PORT` | No | `5432` | Database port |
@@ -187,6 +189,8 @@ docker compose up -d
 | `EMAIL_ENCRYPTION_KEY` | No | - | Encrypts stored SMTP credentials at rest. Recommended if you configure email |
 | `MIGRATION_ENCRYPTION_KEY` | No | - | Encrypts stored migration source credentials. Recommended if you use migrations |
 | `LOG_LEVEL` | No | `info` | Log verbosity. Set to `debug` for detailed output |
+| `OIDC_ALLOW_LOCAL_ISSUERS` | No | `false` | Allows OIDC discovery on private addresses. Enable only on a trusted network |
+| `CSP_ALLOW_CLOUDFLARE_INSIGHTS` | No | `false` | Allows the Cloudflare Web Analytics beacon in the content security policy |
 
 ### Reverse proxy
 

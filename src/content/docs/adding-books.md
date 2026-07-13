@@ -1,5 +1,6 @@
 ---
 title: "Adding Books"
+description: "Upload books, stage them in Book Dock, or import files directly from a library folder."
 ---
 
 
@@ -41,7 +42,7 @@ Up to three files transfer in parallel. Each file shows an individual progress b
 
 | Type | Formats |
 |------|---------|
-| Ebooks | EPUB, KEPUB, PDF, MOBI, AZW3, AZW, FB2 |
+| Ebooks | EPUB, KEPUB, PDF, MOBI, AZW3, FB2 |
 | Comics | CBZ, CBR, CB7 |
 | Audiobooks | M4B, MP3, M4A, OPUS, OGG, FLAC |
 

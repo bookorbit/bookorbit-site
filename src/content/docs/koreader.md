@@ -1,5 +1,6 @@
 ---
 title: "KOReader Sync"
+description: "Configure two-way KOReader progress, reading session, rating, and highlight synchronization."
 ---
 
 

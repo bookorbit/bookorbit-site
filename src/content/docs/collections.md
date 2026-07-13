@@ -1,5 +1,6 @@
 ---
 title: "Collections"
+description: "Create, organize, reorder, and optionally sync hand-curated collections of books."
 ---
 
 
