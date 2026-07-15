@@ -75,7 +75,7 @@ Open your browser and go to `http://your-server-ip:3000`.
 
 You'll be redirected to a setup page - create your administrator account here. You'll need your `SETUP_BOOTSTRAP_TOKEN` from `.env`.
 
-## Unraid
+### Unraid Installation
 
 BookOrbit is available on Unraid through [Community Applications](https://ca.unraid.net) as two templates: `bookorbit` and `bookorbit-db` (PostgreSQL + pgvector). Search **BookOrbit** in the Apps tab to install both.
 
