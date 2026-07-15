@@ -75,6 +75,61 @@ Open your browser and go to `http://your-server-ip:3000`.
 
 You'll be redirected to a setup page - create your administrator account here. You'll need your `SETUP_BOOTSTRAP_TOKEN` from `.env`.
 
+## Unraid
+
+BookOrbit is available on Unraid through [Community Applications](https://ca.unraid.net) as two templates: `bookorbit` and `bookorbit-db` (PostgreSQL + pgvector). Search **BookOrbit** in the Apps tab to install both.
+
+The two containers need to be able to reach each other. There are two ways to set that up:
+
+- **Host IP and Port** (default, simplest) - both templates use Unraid's default `bridge` network. Point the app at the database's container IP and its exposed port.
+- **Custom Docker Network** - attach both containers to a shared custom network and reach the database by container name instead of by IP.
+
+### Install the database first
+
+Search for **bookorbit-db** in the Apps tab and install it first. Fill in:
+
+- **Port** - host port used to reach the database, `5432` by default. Note this value; you'll need it for the app's **Postgres Port** field
+- **Postgres User** / **Postgres DB** - defaults of `bookorbit` are fine
+- **Postgres Password** - generate a strong value (see [Generating secrets](#install) above)
+- **Database Storage** - defaults to `/mnt/user/appdata/bookorbit-db`
+
+Apply, and wait about 20-30 seconds for Postgres to finish initializing before starting the app container.
+
+### Install the app
+
+Search for **bookorbit** and install it. Fill in:
+
+- **WebUI Port** - `3000` by default
+- **Books Folder** - point at your existing books share, e.g. `/mnt/user/data/media/books`
+- **App URL** - `http://your-server-ip:3000`, or your reverse-proxy domain
+- **Postgres User / Password / DB** - must exactly match what you set on `bookorbit-db`
+- **Postgres Host** - the `bookorbit-db` container's IP address (find it under **Docker → Container IP**), or the container name `bookorbit-db` if you're using a custom network
+- **Postgres Port** - must match the **Port** value you set on `bookorbit-db`
+- **JWT Secret** and **Setup Bootstrap Token** - generate your own random values
+- **PUID / PGID** - match the user/group that owns your Books Folder
+
+Less commonly changed variables (Book Dock path, fix-permissions toggle, Node heap size, log level) are available under the template's **Show more settings...** section.
+
+:::tip[Using a custom Docker network instead]
+To reach the database by container name rather than IP, open the Unraid terminal and run:
+
+```bash
+docker network create bookorbit
+```
+
+Then edit both containers (**Docker → click the container → Edit**), set **Network Type** to the `bookorbit` network you just created, and apply. Set the app's **Postgres Host** field to `bookorbit-db`.
+
+Container IPs on the default `bridge` network can change on restart, so a custom network is more reliable long-term if you're not using host networking.
+:::
+
+:::tip[Connecting an external database on Unraid]
+If you'd rather use an external PostgreSQL server instead of the bundled `bookorbit-db` container, point **Postgres Host** and **Postgres Port** at that server instead. See [External Database](#external-database) below for the extension requirements.
+:::
+
+### Complete setup and updates
+
+Once both containers are running, open your **App URL** and complete setup using your Setup Bootstrap Token, the same as any other install.
+
 ---
 
 ## After Installation
