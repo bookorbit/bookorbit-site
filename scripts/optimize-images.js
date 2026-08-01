@@ -11,6 +11,12 @@ const MAX_WIDTH = 1200
 const QUALITY = 85
 const FORCE = process.argv.includes('--force')
 
+// Sources that also need extra widths emitted for a srcset, keyed by path
+// relative to ORIGINALS_DIR. The MAX_WIDTH file is always produced as well.
+const RESPONSIVE = {
+  'home/dashboard-overview.png': [800, 1600, 2000],
+}
+
 async function getSubdirs(dir) {
   const entries = await readdir(dir, { withFileTypes: true })
   return entries.filter(e => e.isDirectory()).map(e => e.name)
@@ -29,10 +35,10 @@ async function shouldProcess(srcPath, destPath) {
   return srcStat.mtimeMs > destStat.mtimeMs
 }
 
-async function processFile(srcPath, destPath) {
+async function processFile(srcPath, destPath, width = MAX_WIDTH) {
   const img = sharp(srcPath)
   const meta = await img.metadata()
-  const pipeline = meta.width > MAX_WIDTH ? img.resize(MAX_WIDTH) : img
+  const pipeline = meta.width > width ? img.resize(width) : img
   await pipeline.webp({ quality: QUALITY }).toFile(destPath)
   const [srcStat, destStat] = await Promise.all([stat(srcPath), stat(destPath)])
   const saved = (((srcStat.size - destStat.size) / srcStat.size) * 100).toFixed(0)
@@ -56,6 +62,16 @@ async function run() {
       await mkdir(destDir, { recursive: true })
       await processFile(srcPath, destPath)
       processed++
+    }
+
+    const key = path.relative(ORIGINALS_DIR, srcPath).split(path.sep).join('/')
+    for (const width of RESPONSIVE[key] ?? []) {
+      const variantPath = path.join(destDir, `${name}-${width}.webp`)
+      if (await shouldProcess(srcPath, variantPath)) {
+        await mkdir(destDir, { recursive: true })
+        await processFile(srcPath, variantPath, width)
+        processed++
+      }
     }
   }
 
