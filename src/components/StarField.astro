@@ -1,0 +1,316 @@
+---
+---
+
+<canvas class="sh-bg" aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('canvas.sh-bg')
+  const ctx = canvas?.getContext('2d')
+
+  if (canvas && ctx) {
+    type Star = {
+      nx: number
+      ny: number
+      radius: number
+      baseAlpha: number
+      twinkleAlpha: number
+      speed: number
+      phase: number
+      bright: boolean
+      flareLength: number
+      sparkleStartsAt: number
+      sparkleEndsAt: number
+      sparkleAlpha: number
+    }
+
+    type ShootingStar = {
+      startX: number
+      startY: number
+      endX: number
+      endY: number
+      spawnedAt: number
+      duration: number
+      length: number
+      width: number
+      alpha: number
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const stars: Star[] = []
+    const shootingStars: ShootingStar[] = []
+    let width = window.innerWidth
+    let height = window.innerHeight
+    let nextShootingStarAt = 0
+    let frameId = 0
+    let running = false
+
+    const starTarget = () =>
+      Math.max(160, Math.min(520, Math.round((width * height) / 3700)))
+
+    const scheduleSparkle = (star: Star, now: number) => {
+      const duration = star.bright ? 360 + Math.random() * 820 : 180 + Math.random() * 620
+      star.sparkleStartsAt =
+        now + (star.bright ? 450 + Math.random() * 4200 : 900 + Math.random() * 7600)
+      star.sparkleEndsAt = star.sparkleStartsAt + duration
+      star.sparkleAlpha = star.bright ? 0.34 + Math.random() * 0.34 : 0.08 + Math.random() * 0.16
+    }
+
+    const scheduleNextShootingStar = (now: number) => {
+      const isCompact = width < 960
+      const minDelay = isCompact ? 3200 : 1700
+      const maxDelay = isCompact ? 7800 : 5600
+      nextShootingStarAt = now + minDelay + Math.random() * (maxDelay - minDelay)
+    }
+
+    const spawnShootingStar = (now: number) => {
+      const startX = width * (-0.08 + Math.random() * 0.38)
+      const startY = height * (0.05 + Math.random() * 0.24)
+      const angle = Math.PI * (0.2 + Math.random() * 0.14)
+      const distance = Math.max(width, height) * (0.2 + Math.random() * 0.26)
+
+      shootingStars.push({
+        startX,
+        startY,
+        endX: startX + Math.cos(angle) * distance,
+        endY: startY + Math.sin(angle) * distance,
+        spawnedAt: now,
+        duration: 1100 + Math.random() * 900,
+        length: 70 + Math.random() * 130,
+        width: 1 + Math.random() * 1.35,
+        alpha: 0.48 + Math.random() * 0.34,
+      })
+    }
+
+    const makeStar = (bright: boolean, now: number): Star => {
+      const star: Star = {
+        nx: Math.random(),
+        ny: Math.random(),
+        radius: bright ? 1.25 + Math.random() * 0.75 : 0.25 + Math.random() * 0.95,
+        baseAlpha: bright ? 0.46 + Math.random() * 0.28 : 0.08 + Math.random() * 0.26,
+        twinkleAlpha: bright ? 0.14 + Math.random() * 0.18 : 0.08 + Math.random() * 0.2,
+        speed: bright ? 0.0007 + Math.random() * 0.0011 : 0.00035 + Math.random() * 0.0009,
+        phase: Math.random() * Math.PI * 2,
+        bright,
+        flareLength: bright ? 7 + Math.random() * 10 : 0,
+        sparkleStartsAt: 0,
+        sparkleEndsAt: 0,
+        sparkleAlpha: 0,
+      }
+
+      scheduleSparkle(star, now - Math.random() * 5000)
+      return star
+    }
+
+    const fitCanvas = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+
+    /* Star positions are normalized, so a resize only adjusts the population
+       to the new area - existing stars keep their place instead of jumping. */
+    const syncStarCount = (now: number) => {
+      const target = starTarget()
+      while (stars.length < target) {
+        stars.push(makeStar(stars.length % 20 === 19, now))
+      }
+      if (stars.length > target) {
+        stars.length = target
+      }
+    }
+
+    const render = (now: number) => {
+      if (now >= nextShootingStarAt) {
+        const isCompact = width < 960
+        const maxActive = isCompact ? 1 : 2
+        if (shootingStars.length < maxActive) {
+          spawnShootingStar(now)
+        }
+        if (!isCompact && Math.random() < 0.18 && shootingStars.length < maxActive) {
+          spawnShootingStar(now + 80 + Math.random() * 120)
+        }
+        scheduleNextShootingStar(now)
+      }
+
+      ctx.clearRect(0, 0, width, height)
+
+      for (const star of stars) {
+        const x = star.nx * width
+        const y = star.ny * height
+        const twinkle = (Math.sin(now * star.speed + star.phase) + 1) / 2
+        const shimmer = (Math.sin(now * star.speed * 2.7 + star.phase * 1.9) + 1) / 2
+        let alpha = star.baseAlpha + star.twinkleAlpha * twinkle * (0.55 + shimmer * 0.45)
+        let sparkle = 0
+
+        if (now >= star.sparkleStartsAt && now <= star.sparkleEndsAt) {
+          const progress = (now - star.sparkleStartsAt) / (star.sparkleEndsAt - star.sparkleStartsAt)
+          sparkle = Math.sin(progress * Math.PI)
+          alpha += sparkle * star.sparkleAlpha
+        } else if (now > star.sparkleEndsAt) {
+          scheduleSparkle(star, now)
+        }
+
+        alpha = Math.min(alpha, star.bright ? 0.96 : 0.78)
+
+        if (star.bright) {
+          const flareAlpha = Math.min(0.9, 0.08 + twinkle * 0.18 + sparkle * 0.72)
+          const flareLength = star.flareLength * (0.7 + twinkle * 0.16 + sparkle * 0.68)
+          const flareWidth = 0.55 + sparkle * 0.65
+          const glow = ctx.createRadialGradient(x, y, 0, x, y, flareLength * 0.46)
+          const horizontal = ctx.createLinearGradient(x - flareLength, y, x + flareLength, y)
+          const vertical = ctx.createLinearGradient(x, y - flareLength, x, y + flareLength)
+
+          glow.addColorStop(0, `rgba(255,255,255,${flareAlpha * 0.2})`)
+          glow.addColorStop(1, 'rgba(255,255,255,0)')
+          ctx.beginPath()
+          ctx.arc(x, y, flareLength * 0.46, 0, Math.PI * 2)
+          ctx.fillStyle = glow
+          ctx.fill()
+
+          horizontal.addColorStop(0, 'rgba(255,255,255,0)')
+          horizontal.addColorStop(0.5, `rgba(255,255,255,${flareAlpha})`)
+          horizontal.addColorStop(1, 'rgba(255,255,255,0)')
+          vertical.addColorStop(0, 'rgba(255,255,255,0)')
+          vertical.addColorStop(0.5, `rgba(210,225,255,${flareAlpha * 0.9})`)
+          vertical.addColorStop(1, 'rgba(255,255,255,0)')
+
+          ctx.save()
+          ctx.lineCap = 'round'
+          ctx.lineWidth = flareWidth
+          ctx.strokeStyle = horizontal
+          ctx.beginPath()
+          ctx.moveTo(x - flareLength, y)
+          ctx.lineTo(x + flareLength, y)
+          ctx.stroke()
+          ctx.strokeStyle = vertical
+          ctx.beginPath()
+          ctx.moveTo(x, y - flareLength)
+          ctx.lineTo(x, y + flareLength)
+          ctx.stroke()
+          ctx.restore()
+        }
+
+        ctx.beginPath()
+        ctx.arc(x, y, star.radius, 0, Math.PI * 2)
+        ctx.fillStyle = star.bright ? `rgba(255,255,255,${alpha})` : `rgba(210,225,255,${alpha})`
+        ctx.fill()
+      }
+
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const shootingStar = shootingStars[i]
+        const progress = (now - shootingStar.spawnedAt) / shootingStar.duration
+
+        if (progress >= 1) {
+          shootingStars.splice(i, 1)
+          continue
+        }
+
+        if (progress < 0) {
+          continue
+        }
+
+        const x = shootingStar.startX + (shootingStar.endX - shootingStar.startX) * progress
+        const y = shootingStar.startY + (shootingStar.endY - shootingStar.startY) * progress
+        const angle = Math.atan2(
+          shootingStar.endY - shootingStar.startY,
+          shootingStar.endX - shootingStar.startX,
+        )
+        const tailX = x - Math.cos(angle) * shootingStar.length
+        const tailY = y - Math.sin(angle) * shootingStar.length
+        const fade = Math.sin(progress * Math.PI)
+        const alpha = shootingStar.alpha * fade
+        const line = ctx.createLinearGradient(x, y, tailX, tailY)
+
+        line.addColorStop(0, `rgba(255,255,255,${alpha})`)
+        line.addColorStop(0.32, `rgba(196,224,255,${alpha * 0.64})`)
+        line.addColorStop(1, 'rgba(196,224,255,0)')
+
+        ctx.save()
+        ctx.lineCap = 'round'
+        ctx.lineWidth = shootingStar.width * (1 - progress * 0.25)
+        ctx.strokeStyle = line
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(tailX, tailY)
+        ctx.stroke()
+
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, shootingStar.length * 0.18)
+        glow.addColorStop(0, `rgba(255,255,255,${alpha * 0.62})`)
+        glow.addColorStop(1, 'rgba(255,255,255,0)')
+        ctx.fillStyle = glow
+        ctx.beginPath()
+        ctx.arc(x, y, shootingStar.length * 0.18, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
+
+      if (running) {
+        frameId = requestAnimationFrame(render)
+      }
+    }
+
+    const start = () => {
+      if (running || motionQuery.matches) return
+      running = true
+      scheduleNextShootingStar(performance.now())
+      frameId = requestAnimationFrame(render)
+    }
+
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(frameId)
+    }
+
+    const handleResize = () => {
+      const nextWidth = window.innerWidth
+      const nextHeight = window.innerHeight
+      if (nextWidth === width && nextHeight === height) return
+
+      width = nextWidth
+      height = nextHeight
+      fitCanvas()
+      syncStarCount(performance.now())
+      if (!running) render(performance.now())
+    }
+
+    fitCanvas()
+    syncStarCount(performance.now())
+
+    if (motionQuery.matches) {
+      render(performance.now())
+    } else {
+      start()
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stop()
+      } else if (!motionQuery.matches) {
+        start()
+      }
+    })
+
+    motionQuery.addEventListener('change', () => {
+      if (motionQuery.matches) {
+        stop()
+        render(performance.now())
+      } else {
+        start()
+      }
+    })
+  }
+</script>
+
+<style>
+  .sh-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>
