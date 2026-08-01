@@ -1,7 +1,6 @@
 import { defineConfig } from 'astro/config'
 import { unified } from '@astrojs/markdown-remark'
 import starlight from '@astrojs/starlight'
-import vue from '@astrojs/vue'
 import starlightImageZoom from 'starlight-image-zoom'
 import starlightLinksValidator from 'starlight-links-validator'
 
@@ -11,7 +10,6 @@ export default defineConfig({
     processor: unified(),
   },
   integrations: [
-    vue(),
     starlight({
       title: 'BookOrbit',
       description: 'Documentation for the self-hosted library and reading platform.',
