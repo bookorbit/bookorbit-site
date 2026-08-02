@@ -72,7 +72,9 @@ The dashboard opens to three areas:
 
 - **Continue reading** - books with in-progress reading, sorted by most recently read. Tap any cover to open that book's detail page.
 - **Discover** - recently added books you have not started yet.
-- **Browse** - tiles for each catalog entry point: In progress, On device, Libraries, All Books, Authors, Series, Collections, and SmartScopes.
+- **Browse** - tiles for each catalog entry point: In progress, On device, Not on device, Libraries, All Books, Authors, Series, Collections, and SmartScopes.
+
+**Not on device** lists recently added books that are not yet downloaded here, so you can pick up several at once without searching for each author or re-scanning the whole library. Because which books are downloaded is known only to the device, the list is built by checking the newest books rather than by asking the server, so it covers the most recent additions rather than the entire library. Bulk download from that list to fetch them in one pass.
 
 The search icon in the title bar opens a full-text search across title and author for your entire library.
 
@@ -103,6 +105,12 @@ Tap the menu icon in the title bar to open view and sort controls.
 Tap a book to open its detail page. The page shows the cover, author, year, publisher, page count, current progress, reading status, library, and a truncated description. Tap the menu icon in the title bar to see the full description and access additional actions.
 
 **Read** opens the file in KOReader if the book is already on the device. For books not yet downloaded, the button shows **Download** instead - tap it to save the file to the device. Once downloaded, the file is linked back to your BookOrbit book record so sync works immediately.
+
+#### Bulk Downloads
+
+From any book list, the **Download** action offers **Download selected**, **Download this page**, and **Download all in this list**. Books already on the device are skipped, and the confirmation reports how many will be skipped before the run starts.
+
+**Settings** in the same menu sets the destination **Folder**, the **Format** preference when a book has several files, and what to do with **Existing files**. The folder is KOReader's own download folder, so it is shared with single-book downloads and changing it in either place changes both.
 
 #### Status and Rating
 
