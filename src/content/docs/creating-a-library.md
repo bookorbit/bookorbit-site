@@ -116,8 +116,8 @@ The final step is optional and is off by default. Leave it that way if you want 
 
 | Option | Default | What it changes |
 |--------|---------|-----------------|
-| **Rename files after metadata changes** | Off | Renames physical files when relevant metadata changes, using the library naming pattern. |
-| **Write metadata to files** | Off | Enables writing metadata to supported files. |
+| **Rename files after metadata changes** | Off | Automatically renames physical files when relevant metadata changes, using the library naming pattern. |
+| **Write metadata to files** | Off | Automatically writes metadata into supported files when it changes. |
 | **Include cover image** | On | Includes the stored cover when the target format supports it. |
 | **EPUB** | On, 100 MB | Writes metadata into the OPF inside the EPUB archive. |
 | **PDF** | On, 100 MB | Writes PDF Info and XMP metadata. |
@@ -125,6 +125,12 @@ The final step is optional and is off by default. Leave it that way if you want 
 | **Audio** | On, 500 MB | Embeds the stored cover into M4B, M4A, MP3, and FLAC files. |
 
 Each file-size limit can be set from 1 MB to 10,000 MB. Keep backups before enabling file updates for a collection you want to preserve exactly as imported.
+
+:::note
+The first two options control what BookOrbit does **automatically**. They are not a lock on the files themselves. A book's **Write to File & Rename** action on the [Edit Metadata](/book-details#edit-metadata) tab is an explicit per-book override and runs even with both options off. The per-format toggles and size limits below them apply in both cases.
+
+If the library is a view over a tree something else manages, such as hardlinked seeding copies or another catalog server reading the same paths, mount it read-only rather than relying on these toggles.
+:::
 
 ## Create It, Then Let It Scan
 

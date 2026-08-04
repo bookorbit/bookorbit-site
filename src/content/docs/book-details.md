@@ -63,12 +63,26 @@ Editing requires the **`library_edit_metadata`** permission.
 | Action | Behavior |
 |--------|----------|
 | **Load from file** | Reads embedded metadata from the primary book file and places found fields into the form. |
+| **Write to File & Rename** | Writes the saved metadata into the book file on disk, then renames the file to match the library naming pattern. |
 | **Search online** | Opens the manual provider search drawer so you can pick and compare candidate records. |
 | **Auto-fill** | Runs the configured metadata provider pipeline from **Settings > Metadata** and applies allowed fields to the form. |
 | **Lock all** | Locks every metadata field, including cover, so automated and manual provider updates cannot overwrite them. |
 | **Unlock all** | Clears all field locks. |
 | **Cancel** | Resets unsaved form changes. |
 | **Save** | Writes the form values to the book record and saves any pending cover change. |
+
+Every other action on this tab, **Save** included, changes only the database record. **Write to File & Rename** is the one action that touches the files on disk.
+
+:::caution
+**Write to File & Rename** is a deliberate manual override. It runs even when **Write metadata to files** and **Rename files after metadata changes** are off for the library, because those two settings govern whether BookOrbit writes back *automatically* on save, not whether it may ever touch the file. The result panel names whichever setting is off, but it does so after the write has already happened.
+
+Two things are worth knowing before you click it:
+
+- On a **Folder as Book** library, the rename can move the whole book folder, not just the file. Every file BookOrbit tracks for that book, including covers, sidecars, and disc subfolders, moves with it to the new pattern-derived path.
+- The write rewrites the book file in place. If the file is a hardlink shared with a torrent client or another catalog server, the rewrite forks it, and a folder move breaks anything pointing at the old path.
+
+Per-format toggles and file-size limits are still enforced, so a format you turned off or a file over its limit is skipped either way.
+:::
 
 ### Editable fields
 
