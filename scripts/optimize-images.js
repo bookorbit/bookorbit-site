@@ -11,10 +11,39 @@ const MAX_WIDTH = 1200
 const QUALITY = 85
 const FORCE = process.argv.includes('--force')
 
-// Sources that also need extra widths emitted for a srcset, keyed by path
-// relative to ORIGINALS_DIR. The MAX_WIDTH file is always produced as well.
+// Sections that get a higher quality than the default. The landing page shows
+// its screenshots far larger than any docs page does, so artifacts show.
+const SECTION_QUALITY = {
+  home: 90,
+}
+
+// Extra widths emitted for a srcset, keyed by path relative to ORIGINALS_DIR.
+// The MAX_WIDTH file is always produced as well.
+const HERO_WIDTHS = [800, 2000]
 const RESPONSIVE = {
   'home/dashboard-overview.png': [800, 1600, 2000],
+  ...Object.fromEntries(
+    [
+      'book-details',
+      'annotations',
+      'series-detail',
+      'library-stats',
+      'achievements',
+      'metadata-field-rules',
+      'koreader-sync',
+      'edit-metadata',
+      'reading-log',
+      'reading-stats',
+      'reading-analytics',
+      'authors-grid',
+      'ebook-reader',
+      'audiobook-player',
+      'comics-reader',
+      // Padded to the gallery's 1200x696 ratio with transparent bands; the
+      // source device shot is shorter than every other screen here.
+      'koreader-plugin',
+    ].map(name => [`home/${name}.png`, HERO_WIDTHS]),
+  ),
 }
 
 async function getSubdirs(dir) {
@@ -35,11 +64,11 @@ async function shouldProcess(srcPath, destPath) {
   return srcStat.mtimeMs > destStat.mtimeMs
 }
 
-async function processFile(srcPath, destPath, width = MAX_WIDTH) {
+async function processFile(srcPath, destPath, width = MAX_WIDTH, quality = QUALITY) {
   const img = sharp(srcPath)
   const meta = await img.metadata()
   const pipeline = meta.width > width ? img.resize(width) : img
-  await pipeline.webp({ quality: QUALITY }).toFile(destPath)
+  await pipeline.webp({ quality }).toFile(destPath)
   const [srcStat, destStat] = await Promise.all([stat(srcPath), stat(destPath)])
   const saved = (((srcStat.size - destStat.size) / srcStat.size) * 100).toFixed(0)
   console.log(`  optimized: ${path.basename(destPath)} (${saved}% smaller)`)
@@ -57,19 +86,21 @@ async function run() {
 
   async function handleFile(srcPath, destDir) {
     const name = path.basename(srcPath, path.extname(srcPath))
+    const key = path.relative(ORIGINALS_DIR, srcPath).split(path.sep).join('/')
+    const quality = SECTION_QUALITY[key.split('/')[0]] ?? QUALITY
     const destPath = path.join(destDir, `${name}.webp`)
+
     if (await shouldProcess(srcPath, destPath)) {
       await mkdir(destDir, { recursive: true })
-      await processFile(srcPath, destPath)
+      await processFile(srcPath, destPath, MAX_WIDTH, quality)
       processed++
     }
 
-    const key = path.relative(ORIGINALS_DIR, srcPath).split(path.sep).join('/')
     for (const width of RESPONSIVE[key] ?? []) {
       const variantPath = path.join(destDir, `${name}-${width}.webp`)
       if (await shouldProcess(srcPath, variantPath)) {
         await mkdir(destDir, { recursive: true })
-        await processFile(srcPath, variantPath, width)
+        await processFile(srcPath, variantPath, width, quality)
         processed++
       }
     }
