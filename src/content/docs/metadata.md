@@ -102,6 +102,8 @@ Eligibility follows the same pattern: conditions for never-enriched authors, tho
 
 ## Per-book controls
 
-Individual books have their own controls on the **Edit Metadata** tab: **Search online**, **Auto-fill**, **Load from file**, and **Field locks**. See [Book Details & Viewer](/book-details#edit-metadata) for the full per-book workflow including cover editing and provider comparison.
+Individual books have their own controls on the **Edit Metadata** tab: **Search online**, **Auto-fill**, **Load from file**, **Field locks**, and **Write to File & Rename**. See [Book Details & Viewer](/book-details#edit-metadata) for the full per-book workflow including cover editing and provider comparison.
+
+**Write to File & Rename** is the only one of those that modifies files on disk, and it overrides the library's automatic write-back and rename settings by design. See the caution on [Book Details & Viewer](/book-details#edit-metadata) before using it on a managed folder tree.
 
 While a fetch queue is running, a **status widget** in the bottom-right corner shows the current book and overall progress, with **Pause**, **Resume**, and **Cancel** controls.
