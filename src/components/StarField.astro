@@ -38,8 +38,11 @@
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const stars: Star[] = []
     const shootingStars: ShootingStar[] = []
-    let width = window.innerWidth
-    let height = window.innerHeight
+    /* clientWidth, not innerWidth: innerWidth counts the scrollbar, which
+       would make the canvas wider than the viewport and cause the very
+       horizontal overflow that then produces a second scrollbar. */
+    let width = document.documentElement.clientWidth
+    let height = document.documentElement.clientHeight
     let nextShootingStarAt = 0
     let frameId = 0
     let running = false
@@ -265,8 +268,8 @@
     }
 
     const handleResize = () => {
-      const nextWidth = window.innerWidth
-      const nextHeight = window.innerHeight
+      const nextWidth = document.documentElement.clientWidth
+      const nextHeight = document.documentElement.clientHeight
       if (nextWidth === width && nextHeight === height) return
 
       width = nextWidth
@@ -307,8 +310,11 @@
 </script>
 
 <style>
+  /* Fixed, not absolute: the canvas is sized to the viewport in script, and
+   on the phone layout its host stops being fixed - as an absolute child it
+   then stretched to the whole document and dragged the page size with it. */
   .sh-bg {
-    position: absolute;
+    position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
