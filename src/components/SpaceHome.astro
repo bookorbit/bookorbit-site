@@ -47,6 +47,131 @@ const features = [
     icon: '<path d="M3 20h18"/><path d="M6.5 20v-5.5M11.5 20V5M16.5 20v-8.5M21 20v-3"/>',
   },
 ]
+
+/* Hero gallery. The first entry is the LCP image and ships eagerly; the rest
+   carry their URLs in data-* until the page has loaded or a tab is hovered.
+   Every source lives in /images/home so the hero stays independent of the
+   docs screenshots. Widths listed here must exist as -<width>.webp variants
+   (see RESPONSIVE in scripts/optimize-images.js). */
+const HERO_WIDTHS = [800, 1200, 2000]
+
+const shots = [
+  /* Land on the product, then browse it */
+  {
+    label: 'Dashboard',
+    file: 'dashboard-overview',
+    widths: [800, 1200, 1600, 2000],
+    height: 692,
+    alt: 'BookOrbit dashboard showing reading stats, currently reading shelf, and book collections',
+  },
+  {
+    label: 'Authors',
+    file: 'authors-grid',
+    height: 696,
+    alt: 'The authors browser as a grid of author portraits with book counts',
+  },
+  {
+    label: 'Series',
+    file: 'series-detail',
+    height: 696,
+    alt: 'A series page for The Chronicles of Narnia showing reading progress and all seven books in order',
+  },
+  /* Zoom into one book and how its metadata is built */
+  {
+    label: 'Book Details',
+    file: 'book-details',
+    height: 696,
+    alt: 'A book details page with the cover, ratings from six metadata providers, genre tags, publisher and file details, per-format progress, and a similar books shelf',
+  },
+  {
+    label: 'Edit Metadata',
+    file: 'edit-metadata',
+    height: 696,
+    alt: 'The metadata editor with per-field locks, provider IDs, series and publisher fields, and a rich text description',
+  },
+  /* Read it, in each format */
+  {
+    label: 'Ebook Reader',
+    file: 'ebook-reader',
+    height: 696,
+    alt: 'The built-in ebook reader in two-page layout with the appearance panel open on text size, page colour, and fonts',
+  },
+  {
+    label: 'Comics Reader',
+    file: 'comics-reader',
+    height: 696,
+    alt: 'The comics reader on a two-page spread with the settings panel open on fit mode, page view, and spread alignment',
+  },
+  {
+    label: 'Audiobook Player',
+    file: 'audiobook-player',
+    height: 696,
+    alt: 'The audiobook player showing cover art, chapter title, scrub bar, and speed, chapters, volume, and sleep controls',
+  },
+  /* What reading leaves behind */
+  {
+    label: 'Annotations',
+    file: 'annotations',
+    height: 696,
+    alt: 'The annotations hub listing highlights and notes from web and KOReader, each tied to a book, chapter, and page',
+  },
+  {
+    label: 'Reading Log',
+    file: 'reading-log',
+    height: 696,
+    alt: 'A book reading log with progress journey chart, activity calendar, reading history, and recorded sessions',
+  },
+  /* Step back out to the numbers */
+  {
+    label: 'Reading Stats',
+    file: 'reading-stats',
+    height: 696,
+    alt: 'Personal reading statistics with a yearly heatmap, peak reading hours, favourite days, and a completion funnel',
+  },
+  {
+    label: 'Analytics',
+    file: 'reading-analytics',
+    height: 696,
+    alt: 'Reading analytics with pace against goal, completion latency, a 24-hour reading clock, and genre reading time',
+  },
+  {
+    label: 'Library Stats',
+    file: 'library-stats',
+    height: 696,
+    alt: 'Library statistics with integrity and freshness gauges, format distribution, metadata scores, and a genre treemap',
+  },
+  {
+    label: 'Achievements',
+    file: 'achievements',
+    height: 696,
+    alt: 'The achievements page with tiered reading and library badges marked earned, in progress, or locked',
+  },
+  /* Set it up and reach the devices */
+  {
+    label: 'Metadata Rules',
+    file: 'metadata-field-rules',
+    height: 696,
+    alt: 'Metadata field rules assigning provider priority and a merge strategy to each field such as title, cover, and authors',
+  },
+  {
+    label: 'KOReader Sync',
+    file: 'koreader-sync',
+    height: 696,
+    alt: 'KOReader sync settings with connection status, plugin server URL, plugin download, and registered devices',
+  },
+  {
+    label: 'KOReader Plugin',
+    file: 'koreader-plugin',
+    height: 696,
+    alt: 'The BookOrbit plugin running on an e-ink device, showing the reading dashboard, the all-books grid, and a book page with a download button',
+  },
+].map(shot => ({
+  ...shot,
+  src: `/images/home/${shot.file}.webp`,
+  srcset: (shot.widths ?? HERO_WIDTHS)
+    .map(w => `/images/home/${shot.file}${w === 1200 ? '' : `-${w}`}.webp ${w}w`)
+    .join(', '),
+}))
 ---
 
 <div class="sh">
@@ -181,24 +306,135 @@ const features = [
       </ul>
     </div>
 
-    <div class="sh-visual">
+    <div class="sh-visual" data-gallery>
       <div class="sh-glow"></div>
+
       <div class="sh-tilt-wrap">
         <div class="sh-app-frame">
-          <img
-            src="/images/home/dashboard-overview.webp"
-            srcset="/images/home/dashboard-overview-800.webp 800w, /images/home/dashboard-overview.webp 1200w, /images/home/dashboard-overview-1600.webp 1600w, /images/home/dashboard-overview-2000.webp 2000w"
-            sizes="(max-width: 960px) 92vw, 65vw"
-            width="1200"
-            height="719"
-            alt="BookOrbit dashboard showing reading stats, currently reading shelf, and book collections"
-            fetchpriority="high"
-            decoding="async"
-          />
+          <button type="button" class="sh-zoom" data-zoom>
+            <span class="sh-sr-only">View screenshot full screen</span>
+            <span class="sh-zoom-badge" aria-hidden="true">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M15 3h6v6M9 21H3v-6M21 3l-7.5 7.5M3 21l7.5-7.5"></path></svg
+              >
+              Expand
+            </span>
+          </button>
+          {
+            shots.map((shot, index) => (
+              <div
+                class:list={['sh-shot', index === 0 && 'is-active']}
+                role="tabpanel"
+                id={`sh-shot-${index}`}
+                aria-labelledby={`sh-tab-${index}`}
+                aria-hidden={index === 0 ? undefined : 'true'}
+              >
+                <img
+                  src={index === 0 ? shot.src : undefined}
+                  srcset={index === 0 ? shot.srcset : undefined}
+                  data-src={index === 0 ? undefined : shot.src}
+                  data-srcset={index === 0 ? undefined : shot.srcset}
+                  sizes="(max-width: 960px) 92vw, calc(62vw - 64px)"
+                  width={1200}
+                  height={shot.height}
+                  alt={shot.alt}
+                  fetchpriority={index === 0 ? 'high' : 'low'}
+                  decoding="async"
+                />
+              </div>
+            ))
+          }
+        </div>
+
+        {/* Hangs off the bottom of the frame rather than sitting in the flow,
+        so the frame itself lands on the column's centre line and stays level
+        with the copy beside it. */}
+        <div class="sh-shot-controls">
+        <div class="sh-shot-nav" role="tablist" aria-label="Screenshots">
+          {
+            shots.map((shot, index) => (
+              <button
+                type="button"
+                role="tab"
+                class="sh-shot-tab"
+                id={`sh-tab-${index}`}
+                aria-controls={`sh-shot-${index}`}
+                aria-selected={index === 0 ? 'true' : 'false'}
+                tabindex={index === 0 ? 0 : -1}
+                aria-label={shot.label}
+              />
+            ))
+          }
+        </div>
+
+          {/* Names only the selected screen, so 16 dots stay a row of dots */}
+          <p class="sh-shot-label" data-shot-label aria-hidden="true">{shots[0].label}</p>
         </div>
       </div>
     </div>
   </main>
+
+  <dialog class="sh-lb" data-lightbox aria-label="Screenshot viewer">
+    <button type="button" class="sh-lb-close" data-lb-close>
+      <span class="sh-sr-only">Close</span>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg
+      >
+    </button>
+
+    <button type="button" class="sh-lb-step sh-lb-prev" data-lb-prev>
+      <span class="sh-sr-only">Previous screenshot</span>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg
+      >
+    </button>
+
+    <figure class="sh-lb-figure">
+      <img class="sh-lb-img" data-lb-img sizes="96vw" alt="" decoding="async" />
+      <figcaption class="sh-lb-cap">
+        <span data-lb-label></span>
+        <span class="sh-lb-count" data-lb-count></span>
+      </figcaption>
+    </figure>
+
+    <button type="button" class="sh-lb-step sh-lb-next" data-lb-next>
+      <span class="sh-sr-only">Next screenshot</span>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg
+      >
+    </button>
+  </dialog>
 
   <footer class="sh-footer">
     <span class="sh-footer-copy">&copy; {new Date().getFullYear()} BookOrbit</span>
@@ -222,82 +458,167 @@ const features = [
       .catch(() => {})
   }
 
-  /* Pointer parallax on the dashboard screenshot */
-  const tilt = document.querySelector<HTMLElement>('.sh-tilt-wrap')
-  if (tilt) {
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const pointerQuery = window.matchMedia('(pointer: fine)')
-    const BASE_X = 10
-    const BASE_Y = -22
-    const BASE_Z = 2
+  /* Screenshot gallery: tabs swap the slide shown inside the tilted frame */
+  const gallery = document.querySelector<HTMLElement>('[data-gallery]')
+  if (gallery) {
+    const tabs = Array.from(gallery.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
+    const slides = Array.from(gallery.querySelectorAll<HTMLElement>('[role="tabpanel"]'))
+    const label = gallery.querySelector<HTMLElement>('[data-shot-label]')
 
-    let targetX = BASE_X
-    let targetY = BASE_Y
-    let currentX = BASE_X
-    let currentY = BASE_Y
-    let frameId = 0
-
-    const apply = () => {
-      currentX += (targetX - currentX) * 0.08
-      currentY += (targetY - currentY) * 0.08
-
-      const done = Math.abs(targetX - currentX) < 0.01 && Math.abs(targetY - currentY) < 0.01
-      if (done) {
-        currentX = targetX
-        currentY = targetY
-      }
-
-      tilt.style.transform = `perspective(1000px) rotateX(${currentX.toFixed(2)}deg) rotateY(${currentY.toFixed(2)}deg) rotateZ(${BASE_Z}deg)`
-
-      if (done) {
-        frameId = 0
-        return
-      }
-      frameId = requestAnimationFrame(apply)
+    /* Deferred slides hold their URLs in data-* so they never compete with the
+       LCP image. Promote one as soon as it is likely to be needed. */
+    const load = (index: number) => {
+      const img = slides[index]?.querySelector<HTMLImageElement>('img')
+      const src = img?.dataset.src
+      if (!img || !src) return
+      if (img.dataset.srcset) img.srcset = img.dataset.srcset
+      img.src = src
+      delete img.dataset.src
+      delete img.dataset.srcset
     }
 
-    const request = () => {
-      if (!frameId) frameId = requestAnimationFrame(apply)
+    /* Three in flight at most: the visible screen and the one on either side,
+       so stepping in either direction never lands on a blank frame. Fetching
+       the whole gallery up front would be megabytes of screens most visitors
+       never open. */
+    const total = tabs.length
+    const warm = (index: number) => {
+      load(index)
+      load((index - 1 + total) % total)
+      load((index + 1) % total)
     }
 
-    const isActive = () =>
-      pointerQuery.matches && !motionQuery.matches && window.innerWidth > 960
+    const select = (index: number, moveFocus = false) => {
+      warm(index)
+      tabs.forEach((tab, i) => {
+        const selected = i === index
+        tab.setAttribute('aria-selected', String(selected))
+        tab.tabIndex = selected ? 0 : -1
+        slides[i].classList.toggle('is-active', selected)
+        if (selected) slides[i].removeAttribute('aria-hidden')
+        else slides[i].setAttribute('aria-hidden', 'true')
+      })
+      if (label) label.textContent = tabs[index].getAttribute('aria-label') ?? ''
+      if (moveFocus) tabs[index].focus()
+    }
 
-    window.addEventListener(
-      'pointermove',
-      event => {
-        if (!isActive()) return
-        const dx = event.clientX / window.innerWidth - 0.5
-        const dy = event.clientY / window.innerHeight - 0.5
-        targetX = BASE_X - dy * 6
-        targetY = BASE_Y + dx * 7
-        request()
-      },
-      { passive: true },
-    )
-
-    window.addEventListener('pointerleave', () => {
-      targetX = BASE_X
-      targetY = BASE_Y
-      request()
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => select(index))
+      tab.addEventListener('pointerenter', () => load(index))
+      tab.addEventListener('focus', () => load(index))
+      tab.addEventListener('keydown', event => {
+        const last = total - 1
+        let next = -1
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = index === last ? 0 : index + 1
+        else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = index === 0 ? last : index - 1
+        else if (event.key === 'Home') next = 0
+        else if (event.key === 'End') next = last
+        if (next < 0) return
+        event.preventDefault()
+        select(next, true)
+      })
     })
 
-    /* Drop the inline transform when the interaction no longer applies so the
-       stylesheet's responsive tilt takes over again. */
-    const reset = () => {
-      if (isActive()) return
-      cancelAnimationFrame(frameId)
-      frameId = 0
-      currentX = BASE_X
-      currentY = BASE_Y
-      targetX = BASE_X
-      targetY = BASE_Y
-      tilt.style.transform = ''
-    }
+    /* Fill the starting window once the hero image is no longer competing */
+    const warmFirst = () => warm(0)
+    if (document.readyState === 'complete') warmFirst()
+    else window.addEventListener('load', warmFirst, { once: true })
 
-    window.addEventListener('resize', reset)
-    motionQuery.addEventListener('change', reset)
+    /* ── Full-screen viewer ──
+       A native <dialog> so the top layer, focus trapping, Esc-to-close and
+       focus restoration all come from the platform. Captured once up front
+       because load() moves each URL from data-src onto src. */
+    const lightbox = document.querySelector<HTMLDialogElement>('[data-lightbox]')
+    const zoom = gallery.querySelector<HTMLButtonElement>('[data-zoom]')
+
+    if (lightbox && zoom && typeof lightbox.showModal === 'function') {
+      const sources = slides.map(slide => {
+        const img = slide.querySelector<HTMLImageElement>('img')
+        return {
+          src: img?.dataset.src ?? img?.getAttribute('src') ?? '',
+          srcset: img?.dataset.srcset ?? img?.getAttribute('srcset') ?? '',
+          alt: img?.alt ?? '',
+        }
+      })
+
+      const lbImg = lightbox.querySelector<HTMLImageElement>('[data-lb-img]')
+      const lbLabel = lightbox.querySelector<HTMLElement>('[data-lb-label]')
+      const lbCount = lightbox.querySelector<HTMLElement>('[data-lb-count]')
+      let current = 0
+
+      const paint = (index: number) => {
+        current = index
+        /* Drive the page gallery too, so its warm window follows along and
+           closing the viewer leaves the hero on the screen you stopped at */
+        select(index)
+        const shot = sources[index]
+        if (lbImg) {
+          lbImg.srcset = shot.srcset
+          lbImg.src = shot.src
+          lbImg.alt = shot.alt
+        }
+        if (lbLabel) lbLabel.textContent = tabs[index].getAttribute('aria-label') ?? ''
+        if (lbCount) lbCount.textContent = `${index + 1} / ${total}`
+      }
+
+      const step = (delta: number) => paint((current + delta + total) % total)
+
+      zoom.addEventListener('click', () => {
+        paint(tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'))
+        lightbox.showModal()
+        document.documentElement.style.overflow = 'hidden'
+      })
+
+      /* Every close path restores the scroll lock itself rather than trusting
+         the dialog's close event, which not every engine delivers reliably */
+      const restore = () => {
+        document.documentElement.style.overflow = ''
+      }
+      const close = () => {
+        lightbox.close()
+        restore()
+      }
+      lightbox.querySelector('[data-lb-close]')?.addEventListener('click', close)
+      lightbox.querySelector('[data-lb-prev]')?.addEventListener('click', () => step(-1))
+      lightbox.querySelector('[data-lb-next]')?.addEventListener('click', () => step(1))
+      lightbox.addEventListener('close', restore)
+      lightbox.addEventListener('cancel', restore)
+
+      /* Clicking the surround closes; clicking the picture itself must not */
+      lightbox.addEventListener('click', event => {
+        if (!(event.target instanceof Element)) return
+        if (event.target.closest('.sh-lb-figure, button')) return
+        close()
+      })
+
+      lightbox.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault()
+          step(1)
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault()
+          step(-1)
+        } else if (event.key === 'Escape') {
+          event.preventDefault()
+          close()
+        }
+      })
+
+      /* Swipe, for the phone layout */
+      let swipeFrom: number | null = null
+      const figure = lightbox.querySelector<HTMLElement>('.sh-lb-figure')
+      figure?.addEventListener('pointerdown', event => {
+        swipeFrom = event.clientX
+      })
+      figure?.addEventListener('pointerup', event => {
+        if (swipeFrom === null) return
+        const dx = event.clientX - swipeFrom
+        swipeFrom = null
+        if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1)
+      })
+    }
   }
+
 </script>
 
 <style>
@@ -365,20 +686,6 @@ const features = [
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-  }
-
-  /* Right-edge gradient fade so the screenshot dissolves into background
-   instead of being hard-clipped by overflow:hidden on .sh */
-  .sh::after {
-    content: '';
-    position: absolute;
-    top: 60px;
-    right: 0;
-    bottom: 44px;
-    width: 140px;
-    background: linear-gradient(to right, transparent, var(--sh-bg) 82%);
-    pointer-events: none;
-    z-index: 8;
   }
 
   .sh-nb {
@@ -498,9 +805,14 @@ const features = [
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 38% 62%;
+    /* A real gutter rather than padding on the copy, so the gap between the
+     two halves is one number and the frame gives the space back */
+    grid-template-columns: 38% 1fr;
+    column-gap: clamp(32px, 3.4vw, 64px);
     align-items: center;
-    padding: 0 0 0 72px;
+    /* Matches the header and footer so the copy starts on the brand's left
+     edge and the frame ends on the GitHub button's right edge */
+    padding: 0 52px;
     overflow: visible;
     min-height: 0;
   }
@@ -511,7 +823,6 @@ const features = [
     flex-direction: column;
     position: relative;
     z-index: 2;
-    padding-right: 24px;
   }
   .sh-eyebrow {
     display: flex;
@@ -665,44 +976,272 @@ const features = [
   .sh-visual {
     position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    /* Right-aligned so the frame's edge stays locked to the header's, even on
+     short screens where the height cap makes it narrower than its column */
+    align-items: flex-end;
+    justify-content: center;
     height: 100%;
     padding: 0;
     overflow: visible;
   }
+  /* Sits behind the frame and is sized off it, so the bloom stays centred on
+   the screenshot at every width */
   .sh-glow {
     position: absolute;
-    width: 620px;
-    height: 480px;
+    width: 108%;
+    aspect-ratio: 1200 / 780;
     top: 50%;
-    left: 20%;
-    transform: translate(-40%, -52%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: radial-gradient(ellipse, rgba(29, 78, 216, 0.22) 0%, transparent 68%);
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
   }
 
-  /* Screenshot is positioned so its visual right edge lands at the viewport
-   edge after perspective projection; .sh::after fades any overflow gracefully */
+  /* The controls hang off this box, so it has to be exactly frame-sized. The
+   height term keeps the frame plus its controls inside a short window instead
+   of pushing them under the footer. */
   .sh-tilt-wrap {
     position: relative;
     z-index: 1;
-    transform: perspective(1000px) rotateX(10deg) rotateY(-22deg) rotateZ(2deg);
-    will-change: transform;
+    width: 100%;
+    max-width: calc((100vh - 250px) * 1.724);
   }
+  /* Slides are stacked and absolutely positioned, so the frame has to carry
+   the aspect ratio itself */
   .sh-app-frame {
+    position: relative;
+    aspect-ratio: 1200 / 696;
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid var(--sh-white-12);
-    box-shadow: inset 0 1px 0 var(--sh-white-20), inset 1px 0 0 var(--sh-white-08),
-      0 60px 140px rgba(0, 0, 0, 0.75), 24px 20px 80px rgba(29, 78, 216, 0.16),
-      -18px 10px 60px rgba(20, 184, 166, 0.12);
+    /* Symmetric now that the frame is flat - the old offsets leaned right to
+     match the perspective */
+    box-shadow: inset 0 1px 0 var(--sh-white-20), 0 40px 110px rgba(0, 0, 0, 0.72),
+      0 18px 70px rgba(29, 78, 216, 0.16);
   }
+  .sh-shot {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.018);
+    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
+  }
+  .sh-shot.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  /* Every screenshot is 1200x696 bar the dashboard, which is 4px shorter -
+   cover absorbs that without letterboxing or squeezing anything. */
   .sh-app-frame img {
     display: block;
-    width: 105%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  /* Slide picker: one dot per screen, centred under the frame. Naming all
+   sixteen would be a wall of text, so only the selected one is named. */
+  .sh-shot-controls {
+    position: absolute;
+    z-index: 3;
+    top: calc(100% + clamp(10px, 2.2vh, 22px));
+    left: 0;
+    right: 0;
+  }
+  .sh-shot-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .sh-shot-tab {
+    appearance: none;
+    border: 0;
+    background: none;
+    padding: 0;
+    width: 22px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .sh-shot-tab::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--sh-white-20);
+    transition: width 0.28s cubic-bezier(0.22, 0.7, 0.25, 1), background 0.2s, box-shadow 0.2s;
+  }
+  .sh-shot-tab:hover::before {
+    background: rgba(255, 255, 255, 0.5);
+  }
+  .sh-shot-tab[aria-selected='true']::before {
+    width: 18px;
+    background: linear-gradient(90deg, var(--sh-accent-blue), var(--sh-accent-cyan));
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+  }
+  /* Covers the frame so the whole screenshot is the click target; the badge
+   is the only visible part and only once you are over it. */
+  .sh-zoom {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    appearance: none;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: zoom-in;
+  }
+  .sh-zoom-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--sh-white-12);
+    background: rgba(6, 9, 26, 0.82);
+    backdrop-filter: blur(10px);
+    font-size: 0.75rem;
+    font-weight: 570;
+    color: var(--sh-text-body-strong);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.18s, transform 0.18s;
+  }
+  .sh-zoom:hover .sh-zoom-badge,
+  .sh-zoom:focus-visible .sh-zoom-badge {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Full-screen viewer ── */
+  .sh-lb {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: hidden;
+    color: var(--sh-text-main);
+    font-family: inherit;
+  }
+  .sh-lb::backdrop {
+    background: rgba(3, 5, 16, 0.9);
+    backdrop-filter: blur(8px);
+  }
+  .sh-lb[open] {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(6px, 1.6vw, 24px);
+    padding: clamp(12px, 3vh, 34px) clamp(8px, 2vw, 28px);
+  }
+  .sh-lb-figure {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    margin: 0;
+  }
+  .sh-lb-img {
+    display: block;
+    max-width: 100%;
+    /* Leaves room for the caption without ever letterboxing the shot */
+    max-height: calc(100dvh - clamp(96px, 14vh, 150px));
+    width: auto;
     height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--sh-white-12);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  }
+  .sh-lb-cap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8125rem;
+    font-weight: 580;
+    color: var(--sh-text-body-strong);
+  }
+  .sh-lb-count {
+    padding-left: 10px;
+    border-left: 1px solid var(--sh-white-12);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--sh-text-body-soft);
+  }
+  .sh-lb-step,
+  .sh-lb-close {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--sh-white-10);
+    border-radius: 999px;
+    background: var(--sh-white-05);
+    color: var(--sh-text-nav);
+    cursor: pointer;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+  }
+  .sh-lb-step {
+    width: clamp(38px, 4vw, 48px);
+    height: clamp(38px, 4vw, 48px);
+  }
+  .sh-lb-prev {
+    grid-column: 1;
+  }
+  .sh-lb-next {
+    grid-column: 3;
+  }
+  .sh-lb-close {
+    position: absolute;
+    top: clamp(10px, 2vh, 20px);
+    right: clamp(10px, 2vw, 20px);
+    width: 36px;
+    height: 36px;
+  }
+  .sh-lb-step:hover,
+  .sh-lb-close:hover {
+    background: var(--sh-white-10);
+    border-color: var(--sh-white-20);
+    color: var(--sh-text-main);
+  }
+
+  @media (max-width: 640px) {
+    .sh-lb[open] {
+      grid-template-columns: 1fr;
+      align-content: center;
+    }
+    /* Arrows would crowd a phone screen - swipe and the counter carry it */
+    .sh-lb-step {
+      display: none;
+    }
+    .sh-lb-figure {
+      grid-column: 1;
+    }
+  }
+
+  .sh-shot-label {
+    margin-top: clamp(5px, 1.1vh, 10px);
+    font-size: clamp(0.6875rem, 1.4vh, 0.8125rem);
+    font-weight: 580;
+    letter-spacing: 0.01em;
+    text-align: center;
+    color: var(--sh-text-body-strong);
   }
 
   /* ── Footer ── */
@@ -775,6 +1314,14 @@ const features = [
     animation-delay: 0.75s;
   }
 
+  /* Past this width the frame stops growing with the column, so the rail's
+   percentage offset would drift onto the screenshot. */
+  @media (min-width: 2008px) {
+    .sh-shot-nav {
+      left: 53px;
+    }
+  }
+
   /* ── Short viewports ──
    The layout never scrolls on desktop, so on short screens secondary content
    is shed in priority order rather than being clipped behind the footer. */
@@ -798,25 +1345,18 @@ const features = [
       min-height: 100dvh;
       overflow: visible;
     }
-    .sh::after {
-      display: none;
-    }
-    .sh-bg,
     .sh-nb {
       position: fixed;
     }
     .sh-header {
       position: sticky;
       top: 0;
-      padding: 0 20px;
+      padding: 0 24px;
     }
     .sh-main {
       grid-template-columns: 1fr;
       padding: 30px 24px 48px;
       align-items: flex-start;
-    }
-    .sh-text {
-      padding-right: 0;
     }
     .sh-h1 {
       font-size: clamp(2rem, 8vw, 3.125rem);
@@ -840,25 +1380,33 @@ const features = [
     .sh-visual {
       height: auto;
       margin-top: 40px;
+      flex-direction: column;
       justify-content: center;
       animation-delay: 0.1s;
     }
     .sh-tilt-wrap {
-      width: 100%;
-      transform: perspective(1200px) rotateX(4deg) rotateY(-7deg) rotateZ(0.6deg);
+      max-width: none;
     }
-    .sh-app-frame img {
-      width: 100%;
+    /* Seventeen dots have to survive a 375px screen: narrower, taller for the
+     touch target, and allowed to wrap rather than overflow the page. */
+    .sh-shot-nav {
+      flex-wrap: wrap;
+      gap: 0;
+      margin-top: 16px;
+    }
+    .sh-shot-tab {
+      width: 18px;
+      height: 24px;
     }
     .sh-footer {
       height: auto;
-      padding: 18px 20px 22px;
+      padding: 18px 24px 22px;
     }
   }
 
   @media (max-width: 640px) {
     .sh-header {
-      padding: 0 12px;
+      padding: 0 18px;
     }
     .sh-main {
       padding: 26px 18px 40px;
@@ -908,8 +1456,16 @@ const features = [
     }
     .sh-nav-link,
     .sh-btn,
-    .sh-feat-icon {
+    .sh-feat-icon,
+    .sh-shot-tab,
+    .sh-zoom-badge,
+    .sh-lb-step,
+    .sh-lb-close {
       transition: none;
+    }
+    .sh-shot {
+      transition: none;
+      transform: none;
     }
   }
 </style>
