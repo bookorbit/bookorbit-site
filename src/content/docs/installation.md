@@ -270,3 +270,65 @@ docker compose up -d
 ```
 
 The app handles database migrations automatically on startup.
+
+### Moving from PostgreSQL 16 to 18
+
+The bundled database image moved from `pgvector/pgvector:pg16` to `pgvector/pgvector:pg18` in BookOrbit v2.2.0. This only affects installs created before that release. If you download a fresh `docker-compose.yml`, the PostgreSQL 18 container will refuse to start on a data directory that PostgreSQL 16 created, and the container is reported as unhealthy:
+
+```
+FATAL:  database files are incompatible with server
+DETAIL: The data directory was initialized by PostgreSQL version 16, which is not compatible with this version 18.x
+```
+
+:::note[You do not have to migrate]
+No BookOrbit feature requires PostgreSQL 18. To stay on 16, edit the `postgres:` service in your `docker-compose.yml` and set the image back to `pgvector/pgvector:pg16`. Everything else in the newer compose file works unchanged.
+:::
+
+PostgreSQL cannot open a data directory written by an older major version, so moving to 18 means dumping the database and restoring it into a fresh one.
+
+**1. Stop the stack and back up the current data directory.**
+
+```bash
+docker compose down
+cp -a data/postgres data/postgres.pg16.bak
+```
+
+**2. Dump the database from a temporary PostgreSQL 16 container.**
+
+```bash
+set -a && . ./.env && set +a
+
+docker run --rm -d --name bookorbit-pg16 \
+  -v "$PWD/data/postgres:/var/lib/postgresql/data" \
+  -e PGDATA=/var/lib/postgresql/data/pgdata \
+  -e POSTGRES_USER="$POSTGRES_USER" \
+  -e POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
+  -e POSTGRES_DB="$POSTGRES_DB" \
+  pgvector/pgvector:pg16
+
+docker exec bookorbit-pg16 pg_dumpall -U "$POSTGRES_USER" > bookorbit-pg16.sql
+docker stop bookorbit-pg16
+```
+
+:::caution[Check the dump before you continue]
+Confirm that `bookorbit-pg16.sql` is a plausible size and that its last line reads `PostgreSQL database dump complete`. The next step deletes the old data directory.
+:::
+
+**3. Start PostgreSQL 18 on an empty data directory.**
+
+```bash
+rm -rf data/postgres
+mkdir -p data/postgres
+docker compose up -d postgres
+```
+
+**4. Restore the dump, then start the rest of the stack.**
+
+```bash
+docker exec -i bookorbit-db psql -U "$POSTGRES_USER" -d postgres < bookorbit-pg16.sql
+docker compose up -d
+```
+
+`role "bookorbit" already exists` and `database "bookorbit" already exists` errors during the restore are expected, because the container creates `POSTGRES_USER` and `POSTGRES_DB` before the dump runs. The rest of the restore proceeds normally.
+
+Once BookOrbit is up and your library looks correct, delete `data/postgres.pg16.bak` and `bookorbit-pg16.sql`.
