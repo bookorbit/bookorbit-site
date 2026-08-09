@@ -77,6 +77,12 @@ const shots = [
     height: 696,
     alt: 'The metadata editor with per-field locks, provider IDs, series and publisher fields, and a rich text description',
   },
+  {
+    label: 'KOReader Plugin',
+    file: 'koreader-plugin',
+    height: 696,
+    alt: 'The BookOrbit plugin running on an e-ink device, showing the reading dashboard, the all-books grid, and a book page with a download button',
+  },
   /* Back out to the author and the series it sits in */
   {
     label: 'Authors',
@@ -160,15 +166,12 @@ const shots = [
     height: 696,
     alt: 'KOReader sync settings with connection status, plugin server URL, plugin download, and registered devices',
   },
-  {
-    label: 'KOReader Plugin',
-    file: 'koreader-plugin',
-    height: 696,
-    alt: 'The BookOrbit plugin running on an e-ink device, showing the reading dashboard, the all-books grid, and a book page with a download button',
-  },
 ].map(shot => ({
   ...shot,
   src: `/images/home/${shot.file}.webp`,
+  /* Its own width rather than a srcset step: the viewer's rail shows all
+     seventeen at once, and the 800 would be eight times the pixels it can use */
+  thumb: `/images/home/${shot.file}-320.webp`,
   srcset: (shot.widths ?? HERO_WIDTHS)
     .map(w => `/images/home/${shot.file}${w === 1200 ? '' : `-${w}`}.webp ${w}w`)
     .join(', '),
@@ -415,8 +418,12 @@ const shots = [
             </button>
           </div>
 
-          {/* Names only the selected screen, so 16 dots stay a row of dots */}
-          <p class="sh-shot-label" data-shot-label aria-hidden="true">{shots[0].label}</p>
+          {/* Names only the selected screen, so 17 dots stay a row of dots.
+          The count is what tells you how much gallery is left. */}
+          <p class="sh-shot-label" aria-hidden="true">
+            <span data-shot-label>{shots[0].label}</span>
+            <span class="sh-shot-count" data-shot-count>1 / {shots.length}</span>
+          </p>
         </div>
       </div>
     </div>
@@ -474,6 +481,26 @@ const shots = [
         aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg
       >
     </button>
+
+    {/* Seventeen dots are navigable but not browsable - once you are in the
+    viewer you want to see where you are going. Sources stay in data-* so the
+    rail costs nothing until the viewer is actually opened. */}
+    <div class="sh-lb-rail" data-lb-rail aria-label="Screenshots">
+      {
+        shots.map((shot, index) => (
+          <button
+            type="button"
+            class="sh-lb-thumb"
+            data-lb-thumb
+            aria-current={index === 0 ? 'true' : undefined}
+            aria-label={shot.label}
+            tabindex={index === 0 ? 0 : -1}
+          >
+            <img data-thumb-src={shot.thumb} width={96} height={56} alt="" decoding="async" />
+          </button>
+        ))
+      }
+    </div>
   </dialog>
 
   <footer class="sh-footer">
@@ -504,6 +531,7 @@ const shots = [
     const tabs = Array.from(gallery.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
     const slides = Array.from(gallery.querySelectorAll<HTMLElement>('[role="tabpanel"]'))
     const label = gallery.querySelector<HTMLElement>('[data-shot-label]')
+    const count = gallery.querySelector<HTMLElement>('[data-shot-count]')
 
     /* Deferred slides hold their URLs in data-* so they never compete with the
        LCP image. Promote one as soon as it is likely to be needed. */
@@ -534,18 +562,42 @@ const shots = [
        focus it previews the dot under the pointer without switching to it. */
     let previewed: number | null = null
     const paintLabel = () => {
-      if (!label) return
       const index = previewed ?? activeIndex()
-      label.textContent = tabs[index]?.getAttribute('aria-label') ?? ''
-      label.classList.toggle('is-preview', previewed !== null && previewed !== activeIndex())
+      if (label) {
+        label.textContent = tabs[index]?.getAttribute('aria-label') ?? ''
+        label.parentElement?.classList.toggle(
+          'is-preview',
+          previewed !== null && previewed !== activeIndex()
+        )
+      }
+      if (count) count.textContent = `${index + 1} / ${total}`
     }
     const preview = (index: number | null) => {
       previewed = index
       paintLabel()
     }
 
+    /* How far a slide drifts as it hands over. Enough to read as a direction,
+       not so far that it becomes a swipe. */
+    const DRIFT = 26
+
     const select = (index: number, moveFocus = false) => {
       warm(index)
+
+      /* Send the outgoing slide out the side the incoming one is not coming
+         from, so the handover carries the direction of travel. Shortest way
+         round, so the wrap from the last screen to the first still reads as
+         forward. */
+      const from = activeIndex()
+      if (from >= 0 && from !== index) {
+        const dir = (index - from + total) % total <= total / 2 ? 1 : -1
+        slides[from].style.setProperty('--x', `${-dir * DRIFT}px`)
+        slides[index].style.setProperty('--x', `${dir * DRIFT}px`)
+        /* Flush, or the incoming slide transitions from wherever it last
+           exited instead of from the offset just set on it */
+        void slides[index].offsetWidth
+      }
+
       tabs.forEach((tab, i) => {
         const selected = i === index
         tab.setAttribute('aria-selected', String(selected))
@@ -773,7 +825,23 @@ const shots = [
       const lbImg = lightbox.querySelector<HTMLImageElement>('[data-lb-img]')
       const lbLabel = lightbox.querySelector<HTMLElement>('[data-lb-label]')
       const lbCount = lightbox.querySelector<HTMLElement>('[data-lb-count]')
+      const thumbs = Array.from(lightbox.querySelectorAll<HTMLButtonElement>('[data-lb-thumb]'))
       let current = 0
+
+      /* A quarter of a megabyte of rail that most visitors never open, so it
+         waits for the first open and then stays */
+      let railLoaded = false
+      const loadRail = () => {
+        if (railLoaded) return
+        railLoaded = true
+        thumbs.forEach(thumb => {
+          const img = thumb.querySelector<HTMLImageElement>('img')
+          if (img?.dataset.thumbSrc) {
+            img.src = img.dataset.thumbSrc
+            delete img.dataset.thumbSrc
+          }
+        })
+      }
 
       const paint = (index: number) => {
         current = index
@@ -788,7 +856,23 @@ const shots = [
         }
         if (lbLabel) lbLabel.textContent = tabs[index].getAttribute('aria-label') ?? ''
         if (lbCount) lbCount.textContent = `${index + 1} / ${total}`
+        /* Roving tabindex so the rail is one tab stop rather than seventeen;
+           the dialog's own arrow keys are what walk it */
+        thumbs.forEach((thumb, i) => {
+          const selected = i === index
+          if (selected) thumb.setAttribute('aria-current', 'true')
+          else thumb.removeAttribute('aria-current')
+          thumb.tabIndex = selected ? 0 : -1
+          if (selected) thumb.scrollIntoView({ block: 'nearest', inline: 'center' })
+        })
       }
+
+      thumbs.forEach((thumb, index) =>
+        thumb.addEventListener('click', () => {
+          stopAuto()
+          paint(index)
+        })
+      )
 
       /* Stepping here is a deliberate pick, so it ends the auto tour the same
          way clicking a dot does */
@@ -799,6 +883,7 @@ const shots = [
 
       zoom.addEventListener('click', () => {
         hold('lightbox', true)
+        loadRail()
         paint(tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'))
         lightbox.showModal()
         document.documentElement.style.overflow = 'hidden'
@@ -853,8 +938,27 @@ const shots = [
         if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1)
       })
     }
-  }
 
+    /* ── Arrows anywhere on the page ──
+       The hero is the page on desktop, so stepping it should not first require
+       finding and focusing a 6px dot. Left and right are free here: nothing
+       scrolls sideways. Deferred to whatever already owns the keys - the open
+       viewer, the dot rail, a text field, or a browser shortcut. */
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return
+      if (lightbox?.open) return
+      const target = event.target
+      if (
+        target instanceof Element &&
+        target.closest('[role="tab"], input, textarea, select, [contenteditable]')
+      )
+        return
+      event.preventDefault()
+      stopAuto()
+      select((activeIndex() + (event.key === 'ArrowRight' ? 1 : total - 1)) % total)
+    })
+  }
 </script>
 
 <style>
@@ -885,6 +989,9 @@ const shots = [
     --sh-white-12: rgba(255, 255, 255, 0.12);
     --sh-white-20: rgba(255, 255, 255, 0.2);
     --sh-cyan-glow: rgba(34, 211, 238, 0.22);
+    /* The viewer's thumbnail rail, named because the picture above it has to
+     subtract the same number to stay uncropped */
+    --sh-rail-h: 70px;
 
     /* Vertical rhythm scales with viewport height so the fixed, non-scrolling
        layout still fits every element on short laptop screens. */
@@ -1083,17 +1190,41 @@ const shots = [
     color: var(--sh-text-hero);
     margin-bottom: var(--sh-gap-sm);
   }
+  /* A sheen travelling over the ramp rather than the ramp itself panning.
+   Panning the hue swung the words fully green at one end and lost the blue the
+   brand leads with; this leaves those three stops exactly where they were and
+   only moves light across them. The sweep occupies the last third of the
+   cycle, so it reads as an occasional glint, not a running light. */
   .sh-accent {
     background: linear-gradient(
-      118deg,
-      var(--sh-accent-blue) 0%,
-      var(--sh-accent-cyan) 52%,
-      var(--sh-accent-green) 100%
-    );
+        100deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.38) 50%,
+        transparent 62%
+      )
+      no-repeat,
+      linear-gradient(
+        118deg,
+        var(--sh-accent-blue) 0%,
+        var(--sh-accent-cyan) 52%,
+        var(--sh-accent-green) 100%
+      );
+    background-size: 240% 100%, 100% 100%;
+    background-position: -70% 0, 0 0;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: drop-shadow(0 0 24px var(--sh-cyan-glow));
+    animation: sh-accent-sheen 9s ease-in-out infinite;
+  }
+  @keyframes sh-accent-sheen {
+    0%,
+    64% {
+      background-position: -70% 0, 0 0;
+    }
+    100% {
+      background-position: 170% 0, 0 0;
+    }
   }
   .sh-desc {
     font-size: clamp(0.8125rem, 1.6vh, 0.90625rem);
@@ -1261,20 +1392,61 @@ const shots = [
     box-shadow: inset 0 1px 0 var(--sh-white-20), 0 40px 110px rgba(0, 0, 0, 0.72),
       0 18px 70px rgba(29, 78, 216, 0.16);
   }
+  /* --x is set per slide as the handover starts: the incoming screen is parked
+   on the side it should arrive from, the outgoing one leaves by the other. */
   .sh-shot {
     position: absolute;
     inset: 0;
     opacity: 0;
     visibility: hidden;
-    transform: scale(1.018);
-    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
+    transform: translateX(var(--x, 0px)) scale(1.018);
+    transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 0.7, 0.25, 1),
+      visibility 0s linear 0.42s;
   }
   .sh-shot.is-active {
     opacity: 1;
     visibility: visible;
     transform: none;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 0.7, 0.25, 1);
   }
+  /* A highlight that travels the frame's edge. Registered so the angle can be
+   interpolated at all; where @property is missing the arc simply sits still.
+   The frame clips to its padding box, so this rides just inside the border
+   rather than replacing it. */
+  @property --sh-spin {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  .sh-app-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: 9px;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--sh-spin),
+      transparent 0deg,
+      transparent 296deg,
+      rgba(96, 165, 250, 0.45) 332deg,
+      rgba(34, 211, 238, 0.7) 348deg,
+      rgba(96, 165, 250, 0.45) 356deg,
+      transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: sh-frame-spin 9s linear infinite;
+  }
+  @keyframes sh-frame-spin {
+    to {
+      --sh-spin: 360deg;
+    }
+  }
+
   /* Every screenshot is 1200x696 bar the dashboard, which is 4px shorter -
    cover absorbs that without letterboxing or squeezing anything. */
   .sh-app-frame img {
@@ -1470,12 +1642,14 @@ const shots = [
   .sh-lb[open] {
     display: grid;
     grid-template-columns: auto 1fr auto;
+    grid-template-rows: minmax(0, 1fr) auto;
     align-items: center;
     gap: clamp(6px, 1.6vw, 24px);
     padding: clamp(12px, 3vh, 34px) clamp(8px, 2vw, 28px);
   }
   .sh-lb-figure {
     grid-column: 2;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1486,8 +1660,8 @@ const shots = [
   .sh-lb-img {
     display: block;
     max-width: 100%;
-    /* Leaves room for the caption without ever letterboxing the shot */
-    max-height: calc(100dvh - clamp(96px, 14vh, 150px));
+    /* Leaves room for the caption and the rail without ever letterboxing */
+    max-height: calc(100dvh - clamp(96px, 14vh, 150px) - var(--sh-rail-h));
     width: auto;
     height: auto;
     border-radius: 10px;
@@ -1527,9 +1701,61 @@ const shots = [
   }
   .sh-lb-prev {
     grid-column: 1;
+    grid-row: 1;
   }
   .sh-lb-next {
     grid-column: 3;
+    grid-row: 1;
+  }
+
+  /* ── Viewer thumbnail rail ──
+   Seventeen at 96px overrun any laptop, so it scrolls and the selected one is
+   kept centred. `safe center` centres the strip when it fits and pins it to
+   the start when it does not, rather than clipping the first thumbnails out
+   of reach. */
+  .sh-lb-rail {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    justify-content: safe center;
+    align-items: center;
+    gap: 6px;
+    height: var(--sh-rail-h);
+    padding: 0 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sh-white-20) transparent;
+    overscroll-behavior-x: contain;
+  }
+  .sh-lb-thumb {
+    appearance: none;
+    flex: none;
+    padding: 0;
+    border: 1px solid var(--sh-white-10);
+    border-radius: 6px;
+    background: #0b1024;
+    overflow: hidden;
+    line-height: 0;
+    cursor: pointer;
+    opacity: 0.42;
+    transition: opacity 0.16s, border-color 0.16s, transform 0.16s;
+  }
+  .sh-lb-thumb img {
+    display: block;
+    width: 96px;
+    height: 56px;
+    object-fit: cover;
+    object-position: center top;
+  }
+  .sh-lb-thumb:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+  }
+  .sh-lb-thumb[aria-current='true'] {
+    opacity: 1;
+    border-color: var(--sh-accent-cyan);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
   }
   .sh-lb-close {
     position: absolute;
@@ -1546,6 +1772,9 @@ const shots = [
   }
 
   @media (max-width: 640px) {
+    .sh {
+      --sh-rail-h: 50px;
+    }
     .sh-lb[open] {
       grid-template-columns: 1fr;
       align-content: center;
@@ -1557,19 +1786,33 @@ const shots = [
     .sh-lb-figure {
       grid-column: 1;
     }
+    .sh-lb-thumb img {
+      width: 64px;
+      height: 38px;
+    }
   }
 
   .sh-shot-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
     margin-top: clamp(5px, 1.1vh, 10px);
     font-size: clamp(0.6875rem, 1.4vh, 0.8125rem);
     font-weight: 580;
     letter-spacing: 0.01em;
-    text-align: center;
     color: var(--sh-text-body-strong);
     transition: color 0.16s;
   }
   /* Reading a dot you are only hovering, not the one you are on */
   .sh-shot-label.is-preview {
+    color: var(--sh-text-body-soft);
+  }
+  .sh-shot-count {
+    padding-left: 9px;
+    border-left: 1px solid var(--sh-white-12);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
     color: var(--sh-text-body-soft);
   }
 
@@ -1782,6 +2025,18 @@ const shots = [
   @media (prefers-reduced-motion: reduce) {
     .sh-btn-alt {
       animation: none;
+    }
+    /* Stopped mid-sweep the sheen would sit on the words as a pale band */
+    .sh-accent {
+      animation: none;
+      background-position: -70% 0, 0 0;
+    }
+    /* A stalled arc reads as a rendering fault rather than a highlight */
+    .sh-app-frame::after {
+      display: none;
+    }
+    .sh-lb-thumb {
+      transition: none;
     }
     .sh-rise,
     .sh-header,

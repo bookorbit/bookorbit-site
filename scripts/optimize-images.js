@@ -19,9 +19,12 @@ const SECTION_QUALITY = {
 
 // Extra widths emitted for a srcset, keyed by path relative to ORIGINALS_DIR.
 // The MAX_WIDTH file is always produced as well.
-const HERO_WIDTHS = [800, 2000]
+// 320 is the lightbox's thumbnail rail rather than a srcset step - the strip
+// shows all seventeen at once, and the 800 would be eight times the pixels it
+// can use.
+const HERO_WIDTHS = [320, 800, 2000]
 const RESPONSIVE = {
-  'home/dashboard-overview.png': [800, 1600, 2000],
+  'home/dashboard-overview.png': [320, 800, 1600, 2000],
   ...Object.fromEntries(
     [
       'book-details',
