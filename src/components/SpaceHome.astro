@@ -310,7 +310,7 @@ const shots = [
     <div class="sh-visual" data-gallery>
       <div class="sh-glow"></div>
 
-      <div class="sh-tilt-wrap">
+      <div class="sh-tilt-wrap" data-stage>
         <div class="sh-app-frame">
           <button type="button" class="sh-zoom" data-zoom>
             <span class="sh-sr-only">View screenshot full screen</span>
@@ -359,22 +359,61 @@ const shots = [
         so the frame itself lands on the column's centre line and stays level
         with the copy beside it. */}
         <div class="sh-shot-controls">
-        <div class="sh-shot-nav" role="tablist" aria-label="Screenshots">
-          {
-            shots.map((shot, index) => (
-              <button
-                type="button"
-                role="tab"
-                class="sh-shot-tab"
-                id={`sh-tab-${index}`}
-                aria-controls={`sh-shot-${index}`}
-                aria-selected={index === 0 ? 'true' : 'false'}
-                tabindex={index === 0 ? 0 : -1}
-                aria-label={shot.label}
-              />
-            ))
-          }
-        </div>
+          <div class="sh-shot-row">
+            {/* Balances the toggle on the far side so the dots stay centred on
+            the frame rather than being pushed off it */}
+            <span class="sh-shot-spacer" aria-hidden="true"></span>
+
+            <div class="sh-shot-nav" role="tablist" aria-label="Screenshots" data-shot-nav>
+              {
+                shots.map((shot, index) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    class="sh-shot-tab"
+                    id={`sh-tab-${index}`}
+                    aria-controls={`sh-shot-${index}`}
+                    aria-selected={index === 0 ? 'true' : 'false'}
+                    tabindex={index === 0 ? 0 : -1}
+                    aria-label={shot.label}
+                  />
+                ))
+              }
+            </div>
+
+            {/* Hidden until the tour actually arms, so a visitor who never gets
+            autoplay is not offered a control over nothing */}
+            <button
+              type="button"
+              class="sh-shot-play"
+              data-shot-play
+              aria-label="Play the screenshot tour"
+              hidden
+            >
+              <svg
+                class="sh-play-glyph"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"><path d="M8.5 5.2 19 12 8.5 18.8Z"></path></svg
+              >
+              <svg
+                class="sh-pause-glyph"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                ><rect x="6.5" y="5" width="4" height="14" rx="1.4"></rect><rect
+                  x="13.5"
+                  y="5"
+                  width="4"
+                  height="14"
+                  rx="1.4"></rect></svg
+              >
+            </button>
+          </div>
 
           {/* Names only the selected screen, so 16 dots stay a row of dots */}
           <p class="sh-shot-label" data-shot-label aria-hidden="true">{shots[0].label}</p>
@@ -489,6 +528,22 @@ const shots = [
       load((index + 1) % total)
     }
 
+    const activeIndex = () => tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true')
+
+    /* One label serves two jobs: it names the screen on show, and on hover or
+       focus it previews the dot under the pointer without switching to it. */
+    let previewed: number | null = null
+    const paintLabel = () => {
+      if (!label) return
+      const index = previewed ?? activeIndex()
+      label.textContent = tabs[index]?.getAttribute('aria-label') ?? ''
+      label.classList.toggle('is-preview', previewed !== null && previewed !== activeIndex())
+    }
+    const preview = (index: number | null) => {
+      previewed = index
+      paintLabel()
+    }
+
     const select = (index: number, moveFocus = false) => {
       warm(index)
       tabs.forEach((tab, i) => {
@@ -499,14 +554,25 @@ const shots = [
         if (selected) slides[i].removeAttribute('aria-hidden')
         else slides[i].setAttribute('aria-hidden', 'true')
       })
-      if (label) label.textContent = tabs[index].getAttribute('aria-label') ?? ''
+      paintLabel()
       if (moveFocus) tabs[index].focus()
     }
 
     tabs.forEach((tab, index) => {
-      tab.addEventListener('click', () => select(index))
-      tab.addEventListener('pointerenter', () => load(index))
-      tab.addEventListener('focus', () => load(index))
+      tab.addEventListener('click', () => {
+        stopAuto()
+        select(index)
+      })
+      tab.addEventListener('pointerenter', () => {
+        load(index)
+        preview(index)
+      })
+      tab.addEventListener('pointerleave', () => preview(null))
+      tab.addEventListener('focus', () => {
+        load(index)
+        preview(index)
+      })
+      tab.addEventListener('blur', () => preview(null))
       tab.addEventListener('keydown', event => {
         const last = total - 1
         let next = -1
@@ -516,12 +582,174 @@ const shots = [
         else if (event.key === 'End') next = last
         if (next < 0) return
         event.preventDefault()
+        stopAuto()
         select(next, true)
       })
     })
 
+    /* ── Auto-advance ──
+       The tour walks itself so the hero is never a still frame, and it yields
+       the moment the visitor might be reading: a hover, a focused control, a
+       backgrounded tab or a hero scrolled out of view all hold it where it is,
+       and picking a screen by hand ends it for good. The active dot fills over
+       the same interval, so the next step is always announced rather than
+       sprung, and it pauses on the same frame the timer does. */
+    const AUTO_MS = 5000
+    const nav = gallery.querySelector<HTMLElement>('[data-shot-nav]')
+    const stage = gallery.querySelector<HTMLElement>('[data-stage]')
+    const playBtn = gallery.querySelector<HTMLButtonElement>('[data-shot-play]')
+
+    let live = false
+    let timer = 0
+    let startedAt = 0
+    let remaining = AUTO_MS
+    const holds = new Set<string>()
+
+    /* Both classes are derived from state in one place, so the dot can never
+       disagree with the timer. `is-auto` turns the selected dot into a track
+       for the fill; `is-paused` freezes that fill where it stands. A hand-pause
+       is deliberately not `is-paused` - it drops the whole timer skin, because
+       a track frozen at 3% reads as nothing at all and the dot still has to
+       mark where you are. */
+    const paintSkin = () => {
+      const armed = live && !holds.has('user')
+      nav?.classList.toggle('is-auto', armed)
+      nav?.classList.toggle('is-paused', armed && holds.size > 0)
+    }
+
+    const run = () => {
+      if (!live || timer) return
+      if (!holds.size) {
+        startedAt = performance.now()
+        timer = window.setTimeout(() => {
+          timer = 0
+          remaining = AUTO_MS
+          select((activeIndex() + 1) % total)
+          run()
+        }, remaining)
+      }
+      paintSkin()
+    }
+
+    /* Bank the unspent time so resuming picks up where the dot's fill stopped
+       rather than restarting the interval under the visitor */
+    const halt = () => {
+      if (timer) {
+        window.clearTimeout(timer)
+        timer = 0
+        remaining = Math.max(600, remaining - (performance.now() - startedAt))
+      }
+      paintSkin()
+    }
+
+    const hold = (reason: string, on: boolean) => {
+      if (on) {
+        holds.add(reason)
+        halt()
+      } else {
+        holds.delete(reason)
+        run()
+      }
+    }
+
+    /* The toggle reports intent, not the transient holds: hovering the frame
+       should not flip it to "play" when nothing was actually turned off. The
+       dot's fill freezing is what reports a hold. */
+    const paintPlay = () => {
+      if (!playBtn || total < 2) return
+      const playing = live && !holds.has('user')
+      playBtn.hidden = false
+      playBtn.classList.toggle('is-playing', playing)
+      playBtn.setAttribute(
+        'aria-label',
+        playing ? 'Pause the screenshot tour' : 'Play the screenshot tour'
+      )
+    }
+
+    function stopAuto() {
+      if (!live) return
+      live = false
+      halt()
+      paintPlay()
+    }
+
+    /* `force` is the toggle pressed by hand, which outranks the motion
+       preference - the visitor is asking for this one specifically. */
+    const startAuto = (force = false) => {
+      if (live || total < 2) return
+      if (!force && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      live = true
+      remaining = AUTO_MS
+      nav?.style.setProperty('--sh-auto', `${AUTO_MS}ms`)
+      /* Seeded, not just watched: a page opened in a background tab is hidden
+         before the first event ever fires, and a hidden tab still runs timers
+         while it renders nothing, so the tour would step through the gallery
+         behind a frozen crossfade and surface blank. */
+      if (document.hidden) holds.add('hidden')
+      run()
+      paintPlay()
+    }
+
+    playBtn?.addEventListener('click', () => {
+      if (live && !holds.has('user')) {
+        holds.add('user')
+        halt()
+        /* Play then gets a whole interval rather than the sliver the fill
+           happened to stop on, since the skin went away with it */
+        remaining = AUTO_MS
+        paintPlay()
+        return
+      }
+      /* Pressing play is an explicit "go", so it drops the holds the visitor is
+         themselves the cause of - otherwise the pointer still resting on the
+         frame swallows the press. The environmental ones stand: a hidden tab
+         or a scrolled-away hero clears itself. */
+      holds.delete('user')
+      holds.delete('hover')
+      holds.delete('focus')
+      if (live) {
+        run()
+        paintPlay()
+      } else {
+        startAuto(true)
+      }
+    })
+
+    /* Touch taps fire pointerenter without a matching leave, which would strand
+       the timer, so hover only holds on devices that really hover */
+    if (stage && window.matchMedia('(hover: hover)').matches) {
+      stage.addEventListener('pointerenter', () => hold('hover', true))
+      stage.addEventListener('pointerleave', () => hold('hover', false))
+    }
+    /* The toggle is exempt: focusing the thing you press to resume must not be
+       what keeps it paused */
+    const onToggle = (event: FocusEvent) =>
+      event.target instanceof Element && !!event.target.closest('[data-shot-play]')
+    gallery.addEventListener('focusin', event => {
+      if (!onToggle(event)) hold('focus', true)
+    })
+    gallery.addEventListener('focusout', event => {
+      if (!onToggle(event)) hold('focus', false)
+    })
+    document.addEventListener('visibilitychange', () => hold('hidden', document.hidden))
+
+    /* On the phone layout the hero sits above a scrollable page - no point
+       burning through seventeen screens nobody is looking at */
+    if (stage && 'IntersectionObserver' in window) {
+      new IntersectionObserver(
+        entries => hold('offscreen', !entries[entries.length - 1].isIntersecting),
+        { threshold: 0.35 }
+      ).observe(stage)
+    }
+
     /* Fill the starting window once the hero image is no longer competing */
-    const warmFirst = () => warm(0)
+    const warmFirst = () => {
+      warm(0)
+      startAuto()
+      /* Shown even when the motion preference kept the tour from arming, so
+         that visitor can still opt into it */
+      paintPlay()
+    }
     if (document.readyState === 'complete') warmFirst()
     else window.addEventListener('load', warmFirst, { once: true })
 
@@ -562,9 +790,15 @@ const shots = [
         if (lbCount) lbCount.textContent = `${index + 1} / ${total}`
       }
 
-      const step = (delta: number) => paint((current + delta + total) % total)
+      /* Stepping here is a deliberate pick, so it ends the auto tour the same
+         way clicking a dot does */
+      const step = (delta: number) => {
+        stopAuto()
+        paint((current + delta + total) % total)
+      }
 
       zoom.addEventListener('click', () => {
+        hold('lightbox', true)
         paint(tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'))
         lightbox.showModal()
         document.documentElement.style.overflow = 'hidden'
@@ -574,6 +808,7 @@ const shots = [
          the dialog's close event, which not every engine delivers reliably */
       const restore = () => {
         document.documentElement.style.overflow = ''
+        hold('lightbox', false)
       }
       const close = () => {
         lightbox.close()
@@ -1018,6 +1253,9 @@ const shots = [
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid var(--sh-white-12);
+    /* Stepping can outrun a slow connection - this keeps a not-yet-decoded
+     screen a lit panel rather than a hole punched in the page */
+    background: linear-gradient(155deg, #101736 0%, #080c1f 60%);
     /* Symmetric now that the frame is flat - the old offsets leaned right to
      match the perspective */
     box-shadow: inset 0 1px 0 var(--sh-white-20), 0 40px 110px rgba(0, 0, 0, 0.72),
@@ -1056,13 +1294,58 @@ const shots = [
     left: 0;
     right: 0;
   }
+  .sh-shot-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
   .sh-shot-nav {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2px;
   }
+  /* Deliberately quiet: the dots are the navigation, this only governs whether
+   they advance on their own, so it sits at the weight of a caption. */
+  .sh-shot-play,
+  .sh-shot-spacer {
+    flex: none;
+    width: 22px;
+    height: 22px;
+  }
+  .sh-shot-play {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: none;
+    color: var(--sh-text-body-soft);
+    cursor: pointer;
+    transition: color 0.16s, background 0.16s, border-color 0.16s;
+  }
+  .sh-shot-play:hover {
+    color: var(--sh-text-body-strong);
+    background: var(--sh-white-07);
+    border-color: var(--sh-white-10);
+  }
+  .sh-shot-play[hidden] {
+    display: none;
+  }
+  .sh-shot-play svg {
+    grid-area: 1 / 1;
+  }
+  .sh-shot-play .sh-pause-glyph,
+  .sh-shot-play.is-playing .sh-play-glyph {
+    display: none;
+  }
+  .sh-shot-play.is-playing .sh-pause-glyph {
+    display: block;
+  }
   .sh-shot-tab {
+    position: relative;
     appearance: none;
     border: 0;
     background: none;
@@ -1088,6 +1371,46 @@ const shots = [
     width: 18px;
     background: linear-gradient(90deg, var(--sh-accent-blue), var(--sh-accent-cyan));
     box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+  }
+
+  /* While the tour is running the selected dot becomes a track and this fill
+   sweeps it over exactly one interval, so the next screen is announced rather
+   than sprung. The gradient is pinned to the full 18px so the colour ramp
+   stays put instead of compressing into the sliver. */
+  .sh-shot-tab::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 6px;
+    margin: -3px 0 0 -9px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--sh-accent-blue), var(--sh-accent-cyan)) left center /
+      18px 100% no-repeat;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sh-shot-nav.is-auto .sh-shot-tab[aria-selected='true']::before {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: none;
+  }
+  .sh-shot-nav.is-auto .sh-shot-tab[aria-selected='true']::after {
+    opacity: 1;
+    animation: sh-tab-fill var(--sh-auto, 5000ms) linear both;
+  }
+  /* Held on the same frame the timer banks its remaining time on */
+  .sh-shot-nav.is-auto.is-paused .sh-shot-tab[aria-selected='true']::after {
+    animation-play-state: paused;
+  }
+  @keyframes sh-tab-fill {
+    from {
+      width: 0;
+    }
+    to {
+      width: 18px;
+    }
   }
   /* Covers the frame so the whole screenshot is the click target; the badge
    is the only visible part and only once you are over it. */
@@ -1243,6 +1566,11 @@ const shots = [
     letter-spacing: 0.01em;
     text-align: center;
     color: var(--sh-text-body-strong);
+    transition: color 0.16s;
+  }
+  /* Reading a dot you are only hovering, not the one you are on */
+  .sh-shot-label.is-preview {
+    color: var(--sh-text-body-soft);
   }
 
   /* ── Footer ── */
@@ -1390,10 +1718,18 @@ const shots = [
     }
     /* Seventeen dots have to survive a 375px screen: narrower, taller for the
      touch target, and allowed to wrap rather than overflow the page. */
+    .sh-shot-row {
+      margin-top: 16px;
+    }
     .sh-shot-nav {
       flex-wrap: wrap;
       gap: 0;
-      margin-top: 16px;
+    }
+    /* Big enough to hit with a thumb once it is the only control down here */
+    .sh-shot-play,
+    .sh-shot-spacer {
+      width: 30px;
+      height: 30px;
     }
     .sh-shot-tab {
       width: 18px;
@@ -1459,10 +1795,26 @@ const shots = [
     .sh-btn,
     .sh-feat-icon,
     .sh-shot-tab,
+    .sh-shot-label,
+    .sh-shot-play,
     .sh-zoom-badge,
     .sh-lb-step,
     .sh-lb-close {
       transition: none;
+    }
+    /* The tour does not arm on its own here, and if it is switched on by hand
+     the dot stays a plain marker rather than becoming a timer */
+    .sh-shot-tab::before,
+    .sh-shot-tab::after {
+      transition: none;
+      animation: none;
+    }
+    .sh-shot-nav.is-auto .sh-shot-tab[aria-selected='true']::before {
+      background: linear-gradient(90deg, var(--sh-accent-blue), var(--sh-accent-cyan));
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+    }
+    .sh-shot-nav.is-auto .sh-shot-tab[aria-selected='true']::after {
+      opacity: 0;
     }
     .sh-shot {
       transition: none;
