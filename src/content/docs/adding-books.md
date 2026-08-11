@@ -90,6 +90,7 @@ Where the uploaded file is written depends on the library's organization mode an
 | `{publisher}` | Publisher name |
 | `{language}` | Language code |
 | `{isbn}` | ISBN-13 |
+| `{library}` | Library name |
 | `{originalFilename}` | Uploaded filename without extension |
 | `{extension}` | File extension without the dot |
 
