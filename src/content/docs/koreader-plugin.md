@@ -12,7 +12,7 @@ For the sync details - reading sessions, highlight exchange, how BookOrbit proce
 
 <img src="/images/koreader/settings-status.webp" alt="KOReader Sync settings page showing progress sync toggle, credentials, plugin server URL, plugin download, and paired device" class="img-lg img-bordered" />
 
-The KOReader account is separate from the normal BookOrbit login. A user with `koreader_sync` creates one username and password in **Settings > Integrations > KOReader**. That account belongs to the same BookOrbit user, so every sync request is still scoped to that user's accessible libraries and permissions.
+The KOReader account is separate from the normal BookOrbit login. A user with `koreader_sync` creates one username and password in **Settings > KOReader**. That account belongs to the same BookOrbit user, so every sync request is still scoped to that user's accessible libraries and permissions. To rotate the username or password, use **Change credentials** beside the current username. BookOrbit keeps the user's synced data, but devices using the previous login must be reconnected or updated with a newly downloaded plugin package.
 
 The **Progress sync** toggle is the kill switch for the device account. When it is off, paired KOReader devices stop syncing. Deleting the credentials disconnects the devices, but the progress, reading sessions, and annotations already stored in BookOrbit remain.
 
@@ -132,7 +132,7 @@ Tapping a genre tag on the detail page opens the full genre list for that book. 
 
 <img src="/images/koreader/settings-danger-zone.webp" alt="KOReader Sync danger zone with delete credentials action" class="img-lg img-bordered" />
 
-Deleting credentials removes the KOReader account and disconnects paired devices. It does not erase existing BookOrbit reading progress, reading sessions, highlights, or ratings. Create new credentials when you want to pair devices again.
+Deleting credentials removes the KOReader account and disconnects paired devices. It does not erase existing BookOrbit reading progress, reading sessions, highlights, or ratings. Use **Change credentials** when you only need to replace the username or password. Delete the credentials when you want to remove the KOReader account entirely; you can create another credential set later.
 
 ## Troubleshooting
 
