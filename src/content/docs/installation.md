@@ -243,6 +243,7 @@ docker compose up -d
 | `CLIENT_URL` | No | Same as `APP_URL` | Frontend URL when the client is served from a different domain |
 | `EMAIL_ENCRYPTION_KEY` | No | - | Encrypts stored SMTP credentials at rest. Recommended if you configure email |
 | `MIGRATION_ENCRYPTION_KEY` | No | - | Encrypts stored migration source credentials. Recommended if you use migrations |
+| `MIGRATION_IMPORT_ROOT` | No | - | Absolute server path containing Audiobookshelf backups or Calibre-Web Automated database snapshots. Use a dedicated read-only mount |
 | `LOG_LEVEL` | No | `info` | Log verbosity. Set to `debug` for detailed output |
 | `OIDC_ALLOW_LOCAL_ISSUERS` | No | `false` | Allows OIDC discovery on private addresses. Enable only on a trusted network |
 | `CSP_ALLOW_CLOUDFLARE_INSIGHTS` | No | `false` | Allows the Cloudflare Web Analytics beacon in the content security policy |
