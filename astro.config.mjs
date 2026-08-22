@@ -45,6 +45,7 @@ export default defineConfig({
           items: [
             { label: 'Library File Structure', slug: 'library-file-structure' },
             { label: 'Book Dock', slug: 'book-dock' },
+            { label: 'Book Requests', slug: 'book-requests' },
             { label: 'Migration', slug: 'migration' },
           ],
         },
@@ -84,6 +85,7 @@ export default defineConfig({
             { label: 'Users & Permissions', slug: 'users' },
             { label: 'Account Activity', slug: 'account-activity' },
             { label: 'OIDC / SSO', slug: 'oidc' },
+            { label: 'Authentication Proxies', slug: 'auth-proxies' },
           ],
         },
       ],

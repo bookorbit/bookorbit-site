@@ -77,3 +77,4 @@ For plugin setup, catalog, and login issues see [KOReader Plugin - Troubleshooti
 | Highlights do not move both ways | Enable **Two-way highlight sync** in the KOReader plugin menu and run another sync for the book. |
 | Deleted highlights remain pending | Sync the KOReader device again so it can acknowledge the delete. Pending deletes are kept until the device reports that it applied them. |
 | Restore lands near the chapter, not the exact line | BookOrbit may only have an approximate translated position for that direction. Open and sync the book once from KOReader to store a native KOReader position. |
+| Sync does nothing at all, with no error | A login proxy in front of BookOrbit is answering with its sign-in page. See [Authentication Proxies](/auth-proxies). |

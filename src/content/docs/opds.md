@@ -141,3 +141,4 @@ If a reader app has separate choices for OPDS version or authentication type, us
 | Catalog opens but has no books | Confirm the user has access to at least one library with `present` books. |
 | A specific book is missing | Confirm the book is present, belongs to an accessible library, and has a primary file. |
 | Covers do not load | Confirm the BookOrbit URL is reachable from the reader and that your reverse proxy allows image requests under `/api/v1/opds`. |
+| Catalog opens but is completely empty, with no error | A login proxy in front of BookOrbit is answering with its sign-in page. See [Authentication Proxies](/auth-proxies). |
