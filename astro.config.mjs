@@ -88,6 +88,13 @@ export default defineConfig({
             { label: 'Authentication Proxies', slug: 'auth-proxies' },
           ],
         },
+        {
+          label: 'Support & Legal',
+          items: [
+            { label: 'BookOrbit iOS Support', slug: 'support' },
+            { label: 'Privacy Policy', slug: 'privacy' },
+          ],
+        },
       ],
     }),
   ],
