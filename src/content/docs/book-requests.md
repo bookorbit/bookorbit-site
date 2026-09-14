@@ -21,13 +21,13 @@ Two permissions decide how much of this feature a person sees.
 
 **Manage book requests** (`manage_book_requests`) turns the page into a moderation queue: the **All requests** tab, the approve and reject buttons, the release picker, and deleting a settled request for everybody.
 
-Setting up the plumbing - sources, download clients, automation - needs **App settings** (`manage_app_settings`) instead, under **Settings > Server > Requests**: holding a tracker credential is a different level of trust from waving a request through.
+Setting up the plumbing - sources, download clients, automation - needs **App settings** (`manage_app_settings`) instead, under **Settings > Server > Requests**: holding an indexer credential is a different level of trust from waving a request through.
 
 Everything below works without a single source configured, right up to the moment a book has to be fetched. If you only want the social half, a queue of what people want that you satisfy by hand, you can stop reading after [Closing a request by hand](#closing-a-request-by-hand).
 
 ## Asking for a book
 
-The **Request a book** tab searches metadata providers, not trackers. A requester asks for a *work* and never sees a tracker, a release name or a seeder count; picking the actual file is somebody else's job.
+The **Request a book** tab searches metadata providers, not trackers or indexers. A requester asks for a *work* and never sees an indexer, a release name or a seeder count; picking the actual file is somebody else's job.
 
 <img src="/images/book-requests/request-a-book.webp" alt="Request a book tab with search results grouped by work, each showing its cover, author, year and source count" class="img-bordered" />
 
@@ -87,7 +87,7 @@ Four actions that sound alike and are not:
 - **Cancel** stops a request that is still running, and anyone waiting on it does not get the book. A transfer in flight is stopped: data already in the download client is kept, and partial direct-download staging is cleaned up.
 - **Dismiss** hides a settled request from *your own* list; nobody else's view changes, and **Restore** puts it back.
 - **Leave** is for someone who joined a request rather than making it. You stop following it and stop hearing about it; the request carries on.
-- **Delete** removes the row for everyone, which is why it is a moderator action on a settled request only. Any torrent still seeding is removed from the download client with its files left in place.
+- **Delete** removes the row for everyone, which is why it is a moderator action on a settled request only. Any download still in a client (such as an active transfer or seeding torrent) is removed with its files left in place.
 
 ## Approving
 
@@ -97,7 +97,7 @@ Approving does not fetch anything by itself; a release still has to be chosen. W
 
 ### The release picker
 
-This is where the tracker side of the world finally appears, and only for the person approving.
+This is where the tracker and indexer side of the world finally appears, and only for the person approving.
 
 <img src="/images/book-requests/release-picker.webp" alt="Release picker showing three scored releases with sort controls and format and indexer facets" class="img-lg img-bordered" />
 
@@ -115,15 +115,15 @@ BookOrbit searches every enabled source in parallel, merges the answers into one
 
 **Why this score** on any row breaks that down line by line. Since the match is worth more than everything else put together, a well-seeded release of the wrong book cannot climb over a thin one of the right book.
 
-Some releases never reach the list. A seeder count of zero, a format not usable for the medium, or a language the request ruled out is filtered before scoring, and a line under the list says how many went that way. File count is deliberately *not* a filter: three formats of one title, or an audiobook in twelve parts, are ordinary packaging.
+Some releases never reach the list. A torrent with a seeder count of zero, a format not usable for the medium, or a language the request ruled out is filtered before scoring, and a line under the list says how many went that way. (Usenet releases do not have swarms or seeders; they are never filtered for zero seeders and do not receive seeder points.) File count is deliberately *not* a filter: three formats of one title, or an audiobook in twelve parts, are ordinary packaging.
 
-Above the list, sort by best match, seeders, size, bitrate or date, and narrow by format, source, language, file layout, audio, freeleech or **Hide VIP only**. Facets are counted from the results you actually got, so a chip that would leave nothing is not offered.
+Above the list, sort by best match, seeders, size, bitrate or date, and narrow by format, source, language, file layout, audio, freeleech or **Hide VIP only**. Releases carry a protocol badge (**Torrent**, **Usenet**, or **Direct**) alongside the source name. Facets are counted from the results you actually got, so a chip that would leave nothing is not offered.
 
 **Change search** reopens the query, because a request snapshot is not always the best one. Edit the title and authors, switch between the ISBNs on offer, one you type yourself, or a plain title-and-author search, adjust the language and formats, and search again. The line above the list says what each source was handed and what it returned.
 
-**View files** reads a release's file list before you commit to it: one book in several formats, one book split into parts, an archive whose contents are unknown until it unpacks, or genuinely several separate books. The last case is fine - it downloads, and then BookOrbit asks which book to keep. A magnet link cannot be inspected this way, because its file list does not exist until a client fetches it from the swarm.
+**View files** (or **About contents** for Usenet) reads a release's file list before you commit to it: one book in several formats, one book split into parts, an archive whose contents are unknown until it unpacks, or genuinely several separate books. The last case is fine - it downloads, and then BookOrbit asks which book to keep. A magnet link cannot be inspected this way because its file list does not exist until a client fetches metadata from the swarm, and a Usenet release's final unpacked files remain unavailable until NZBGet downloads and extracts them.
 
-**Paste a link instead** skips the search for a magnet link or `.torrent` file you already have, and goes through the same pipeline as everything else.
+**Use magnet or .torrent instead** skips the search for a torrent link or `.torrent` file you already have, and goes through the same pipeline as everything else.
 
 If a release turns out badly, **Try another release** reopens the picker on a failed request without re-approving it. Releases that already failed are marked with the reason, so you do not walk into the same wall twice: a source that refused the file or did not answer, a release needing a VIP account, or a download client that would not take it.
 
@@ -135,14 +135,14 @@ The **Progress** strip at the top of the drawer is the whole journey in five ste
 
 Behind those five steps:
 
-1. The release goes to the highest-priority enabled download client, tagged with that client's category so BookOrbit only ever acts on its own downloads.
+1. The release goes to the highest-priority enabled download client supporting that delivery method (torrents go to a torrent client, NZBs go to NZBGet), tagged with that client's category so BookOrbit only ever acts on its own downloads.
 2. BookOrbit polls for progress. Nothing is moved while the transfer runs.
-3. When it completes, the finished file is **hardlinked** into the Book Dock, so it occupies no extra disk and the torrent keeps seeding from where it was. Across filesystems a hardlink is impossible, and BookOrbit copies instead, which does use the space twice.
+3. When it completes, the finished file is **hardlinked** into the Book Dock, so it occupies no extra disk. For torrents, the file keeps seeding from the client's download folder; for NZBs, duplicate disk usage is avoided while files stay in NZBGet. Across filesystems a hardlink is impossible, and BookOrbit copies instead, which does use the space twice.
 4. The Book Dock reads the file's title and author, so it can be named and filed correctly.
 5. If import checking is on, the file is scored against the request. Anything clearing the threshold is filed into the destination library and the request goes to **Available**.
 6. Everyone who asked for the book is notified.
 
-Sources that hand over a plain file rather than a torrent - LibriVox, Project Gutenberg and similar - skip the download client entirely. BookOrbit fetches the file itself into a staging directory and joins the pipeline at step 4.
+Sources that hand over a plain file rather than a torrent or NZB - LibriVox, Project Gutenberg and similar - skip the download client entirely. BookOrbit fetches the file itself into a staging directory and joins the pipeline at step 4.
 
 ### When a request needs review
 
@@ -150,15 +150,17 @@ Step 5 guards against the thing that goes wrong most often: a release that says 
 
 This is a different question from the one the Book Dock's confidence column answers, which is whether the file's embedded metadata agrees with what providers returned for it. Ask for *Dune*, receive *Dune Messiah*, and both sides agree perfectly on *Dune Messiah*: high confidence, wrong book. The request check is what catches it.
 
-Below the threshold, nothing is filed. The request moves to **Needs review**, the file waits in the Book Dock, and the drawer shows a **Why this is waiting** panel with the requested and imported values side by side and a verdict on each field. From there, **File it anyway** files it exactly as a passing score would have, and **Discard this import** clears the files out of the Book Dock and marks the request failed. Discarding leaves the torrent seeding; stop that separately if you want it gone.
+Below the threshold, nothing is filed. The request moves to **Needs review**, the file waits in the Book Dock, and the drawer shows a **Why this is waiting** panel with the requested and imported values side by side and a verdict on each field. From there, **File it anyway** files it exactly as a passing score would have, and **Discard this import** clears the files out of the Book Dock and marks the request failed. Discarding leaves the files in the download client; stop or delete them separately if you want them gone.
 
 The threshold is forgiving on purpose: subtitles, series suffixes and translated editions all cost points, and a false hold costs one click while a false pass puts the wrong book in somebody's library.
 
-### Seeding
+### Seeding and client downloads
 
-BookOrbit never stops a seed on its own. The source file is never moved or deleted, so a torrent keeps seeding indefinitely after the book is in your library.
+BookOrbit never stops a seed or removes a finished download on its own. For torrents, the source file is never moved or deleted, so it keeps seeding indefinitely after the book is in your library.
 
-Seed goals are not something you set on a source. Where a tracker's feed states a ratio or a time, that figure is passed to the download client at grab time and the client enforces it; otherwise your client's defaults apply. BookOrbit only reads the result back: the **Download client** section of the drawer shows state, ratio, seeding time and uploaded bytes, with a **Remove from client** action and an optional **Also delete the downloaded files** checkbox. Removing a torrent never touches the imported book.
+Torrent sources can set manual seed ratio and seed-time goals under **Settings > Server > Requests > Sources**, or inherit tracker-advertised goals when enabled. Usenet releases do not seed back once completed.
+
+BookOrbit reads client statistics back: the **Download client** section of the drawer shows state, ratio, seeding time and uploaded bytes for torrents, or transfer status for NZBs, with a **Remove from client** action and an optional **Also delete the downloaded files** checkbox. Removing a client download never touches the imported book.
 
 ### Closing a request by hand
 
@@ -170,13 +172,13 @@ Everything from here is **Settings > Server > Requests**, and needs the **App se
 
 ### Sources
 
-<img src="/images/book-requests/settings-sources.webp" alt="Sources tab listing installed plugins and Torznab indexers with their connection status" class="img-bordered" />
+<img src="/images/book-requests/settings-sources.webp" alt="Sources tab listing installed plugins and built-in indexers with their connection status" class="img-bordered" />
 
-There are two kinds of source.
+There are three kinds of source:
 
-**Torrent indexers** speak Torznab, the protocol Prowlarr, Jackett and NZBHydra all expose. It is generic and names no site, which is why it is the one indexer type built into BookOrbit. Add one row per feed you want searched, with its URL and API key.
-
-**Plugins** are single files that teach BookOrbit to search one specific site. None ship with BookOrbit. **Install plugin** uploads one, and the review dialog shows what the file declares about itself and the code it will run before you agree to anything. A plugin starts working as soon as it is installed; you are only asked to restart if it will not load in the running process.
+- **Torznab**: for torrent indexers. Speaks the Torznab protocol exposed by Prowlarr, Jackett and NZBHydra. Add one row per feed you want searched, with its URL and API key.
+- **Newznab**: for Usenet indexers. Speaks the standard Newznab API exposed by Usenet indexers and NZBHydra. Add one row per indexer with its URL and API key. BookOrbit searches by generic query (including ISBN when enabled) and fetches the NZB securely without exposing credentials to the download client.
+- **Plugins**: single `.mjs` files that teach BookOrbit to search one specific site. None ship with BookOrbit. **Install plugin** uploads one, and the review dialog shows what the file declares about itself and the code it will run before you agree to anything. A plugin starts working as soon as it is installed; you are only asked to restart if it will not load in the running process.
 
 :::caution
 A plugin runs inside the BookOrbit process with that process's access: your database, your library files, your encryption key. Install one only from a source you trust, and read it first.
@@ -188,11 +190,13 @@ Either way, a source is a row you configure and switch on.
 
 | Setting | What it does |
 |---------|--------------|
-| **Color** | Marks this source on every release it returns, so you can tell where a result came from before reading the name. Torrent and direct download keep their own two colors. |
-| **Search this source for** | Turn off a medium the source does not carry. An audiobook-only tracker behind a general proxy still claims to carry everything, and asking it for ebooks costs a request per search. |
+| **Type** | When adding a built-in source, choose between **Torznab** (torrents) and **Newznab** (Usenet). |
+| **Color** | Marks this source on every release it returns, so you can tell where a result came from before reading the name. Delivery protocols (Torrent, Usenet, Direct) keep their own distinct badges. |
+| **Search this source for** | Turn off a medium the source does not carry. An audiobook-only indexer behind a general proxy still claims to carry everything, and asking it for ebooks costs a request per search. |
 | **Search by ISBN** | On by default. Turn it off where a catalogue answers an exact ISBN with the wrong book; the source then gets the title and author instead. |
-| **Categories** | For Torznab, the indexer's own category numbers to search per medium. |
-| **Allow private addresses** | Off by default. Needed only when the source runs on your own network, such as a local Jackett. |
+| **Categories** | For Torznab and Newznab, the indexer's own category numbers to search per medium (defaults: 7020 for ebooks, 3030 for audiobooks, 7030 for comics). |
+| **Seed ratio / Seed time** | For torrent sources, set target seed ratio or total seeding minutes, or allow tracker-advertised goals to fill blank values. Usenet sources do not seed. |
+| **Allow private addresses** | Off by default. Needed only when the source runs on your own network, such as a local Jackett, Prowlarr or NZBHydra instance. |
 | **Advanced network** | Per-source DNS servers and an HTTP proxy, for when the default path to a site does not work. |
 
 Credentials are stored encrypted, which needs `BOOK_REQUEST_ENCRYPTION_KEY` in the server environment. Without it, saving one is refused rather than stored in the clear:
@@ -201,23 +205,29 @@ Credentials are stored encrypted, which needs `BOOK_REQUEST_ENCRYPTION_KEY` in t
 openssl rand -hex 32
 ```
 
-**Test connection** tells you whether a source answers, and the result is stamped on the row. A source that keeps failing *real* searches is flagged separately, with the length of the run: a test call can succeed against a tracker that has refused every search for a week.
+**Test connection** tells you whether a source answers, and the result is stamped on the row. A source that keeps failing *real* searches is flagged separately, with the length of the run: a test call can succeed against an indexer that has refused every search for a week.
 
 ### Download clients
 
-<img src="/images/book-requests/settings-download-clients.webp" alt="Download clients tab showing qBittorrent, Transmission and Deluge each connected" class="img-bordered" />
+<img src="/images/book-requests/settings-download-clients.webp" alt="Download clients tab showing configured download clients with connection status" class="img-bordered" />
 
-qBittorrent, Transmission and Deluge are supported. Direct HTTP downloads need no client, so you only need one of these if you use torrent sources.
+Four external download clients are supported across two delivery protocols:
+- **Torrents**: qBittorrent, Transmission, and Deluge.
+- **Usenet**: NZBGet.
+
+Direct HTTP downloads need no external client, so you only need one of these if you use torrent or Usenet sources. A Newznab source needs an enabled NZBGet client, while a Torznab source needs an enabled torrent client.
+
+BookOrbit does not connect to NNTP news servers directly. Configure your Usenet provider account inside NZBGet, and configure NZBGet's JSON-RPC API connection in BookOrbit. BookOrbit downloads the credentialed NZB file from your indexer, sends its bytes to NZBGet, and monitors the download by a stable ownership key rather than a transient queue ID.
 
 <img src="/images/book-requests/download-client-editor.webp" alt="Download client editor showing connection fields, category, hardlink toggle and path mappings" class="img-md img-bordered" />
 
 Three settings are worth understanding first:
 
-**Category** tags every torrent BookOrbit adds, so it only ever acts on its own downloads. Transmission has no categories, so the category becomes a subfolder of its download directory instead; Deluge needs its Label plugin switched on.
+**Category** tags every download BookOrbit adds, so it only ever acts on its own downloads. For qBittorrent and NZBGet, the category is set on the task. Transmission has no categories, so the category becomes a subfolder of its download directory instead; Deluge needs its Label plugin switched on.
 
-**Use hardlinks** is on by default, and is what lets a torrent keep seeding while the book sits in your library without storing it twice. It only works when the client's download folder and the Book Dock are on the same filesystem, and **Test hardlink** answers that rather than leaving you to find out later.
+**Use hardlinks** is on by default, avoiding duplicate disk usage when files are imported into the Book Dock. For torrents, it keeps the release seeding from the download directory; for NZBs, it avoids storing the extracted files twice. It only works when the client's download folder and the Book Dock are on the same filesystem, and **Test hardlink** verifies that rather than leaving you to find out later.
 
-**Path mappings** translate the paths the client reports into paths BookOrbit can open, and at least one is required: the mapping also declares the directory BookOrbit may import from. When both see the same files at the same paths, map the download directory to itself.
+**Path mappings** translate the paths the client reports into paths BookOrbit can open, and at least one is required on every client: the mapping also declares the directory BookOrbit may import from. When both see the same files at the same paths, map the download directory to itself.
 
 ### Automation
 
@@ -259,13 +269,13 @@ What to keep when one release carries the same book in more than one format, an 
 
 **Download books directly** (`book_request_self_fulfill`) gives a trusted user the whole pipeline with no approver in it: they search, pick the release themselves, and it downloads.
 
-For those users the search results say **Download** rather than **Request**, and pressing it goes straight to the release picker. The button also carries a menu of editions: BookOrbit recommends one to search for, preferring the requested language and an ISBN several providers agree on, and you can pick a different edition's ISBN or skip the ISBN entirely. When no provider knows the book at all, the empty state offers to search the indexers for the typed text directly. That last one is self-servers only, because a request row carrying nothing but a typed string gives an approver no way to tell whether it is the book that was meant.
+For those users the search results say **Choose release** rather than **Request**, and pressing it goes straight to the release picker. The button also carries a menu of editions: BookOrbit recommends one to search for, preferring the requested language and an ISBN several providers agree on, and you can pick a different edition's ISBN or skip the ISBN entirely. When no provider knows the book at all, the empty state offers to search the indexers for the typed text directly. That last one is self-servers only, because a request row carrying nothing but a typed string gives an approver no way to tell whether it is the book that was meant.
 
 Self-served requests still create a real row, so the history is visible and everything downstream works the same way. They appear in **All requests** with a **Self-served** badge, and when one goes wrong the people on that request are notified rather than every moderator. What bounds them is work in flight: ten can be open at once, because every live one is a release search against every enabled source. A picker opened and never acted on is swept after six hours, so an abandoned search does not keep its claim on a book nobody is fetching.
 
 **Auto-approve requests** (`book_request_auto_approve`) is a lighter version: requests are created already approved, but a release is still picked the normal way.
 
-Both need **Request books** to be useful, and BookOrbit enforces that for **Download books directly** when permissions are assigned rather than implying it at check time.
+Both need **Request books** to be useful, and BookOrbit enforces that dependency when permissions are assigned rather than implying it at check time.
 
 ## Notifications
 
@@ -292,7 +302,7 @@ Notification text is written once per event in English, not per recipient. Every
 | **Download books directly** (`book_request_self_fulfill`) | Pick a release and download it yourself, with no approval step. Requires **Request books**. |
 | **App settings** (`manage_app_settings`) | Configure sources, download clients and automation under Settings > Server > Requests. |
 
-Every action on a request is audited: created, approved, rejected, cancelled, grabbed, imported, fulfilled, deleted, and torrents removed from a client.
+Every action on a request is audited: created, approved, rejected, cancelled, grabbed, imported, fulfilled, deleted, and client downloads removed.
 
 ## Troubleshooting
 
@@ -319,6 +329,14 @@ Turn on **Allow private addresses** for that source. It is off by default, and n
 ### A download client will not save
 
 Every client needs at least one path mapping, because that declares the directory BookOrbit may import from. If both see the same paths, map the download directory to itself.
+
+### A Usenet release cannot be downloaded
+
+Make sure an NZBGet client is added and enabled under **Settings > Server > Requests > Download clients**. Newznab sources require NZBGet, while Torznab sources require a torrent client (qBittorrent, Transmission, or Deluge).
+
+### NZBGet connects but downloads fail
+
+BookOrbit uploads NZBs to NZBGet over its JSON-RPC API. BookOrbit does not communicate directly with NNTP article servers; your Usenet provider account, server host, and ports must be configured inside NZBGet itself.
 
 ### Downloads finish but nothing lands in the library
 
