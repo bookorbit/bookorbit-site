@@ -1,0 +1,138 @@
+---
+import Default from '@astrojs/starlight/components/MarkdownContent.astro'
+---
+
+<Default>
+  <slot />
+  <script>
+    const TOKENS = {
+      background: '--docs-diagram-bg',
+      nodeBg: '--docs-diagram-node-bg',
+      nodeBorder: '--docs-diagram-node-border',
+      nodeText: '--docs-diagram-node-text',
+      accentBg: '--docs-diagram-accent-bg',
+      accentBorder: '--docs-diagram-accent-border',
+      accentText: '--docs-diagram-accent-text',
+      line: '--docs-diagram-line',
+      labelBg: '--docs-diagram-label-bg',
+      labelText: '--docs-diagram-label-text',
+    } as const
+
+    type Palette = Record<keyof typeof TOKENS, string>
+
+    // Mermaid parses colours with khroma, which understands hex but not the
+    // `color(srgb ...)` that a `color-mix()` token computes to.
+    function toHex(computed: string) {
+      const channels = computed.match(/-?[\d.]+(?:e-?\d+)?/g)?.map(Number) ?? []
+      const scale = computed.startsWith('color(') ? 255 : 1
+      return (
+        '#' +
+        channels
+          .slice(0, 3)
+          .map((channel) =>
+            Math.round(Math.min(255, Math.max(0, channel * scale)))
+              .toString(16)
+              .padStart(2, '0'),
+          )
+          .join('')
+      )
+    }
+
+    function readPalette(): Palette {
+      const probe = document.createElement('span')
+      probe.style.display = 'none'
+      document.body.append(probe)
+
+      const palette = Object.fromEntries(
+        Object.entries(TOKENS).map(([name, token]) => {
+          probe.style.color = ''
+          probe.style.color = `var(${token})`
+          return [name, toHex(getComputedStyle(probe).color)]
+        }),
+      ) as Palette
+
+      probe.remove()
+      return palette
+    }
+
+    async function renderDiagrams(diagrams: HTMLElement[]) {
+      const { default: mermaid } = await import('mermaid')
+
+      const render = () => {
+        const palette = readPalette()
+
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          fontFamily: getComputedStyle(document.body).fontFamily,
+          flowchart: {
+            useMaxWidth: false,
+            padding: 14,
+            nodeSpacing: 44,
+            rankSpacing: 62,
+          },
+          themeVariables: {
+            background: palette.background,
+            fontSize: '15px',
+            primaryColor: palette.nodeBg,
+            primaryBorderColor: palette.nodeBorder,
+            primaryTextColor: palette.nodeText,
+            secondaryColor: palette.accentBg,
+            secondaryBorderColor: palette.accentBorder,
+            secondaryTextColor: palette.accentText,
+            tertiaryColor: palette.nodeBg,
+            tertiaryBorderColor: palette.nodeBorder,
+            tertiaryTextColor: palette.nodeText,
+            mainBkg: palette.nodeBg,
+            nodeBorder: palette.nodeBorder,
+            nodeTextColor: palette.nodeText,
+            titleColor: palette.nodeText,
+            textColor: palette.labelText,
+            lineColor: palette.line,
+            edgeLabelBackground: palette.labelBg,
+            clusterBkg: palette.background,
+            clusterBorder: palette.nodeBorder,
+          },
+          themeCSS: `
+            .node.accent :is(rect, polygon, path, circle) {
+              fill: ${palette.accentBg};
+              stroke: ${palette.accentBorder};
+              stroke-width: 1.5px;
+            }
+            .node.accent .nodeLabel { color: ${palette.accentText}; }
+            .edgeLabel :is(p, span) {
+              background: ${palette.labelBg};
+              color: ${palette.labelText};
+            }
+          `,
+        })
+
+        for (const [index, diagram] of diagrams.entries()) {
+          const content = diagram.dataset.content
+          if (!content) continue
+
+          mermaid
+            .render(`mermaid-diagram-${index}-${Date.now()}`, content)
+            .then(({ svg }) => {
+              diagram.innerHTML = svg
+              diagram.dataset.status = 'rendered'
+            })
+            .catch((error: unknown) => {
+              diagram.dataset.status = 'error'
+              console.error('Failed to render Mermaid diagram', error)
+            })
+        }
+      }
+
+      render()
+
+      new MutationObserver(render).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+      })
+    }
+
+    const diagrams = [...document.querySelectorAll<HTMLElement>('.mermaid')]
+    if (diagrams.length > 0) renderDiagrams(diagrams)
+  </script>
+</Default>

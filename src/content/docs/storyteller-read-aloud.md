@@ -1,94 +1,184 @@
 ---
 title: "Storyteller Read-Aloud Books"
-description: "Keep a normal EPUB, a Storyteller EPUB3, and an audiobook together without losing your place."
+description: "Read and listen from one EPUB3 with synchronized narration."
 ---
 
-A Storyteller book is more than an EPUB with a large audio file tucked inside it. Its media overlay is a map between the words on the page and moments in the narration. BookOrbit can use that map to make several copies of the same book feel like one continuous reading experience.
+A Storyteller EPUB3 is a complete read-aloud book. It contains the book text, the narration audio, and an EPUB media overlay that maps the narration to the text.
 
-The most reliable setup begins with two matching files on one BookOrbit book, with a third file available when you want a plain reading copy:
+You only need the Storyteller EPUB to use Read Along in BookOrbit. A separate audiobook and a plain EPUB are optional.
 
-- A Storyteller EPUB3 for reading and listening together in the web reader.
-- The matching standalone audiobook, as one file or an ordered set of audio files, for the audiobook player.
-- Optionally, the normal EPUB that Storyteller used as its source.
+:::note[One file is enough]
+Add the Storyteller `.epub`, scan the library, and open that file to read or listen. You do not need to extract its audio or add another copy of the book.
+:::
 
-If you keep a normal EPUB beside it, use the same textual edition that Storyteller used, ideally the exact source EPUB. Matching titles are not enough: chapter order and text must still agree.
-
-Storyteller normally adds sentence anchors that do not exist in the untouched source. BookOrbit needs those anchors for its most precise position bridge, so the Storyteller EPUB should be the primary file. That makes one canonical text-and-audio map responsible for the default web reading experience, Kobo delivery, and audiobook position translation.
-
-BookOrbit makes that choice for you. The library's format priority is considered first. When EPUB is the winning format, the scanner looks inside each EPUB for a usable media overlay and prefers the read-aloud edition over a plain EPUB. This is capability detection, not filename detection: an ordinary EPUB3 is still an ordinary EPUB unless it contains the timing map and synchronized audio resources.
-
-## One book, several ways to read
-
-Imagine stopping halfway through a chapter while listening in the car. The audiobook player saves the exact audio position. BookOrbit follows the Storyteller timing map to the corresponding sentence, then records that native position in the Storyteller EPUB. It also tries to carry the position into every other EPUB attached to the book.
-
-An untouched source EPUB usually does not have Storyteller's sentence IDs. BookOrbit therefore compares the normalized text of the corresponding chapter. When the chapter text is identical, it can use the same character position to create a locator native to that EPUB. When the chapter text differs, BookOrbit skips that copy instead of guessing.
-
-The return trip works too. Read several pages in the web reader, on Kobo, or in KOReader and BookOrbit maps the position back into the Storyteller chapter, finds the nearest earlier sentence marker, and translates that marker onto the audiobook timeline. If the source chapter cannot be proven equivalent, the audiobook keeps its existing position.
-
-```text
-                              +-> Web read-aloud (full EPUB3)
-Standalone audiobook <-> map <-> Storyteller EPUB3 (preferred primary)
-                              +-> Kobo / KOReader (audio removed)
-                              +-> Normal EPUB (when chapter text matches)
+```mermaid
+flowchart LR
+    S(["Storyteller EPUB3<br/>Text + audio + timing"]):::accent
+    S -->|Full EPUB3| W["Web Reader<br/>Synchronized narration"]
+    S -->|Full EPUB3| I["iPhone and iPad<br/>Read Along"]
+    S -->|Narration| A["Apple Watch<br/>Offline listening"]
+    S -->|Audio-free EPUB| K["Kobo and KOReader<br/>Text-focused reading"]
 ```
 
-This is not a simple percentage copy. BookOrbit uses the media-overlay fragments inside the Storyteller EPUB to resolve a real text position, then converts that position for each compatible EPUB. Source timestamps travel with the update, so an older device report cannot replace a newer cross-format position.
+## What the Storyteller EPUB contains
 
-The bridge synchronizes reading position only. Highlights, notes, and bookmarks follow the normal [annotation sync](/annotations) rules and are not copied between the normal and Storyteller EPUB by this feature.
+BookOrbit recognizes a read-along book by its capabilities, not its filename. The EPUB must contain a usable media overlay, normally a SMIL timing map, together with its synchronized audio resources. An ordinary EPUB3 with unrelated embedded audio is not enough.
 
-BookOrbit also keeps reading and listening intent separate inside a read-aloud session. If you read ahead and later resume narration from an earlier sentence, that narration does not drag the furthest text position backward. Once the narration advances beyond the stored page, it can move the shared position forward again.
+During a library scan, BookOrbit inspects EPUB files for that media overlay. When EPUB is the highest-priority available format, BookOrbit prefers the read-along EPUB over other EPUB files as the book's primary file.
 
-## What each reader receives
+Making the Storyteller EPUB primary is recommended when a book has several files. The primary file controls the default reading file and the file delivered to Kobo. Read Along itself can still open a non-primary read-along EPUB when you choose that file explicitly.
 
-The web reader receives the original file you choose. The default **Read** action opens the primary Storyteller EPUB in the recommended setup. BookOrbit serves that full original EPUB3, keeping its embedded audio and timing information intact so narration can follow the text. Choose the normal EPUB from the Read or Files menu when you want an ordinary text-only session.
+## Add a Storyteller book
 
-The audiobook player uses the standalone audio files. It does not extract audio from the Storyteller EPUB. That separation keeps normal audiobook playback efficient and gives BookOrbit a stable audio timeline to synchronize.
+1. Put the Storyteller `.epub` in the book's library folder.
+2. Scan the library.
+3. Open the book and check that the EPUB is identified as a **Read-along EPUB** in its file information.
+4. Open the EPUB and start listening.
 
-Kobo receives the primary Storyteller EPUB through a device-safe path. BookOrbit first builds an audio-free copy so the device does not have to download narration it cannot use, then converts that copy to KEPUB when your [Kobo settings](/kobo) allow it. The stripped edition keeps the text anchors that make precise progress translation possible.
+If the book has several formats, also confirm that the Storyteller EPUB has the **Primary** badge when you want it to be the default file and the source used for Kobo delivery.
 
-To carry progress in both directions, enable **Two-way progress sync** in the Kobo settings and use the BookOrbit-delivered KEPUB. A manually sideloaded EPUB or a regular EPUB delivered without KEPUB conversion cannot provide the same precise Kobo position bridge.
+## Read and listen
 
-The [KOReader catalog](/koreader-plugin) shows the normal EPUB as usual. A Storyteller edition appears as **Read Along (audio removed)**. When both editions would otherwise have the same filename, the derived edition receives a ` - Read Along.epub` suffix so it cannot overwrite the normal book. Install the current BookOrbit plugin and keep progress sync enabled on the device; the position returns to BookOrbit when KOReader performs its normal open, close, periodic, or manual sync.
+### Web Reader
 
-## The audio-free copy is disposable
+The Web Reader plays the narration embedded inside the Storyteller EPUB. While it plays, the current narrated sentence is highlighted.
 
-BookOrbit never removes audio from the EPUB in your library. A normal download of the Storyteller file still returns the full original EPUB3. Choose the explicitly labeled audio-free or KOReader download when you need a lighter edition.
+The read-along controls support:
 
-When Kobo, KOReader, or that audio-free action requests the lighter edition, the server rebuilds the archive in temporary storage. It removes the embedded audio and playback overlays while preserving the text anchors used for position matching.
+- Play, pause, previous sentence, and next sentence
+- Playback speeds from 0.5x to 4.0x
+- A sleep timer
+- Spacebar play and pause, arrow-key sentence navigation, and `+` or `-` speed changes
+- Browser media controls on supported browsers and devices
 
-The temporary EPUB is deleted after delivery. If Kobo conversion is enabled, the resulting audio-free KEPUB may remain in BookOrbit's conversion cache so the next device download does not repeat the expensive conversion. The cache identity includes the source and BookOrbit's stripping version, so a changed source or a future stripping revision does not silently reuse an older result. The original Storyteller file remains untouched.
+To begin from the visible page, use the reader's listening control. To begin from a particular sentence, select text in that sentence and choose **Read from here** from the selection menu.
 
-KOReader delivery fails closed: if BookOrbit cannot safely build the audio-free edition, it reports a download error instead of quietly sending the full audio archive. Kobo can fall back to the original Storyteller EPUB when rebuilding fails. That keeps the book downloadable, but it can produce a much larger device transfer, so investigate repeated rebuild failures in the server logs.
+BookOrbit stores the current media-overlay fragment and can return to that narrated sentence when the EPUB is opened again.
 
-## Let the files prove they belong together
+### BookOrbit for iPhone and iPad
 
-Open the book's **Details** tab and find **Read-aloud progress sync**. The setting belongs to the signed-in user, so another reader can make a different choice for the same book. BookOrbit enables the bridge automatically when it finds an EPUB with a usable media overlay, at least one standalone audio file, and complete duration metadata. Storyteller EPUB3 files are the usual source, but the capability is based on the EPUB media overlay rather than a Storyteller filename or label.
+The iOS app also reads the narration directly from the Storyteller EPUB. Use **Read Along** to open the reader with narration, or use **Listen** and choose **EPUB Narration** when both embedded narration and a separate audiobook are available.
 
-The two audio timelines must be close. BookOrbit adds the duration of every standalone audio file on the book in its stored track order, then compares that total with the selected media overlay. BookOrbit accepts a difference of up to 5 percent, capped at five minutes. A small difference is normal when one edition has a short lead-in or slightly different encoding. A larger difference usually means the audiobook is abridged, belongs to another edition, has missing or duplicate tracks, includes bonus audio, or is ordered incorrectly.
+For offline Read Along, download the Storyteller EPUB in the app while connected so the document and its media-overlay playlist are cached.
 
-Keep one read-aloud EPUB on the book when possible. If several EPUBs contain media overlays, BookOrbit uses the primary one when it is eligible; otherwise it uses the first eligible file in the book's stored order. Removing that ambiguity makes both the status and any troubleshooting easier to understand. Remember that format priority still comes first: if your library places another format ahead of EPUB, that format can remain primary even though a read-aloud EPUB is present.
+### Apple Watch
 
-Primary selection controls the default file used for reading, downloads, and device delivery. It does not switch the progress bridge on or off by itself. BookOrbit can still find an eligible read-aloud EPUB for synchronization when a custom format priority makes another format primary, but keeping EPUB first gives every reading path the same canonical text map.
+The iOS app can also send the narration from a read-along EPUB to Apple Watch. In the book's file list, use the Watch transfer control beside the read-along EPUB. BookOrbit packages the EPUB's narration resources for offline audio playback on the Watch; no standalone audiobook is required.
 
-If the status says **Unavailable**, the message points to the part of the chain that is missing:
+Apple Watch plays the narration as an audiobook-style experience. It does not display the EPUB text or sentence highlighting on the Watch screen.
 
-- No read-aloud EPUB means BookOrbit found no usable media overlay.
-- No audio files means the standalone audiobook is absent.
-- Missing duration means one or more audio files, or the overlay itself, could not be measured.
-- A duration mismatch means the two narrations are too different to map safely.
+## Kobo and KOReader
 
-Rescan or replace the incorrect file instead of forcing a questionable match. A wrong mapping is worse than keeping two honest, independent positions.
+Storyteller EPUBs can be very large because they carry the narration audio. BookOrbit can create a temporary audio-free EPUB for text-focused e-reader delivery. The original Storyteller file in the library is not changed.
 
-## When to turn sync off
+The rebuilt copy removes the embedded narration and media-overlay playback resources while retaining the text anchors used to translate reading positions. Its final size depends on the source book, images, and other resources, so BookOrbit does not promise a particular output size.
 
-Leave sync enabled when the standalone audiobook is the same narration embedded by Storyteller. Turn it off from the book's **Details** tab when the files tell different versions of the story: abridged and unabridged recordings, dramatizations, alternate translations, or editions with substantially different chapter order.
+### Kobo
 
-Disabling read-aloud sync does not remove files or erase their progress. It simply lets the audiobook and EPUB editions remember their own places for your account until you enable the bridge again.
+Kobo Sync delivers the book's primary file. When the primary file is a read-along EPUB, BookOrbit tries to remove its narration before applying the normal Kobo delivery settings:
 
-## A comfortable long-term routine
+- If KEPUB conversion is enabled and the audio-free file is within the configured conversion limit, BookOrbit sends a KEPUB.
+- Otherwise, BookOrbit sends the audio-free EPUB.
+- A converted audio-free KEPUB may be reused from the conversion cache on later downloads.
 
-Start with the Storyteller EPUB3, add the complete matching audiobook in the correct track order, and add the normal source EPUB only if you want a separate text-only copy. Let the next scan choose the read-aloud EPUB automatically, then confirm that its **Primary** badge is visible in the **Files** tab. Remove bonus or duplicate audio files, then check that read-aloud sync reports **Enabled**.
+Enable **Two-way progress sync** in [Kobo settings](/kobo) and use the BookOrbit-delivered KEPUB when you want precise positions to return from Kobo.
 
-Open the Storyteller edition from the book's Read or Files menu and confirm that narration follows the text. For Kobo, enable two-way progress sync and download the BookOrbit KEPUB. For KOReader, install the current plugin, leave progress sync enabled, and download whichever of the clearly labeled normal and audio-free editions you want on the device.
+:::caution[Kobo fallback]
+If BookOrbit cannot safely build the audio-free copy, Kobo delivery falls back to the original Storyteller EPUB. That fallback can be much larger because it still contains narration.
+:::
 
-From then on, choose the reader that suits the moment. BookOrbit keeps the original files in their proper roles and carries your place between them.
+### KOReader
+
+The [BookOrbit KOReader plugin](/koreader-plugin) requests an audio-free copy whenever it downloads an EPUB with a media overlay. If a plain EPUB and a read-along EPUB would use the same device filename, the read-along copy receives a ` - Read Along.epub` suffix so the files do not overwrite each other.
+
+You can also open the download menu in the BookOrbit web app and choose **KOReader EPUB** with the **no audio** label. This builds the same kind of temporary copy for a manual transfer.
+
+KOReader delivery does not fall back to the full Storyteller EPUB. If the audio-free copy cannot be generated, BookOrbit reports an error instead of unexpectedly transferring the embedded audio.
+
+## Optional: add a standalone audiobook
+
+A separate audiobook is not needed for embedded narration. Add one only when you also want to use the ordinary standalone audiobook player and carry your position between that player and the Storyteller EPUB.
+
+BookOrbit supports standalone audio in `.m4b`, `.mp3`, `.m4a`, `.opus`, `.ogg`, and `.flac` files. A multi-file audiobook must be attached to the same BookOrbit book in the correct track order.
+
+After you add matching standalone audio, open the book's **Details** tab and find **Read-aloud progress sync**. This setting describes the bridge between two audio timelines:
+
+```mermaid
+flowchart TB
+    A["Standalone audiobook<br/>Playback time"] <-->|Audio timestamp| S(["Storyteller EPUB3<br/>Timing map"]):::accent
+    S <-->|Text locator| E["Compatible EPUBs<br/>Reading position"]
+```
+
+BookOrbit translates real positions through the Storyteller timing map. It does not copy a percentage between files.
+
+It does not determine whether the Storyteller EPUB can play its own narration.
+
+### Bridge requirements
+
+The bridge becomes **Enabled** when BookOrbit finds:
+
+- An EPUB with a usable media overlay
+- One or more standalone audio files on the same book
+- Complete duration metadata for both narrations
+- Durations close enough to represent the same recording
+
+The maximum permitted duration difference is the smaller of 5 percent or five minutes. This rejects likely mismatches such as abridged recordings, missing or duplicate tracks, bonus audio, and incorrectly ordered tracks.
+
+When the bridge is enabled, BookOrbit uses the Storyteller timing map to translate between the standalone audio timeline and a text location. The source timestamp accompanies each update so an older report does not replace a newer one.
+
+:::tip[Unavailable can be expected]
+If your book contains only the Storyteller EPUB, **Read-aloud progress sync** reports **Unavailable** because there is no separate audiobook to bridge. Read Along in the Web Reader and iOS app still works normally.
+:::
+
+### Bridge status messages
+
+| Status or message | Meaning | What to do |
+| :--- | :--- | :--- |
+| **Enabled** | The standalone audiobook and media-overlay EPUB can exchange positions. | Nothing. |
+| **Disabled** | You turned off cross-format position translation for your account. | Enable it if both files contain the same narration. |
+| **A read-along EPUB with media overlays is required.** | No usable media-overlay EPUB was detected. | Check the EPUB and rescan the library. |
+| **Matching standalone audiobook files are required.** | The book has no separate audio files. | Ignore this for an EPUB-only setup, or add the matching audiobook if you want the optional bridge. |
+| **Audio duration metadata is incomplete.** | BookOrbit could not measure every required audio timeline. | Check the files and refresh their metadata. |
+| **Durations do not match closely enough.** | The two narrations exceed the duration tolerance. | Check the edition, track order, missing tracks, duplicates, and bonus audio. |
+
+The setting is per user. Disabling it does not remove files or erase stored progress. It only stops BookOrbit from translating new positions between the standalone audiobook and EPUB files for that account.
+
+## Optional: add a plain EPUB
+
+You may also keep the untouched source EPUB on the same book when you want a smaller or unmodified text-only edition. It is not required for Read Along or e-reader delivery.
+
+When the standalone-audiobook bridge is enabled, BookOrbit can also try to translate the current location into sibling EPUB files. Storyteller usually adds sentence identifiers that the plain EPUB does not contain, so BookOrbit compares the corresponding chapter text and converts the location only when it can establish a compatible match. It skips incompatible chapters or editions instead of guessing.
+
+Highlights, notes, and bookmarks are not copied between separate EPUB files by this bridge. They continue to follow the normal [annotation sync](/annotations) rules for the file on which they were created.
+
+## Troubleshooting
+
+### Read Along is not offered
+
+- Confirm that you added the Storyteller output EPUB, not only the original source EPUB.
+- Confirm that the EPUB contains a valid media overlay and synchronized audio resources.
+- Rescan the library after replacing or adding the file.
+- Check the book's file information for the **Read-along EPUB** indicator.
+
+### The wrong file opens or reaches Kobo
+
+Check the **Primary** badge. When EPUB is the preferred format, a library scan normally chooses the media-overlay EPUB over a plain EPUB. A different higher-priority format can still remain primary.
+
+### Read Along works but progress sync says Unavailable
+
+This is normal when there is no separate standalone audiobook. The status belongs to the optional cross-format bridge, not embedded EPUB narration.
+
+### An e-reader download is unexpectedly large
+
+For a manual download, choose the explicitly labeled **KOReader EPUB** option with **no audio**. For Kobo, confirm that the Storyteller EPUB is primary and check the server logs for an audio-free rebuild failure, because Kobo falls back to the original EPUB when rebuilding fails.
+
+## Quick reference
+
+| Goal | Files required |
+| :--- | :--- |
+| Read and listen together in the Web Reader | Storyteller EPUB only |
+| Read Along or listen to EPUB narration on iPhone or iPad | Storyteller EPUB only |
+| Listen to the EPUB narration on Apple Watch | Storyteller EPUB only |
+| Send an audio-free copy to Kobo or KOReader | Storyteller EPUB only |
+| Synchronize with a separate audiobook player | Storyteller EPUB plus matching standalone audio |
+| Keep an additional untouched text edition | Storyteller EPUB plus optional plain EPUB |

@@ -233,6 +233,42 @@ img.starlight-image-zoom-image:hover {
   border-bottom: 0;
 }
 
+.sl-markdown-content .mermaid {
+  display: flex;
+  justify-content: center;
+  justify-content: safe center;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--docs-border);
+  border-radius: var(--docs-radius-lg);
+  background-color: var(--docs-surface);
+  box-shadow: var(--docs-shadow-sm);
+}
+
+.sl-markdown-content .mermaid[data-status='loading'] {
+  min-height: 8rem;
+}
+
+.sl-markdown-content .mermaid noscript pre {
+  margin: 0;
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-xs);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.sl-markdown-content .mermaid svg {
+  flex: none;
+  height: auto;
+}
+
+.sl-markdown-content .mermaid[data-status='error']::after {
+  content: 'This diagram could not be rendered.';
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .img-bordered,
   .sl-link-card,
@@ -253,7 +289,8 @@ img.starlight-image-zoom-image:hover {
   .starlight-aside,
   .sl-link-card,
   .sl-markdown-content .card,
-  .sl-markdown-content table:not(:where(.not-content *)) {
+  .sl-markdown-content table:not(:where(.not-content *)),
+  .sl-markdown-content .mermaid {
     box-shadow: none;
   }
 }

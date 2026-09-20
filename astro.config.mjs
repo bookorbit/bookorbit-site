@@ -3,11 +3,17 @@ import { unified } from '@astrojs/markdown-remark'
 import starlight from '@astrojs/starlight'
 import starlightImageZoom from 'starlight-image-zoom'
 import starlightLinksValidator from 'starlight-links-validator'
+import { remarkMermaid } from './src/plugins/remark-mermaid.mjs'
 
 export default defineConfig({
   site: 'https://bookorbit.app',
   markdown: {
-    processor: unified(),
+    processor: unified({ remarkPlugins: [remarkMermaid] }),
+  },
+  vite: {
+    optimizeDeps: {
+      include: ['mermaid'],
+    },
   },
   integrations: [
     starlight({
@@ -19,6 +25,9 @@ export default defineConfig({
       },
       lastUpdated: true,
       plugins: [starlightLinksValidator(), starlightImageZoom()],
+      components: {
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
       logo: {
         src: './src/assets/bookorbit-mark.png',
       },

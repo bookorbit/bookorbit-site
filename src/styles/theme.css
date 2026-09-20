@@ -70,6 +70,29 @@
   );
   --docs-nav-hover-bg: color-mix(in srgb, var(--sl-color-white) 4%, transparent);
 
+  --docs-diagram-bg: var(--docs-surface);
+  --docs-diagram-node-bg: var(--docs-surface-raised);
+  --docs-diagram-node-border: color-mix(
+    in srgb,
+    var(--sl-color-green) 16%,
+    var(--docs-border-strong)
+  );
+  --docs-diagram-node-text: var(--sl-color-white);
+  --docs-diagram-accent-bg: color-mix(
+    in srgb,
+    var(--sl-color-green-low) 68%,
+    var(--docs-surface-raised)
+  );
+  --docs-diagram-accent-border: var(--sl-color-green);
+  --docs-diagram-accent-text: var(--sl-color-green-high);
+  --docs-diagram-line: color-mix(
+    in srgb,
+    var(--sl-color-green) 44%,
+    var(--sl-color-gray-4)
+  );
+  --docs-diagram-label-bg: var(--docs-surface);
+  --docs-diagram-label-text: var(--sl-color-gray-3);
+
   --docs-sidebar-active-bg: #0d2727;
   --docs-sidebar-active-text: var(--sl-color-green-high);
   --docs-sidebar-active-indicator: var(--sl-color-green);
