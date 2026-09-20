@@ -59,6 +59,8 @@ openssl rand -hex 24   # use for POSTGRES_PASSWORD
 openssl rand -hex 32   # use for JWT_SECRET
 openssl rand -hex 16   # use for SETUP_BOOTSTRAP_TOKEN
 ```
+
+Generate an independent value for each one.
 :::
 
 ### Start BookOrbit
@@ -246,7 +248,50 @@ docker compose up -d
 | `MIGRATION_IMPORT_ROOT` | No | - | Absolute server path containing Audiobookshelf backups or Calibre-Web Automated database snapshots. Use a dedicated read-only mount |
 | `LOG_LEVEL` | No | `info` | Log verbosity. Set to `debug` for detailed output |
 | `OIDC_ALLOW_LOCAL_ISSUERS` | No | `false` | Allows OIDC discovery on private addresses. Enable only on a trusted network |
+| `DISABLE_LOCAL_AUTH` | No | `false` | Removes and rejects password sign-in once OIDC is in place. See [OIDC](/oidc#disabling-password-sign-in) |
+| `NODE_EXTRA_CA_CERTS` | No | - | In-container path to a PEM CA bundle. Needed when an OIDC provider uses a private certificate authority |
 | `CSP_ALLOW_CLOUDFLARE_INSIGHTS` | No | `false` | Allows the Cloudflare Web Analytics beacon in the content security policy |
+
+### Secrets from files
+
+Any sensitive value can be read from a mounted file instead of sitting as literal text in `.env`. Append `_FILE` to the variable name and point it at the path inside the container:
+
+```dotenv
+JWT_SECRET=
+JWT_SECRET_FILE=/run/secrets/bookorbit_jwt_secret
+```
+
+Supported variables: `POSTGRES_PASSWORD`, `DATABASE_URL`, `JWT_SECRET`, `SETUP_BOOTSTRAP_TOKEN`, `EMAIL_ENCRYPTION_KEY`, `MIGRATION_ENCRYPTION_KEY`, `BOOK_REQUEST_ENCRYPTION_KEY`, and `GITHUB_RELEASES_TOKEN`.
+
+:::caution[Keep the blank assignment]
+Leave the direct variable in `.env` with an empty value rather than deleting the line. `docker-compose.yml` marks several keys as required, including `APP_IMAGE`, `APP_URL`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `JWT_SECRET`, and `SETUP_BOOTSTRAP_TOKEN`. Removing one of those lines entirely fails before the container starts. An empty value is accepted.
+:::
+
+BookOrbit validates each file at startup and refuses to start if:
+
+- both the direct variable and its `_FILE` variable hold a non-empty value
+- the path is missing, is not a regular file, or is not readable
+- the file is empty, or larger than 65536 bytes
+
+Trailing newlines are stripped, so a secret file written by `openssl rand -hex 32 > secret` works as-is. The `_FILE` variable itself is removed from the environment once the value is loaded.
+
+Mount the file into every service that reads it. PostgreSQL is the case that needs attention: it reads the password directly rather than through BookOrbit, so a Compose override has to hand it the file as well.
+
+```yaml
+services:
+  app:
+    secrets: [bookorbit_postgres_password]
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: ${POSTGRES_PASSWORD_FILE?required}
+    secrets: [bookorbit_postgres_password]
+
+secrets:
+  bookorbit_postgres_password:
+    file: ./secrets/postgres_password
+```
+
+With `POSTGRES_PASSWORD=` and `POSTGRES_PASSWORD_FILE=/run/secrets/bookorbit_postgres_password` in `.env`, the override passes the path to PostgreSQL while the app picks it up from the existing `.env` import. Container platforms other than Compose can mount the secret files directly, with no override needed.
 
 ### Reverse proxy
 

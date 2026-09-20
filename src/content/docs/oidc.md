@@ -72,6 +72,21 @@ Click **Test** after entering the issuer URI to verify that BookOrbit can reach 
 The issuer URI must be reachable from the BookOrbit server, not just from your browser. If BookOrbit runs in Docker and the provider runs on the host, `localhost` in the issuer URI may not resolve correctly inside the container.
 :::
 
+### Private certificate authority
+
+If your provider's certificate is signed by a private or internal certificate authority, BookOrbit cannot verify it until that authority is trusted inside the container. Mount the authority's PEM bundle read-only and point `NODE_EXTRA_CA_CERTS` at the in-container path:
+
+```yaml
+services:
+  app:
+    volumes:
+      - ./secrets/internal-ca.pem:/etc/ssl/certs/internal-ca.pem:ro
+    environment:
+      NODE_EXTRA_CA_CERTS: /etc/ssl/certs/internal-ca.pem
+```
+
+Restart BookOrbit after adding it. This adds the private authority to Node's normal certificate verification; it does not disable TLS checks. A provider on a private network address also needs `OIDC_ALLOW_LOCAL_ISSUERS=true`.
+
 ### Redirect URI
 
 Your OIDC provider needs to know where to send users after authentication. Set the redirect URI (sometimes called "callback URL") in your provider to:
@@ -185,12 +200,23 @@ Users can link additional OIDC identities from **Settings > Account** without ne
 
 Unlinking an OIDC identity requires the user's local password as confirmation. A user cannot unlink their last authentication method: they must have either a local password or another linked identity before they can remove one.
 
+### Disabling password sign-in
+
+Once OIDC is working, you can remove password sign-in entirely by setting `DISABLE_LOCAL_AUTH=true` in `.env` and restarting. The login form disappears, leaving only the provider buttons, and the server rejects password login even if a request reaches the endpoint directly. Registration, password changes, and password resets are rejected too.
+
+BookOrbit refuses to start if this would lock everyone out. Before enabling it, link at least one active superuser to an enabled provider and confirm that account can sign in through it. Being an administrator by permission is not enough: the startup check looks for a superuser specifically.
+
+:::tip[Recovering during a provider outage]
+Set `DISABLE_LOCAL_AUTH=false` and restart. Password sign-in returns for accounts that still have a local password.
+:::
+
 ## Troubleshooting
 
 | Symptom | Check |
 |---------|-------|
 | "Your account has not been set up" after OIDC login | Enable **Allow local account linking** on the provider if the user already has a local account. Enable **Auto-provision users** if new accounts should be created automatically. This is the most common issue when adding OIDC to an existing instance. |
 | OIDC button does not appear on the login page | Confirm the provider is saved and **Enable provider** is turned on. |
+| "Connection test failed" with a certificate or self-signed certificate error | The provider uses a private certificate authority. Mount its PEM bundle and set `NODE_EXTRA_CA_CERTS`. See [Private certificate authority](#private-certificate-authority). |
 | "Connection test failed" when testing the issuer URI | Verify the issuer URI is reachable from the BookOrbit server. If BookOrbit runs in Docker, `localhost` may not point to the host machine. Use the host's IP address or a DNS name instead. Additionally, if BookOrbit is running on your local network, make sure that the `OIDC_ALLOW_LOCAL_ISSUERS` environment variable is set to true. |
 | User gets a duplicate account after OIDC login | **Allow local account linking** was off when the user first logged in via OIDC. Delete the duplicate OIDC-provisioned account and enable linking, or have the user link their OIDC identity from account settings on their original account. |
 | Group permissions are not applied | Confirm `groups` is in the **Scopes** field, the **Groups claim** name matches your provider's claim, and at least one group mapping is configured. Use **Preview Claims** to verify the groups claim is present in the token. |
