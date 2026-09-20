@@ -13,14 +13,14 @@ export default defineConfig({
     starlight({
       title: 'BookOrbit',
       description: 'Documentation for the self-hosted library and reading platform.',
-      favicon: '/favicon.svg',
+      favicon: '/favicon-96.png',
       editLink: {
         baseUrl: 'https://github.com/bookorbit/bookorbit-site/edit/main/',
       },
       lastUpdated: true,
       plugins: [starlightLinksValidator(), starlightImageZoom()],
       logo: {
-        src: './src/assets/bookorbit-mark.svg',
+        src: './src/assets/bookorbit-mark.png',
       },
       customCss: ['./src/styles/theme.css', './src/styles/content.css'],
       social: [
@@ -56,6 +56,7 @@ export default defineConfig({
             { label: 'Book Details & Viewer', slug: 'book-details' },
             { label: 'Table View', slug: 'table-view' },
             { label: 'Reader', slug: 'reader' },
+            { label: 'Storyteller Read-Aloud', slug: 'storyteller-read-aloud' },
             { label: 'Annotations & Highlights', slug: 'annotations' },
             { label: 'Display', slug: 'appearance' },
           ],
@@ -77,6 +78,7 @@ export default defineConfig({
             { label: 'Hardcover Sync', slug: 'hardcover' },
             { label: 'OPDS', slug: 'opds' },
             { label: 'Email', slug: 'email' },
+            { label: 'Kokoro Text-to-Speech', slug: 'text-to-speech' },
           ],
         },
         {
