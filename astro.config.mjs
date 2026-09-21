@@ -44,6 +44,7 @@ export default defineConfig({
           label: 'Getting Started',
           items: [
             { label: 'What is BookOrbit?', slug: 'what-is-bookorbit' },
+            { label: 'How I Use BookOrbit', slug: 'my-workflow' },
             { label: 'Installation', slug: 'installation' },
             { label: 'Creating a Library', slug: 'creating-a-library' },
             { label: 'Adding Books', slug: 'adding-books' },
