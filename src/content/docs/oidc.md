@@ -95,7 +95,15 @@ Your OIDC provider needs to know where to send users after authentication. Set t
 https://your-bookorbit-url/oauth2-callback
 ```
 
-Replace `https://your-bookorbit-url` with your actual BookOrbit URL. This must match exactly, including the protocol and port if applicable.
+Replace `https://your-bookorbit-url` with your actual BookOrbit URL. This must match exactly, including the protocol and port if applicable. 
+
+For OIDC functionality within the iOS app, additionally include the following redirect URI:
+
+```text
+bookorbit://oauth2-callback
+```
+
+Do not replace any values.
 
 ## Claim Mapping
 
