@@ -92,7 +92,7 @@ BookOrbit includes:
 - Books with status `present`.
 - Books in libraries assigned to the parent user, unless the user is a superuser.
 - The book's primary file as the acquisition download.
-- Cover and thumbnail links when the book has cover art.
+- Cover and thumbnail links when the book has cover art. These serve the portrait Book cover; a book that has only an [Audiobook cover](/book-details#book-and-audiobook-covers) serves that image unchanged.
 - Metadata such as title, authors, description, series, language, publisher, and ISBN when available.
 
 BookOrbit does not expose deleted or unavailable books through OPDS.

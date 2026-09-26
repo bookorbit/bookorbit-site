@@ -155,7 +155,7 @@ Only content-role files become books. Sidecar files in the same folder are assoc
 |------|-----------|----------|
 | **Content** | epub, kepub, pdf, mobi, azw3, azw, cbz, cbr, cb7, fb2, m4b, m4a, mp3, opus, ogg, flac | Becomes a book |
 | **Metadata sidecar** | opf, nfo | Associated with the book in the same folder |
-| **Cover sidecar** | jpg, jpeg, png, webp, gif, bmp (only when filename is `cover`, `folder`, `thumbnail`, `artwork`, or `front`) | Associated as the book cover |
+| **Cover sidecar** | jpg, jpeg, png, webp, gif, bmp (only when filename is `cover`, `folder`, `thumbnail`, `artwork`, or `front`) | Used as the cover when the book's files have no embedded art. See [Cover images](/library-file-structure#cover-images) |
 | **Supplement** | Everything else | Ignored |
 
 The scanner also skips:

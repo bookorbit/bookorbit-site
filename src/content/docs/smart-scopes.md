@@ -47,7 +47,8 @@ Every filter is a **rule** with three parts: a **field**, an **operator**, and a
 | Rating | Your star rating (1-10) |
 | Reading Progress | Unread / In Progress / Finished |
 | Added At | When the book was added to your library |
-| Cover | Whether a cover image is present or missing |
+| Cover | Whether a cover image is present or missing. A book with a Book cover or an Audiobook cover counts as present |
+| Audiobook Cover | Whether a book with audio has an Audiobook cover. Only books with audio files or a read-along EPUB can match, for **is present** and **is missing** alike |
 | File Availability | Whether the file is present or missing on disk |
 | Collection | Whether the book belongs to a specific collection |
 | Library | Which library the book is in |

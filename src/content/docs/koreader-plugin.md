@@ -84,6 +84,8 @@ The search icon in the title bar opens a full-text search across title and autho
 
 Tap any Browse tile or section to open a book list. Each row shows the cover, title, author, a progress bar, reading status, and file format. Tap a row to open the book's detail page. The title bar shows the current section name and book count.
 
+Catalog covers are each book's portrait Book cover. A book that has only an [Audiobook cover](/book-details#book-and-audiobook-covers) shows that instead.
+
 <img src="/images/koreader/catalog-view-options.webp" alt="BookOrbit catalog view options menu showing Refresh, Sort, Order, Status, Format, View, and Grid size controls overlaid on the book list" class="img-md img-bordered" />
 
 Tap the menu icon in the title bar to open view and sort controls.

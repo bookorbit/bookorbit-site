@@ -40,7 +40,13 @@ Field Rules control exactly what BookOrbit does with each metadata field. Each f
 | **Overwrite if provided** | Replaces the existing value when a provider returns something |
 | **Always overwrite** | Always replaces, no matter what |
 
-Title defaults to **Fill missing** to protect manual edits. Cover defaults to Amazon and iTunes first, since they tend to have better images.
+Title defaults to **Fill missing** to protect manual edits.
+
+Covers have two rules, one per kind of cover. **Book cover** fills the portrait cover of ebooks, comics and PDFs, and defaults to Amazon and iTunes first, since they tend to have better images. **Audiobook cover** fills the square cover of audiobooks, and defaults to Audible, Libro.fm and iTunes first. A book with both an ebook and an audiobook runs both rules; a book with one kind of file runs only its own. For the second cover of such a book, iTunes and Hardcover are asked again for their audiobook (or book) edition, and anything they return must describe the same book.
+
+A fetched cover is checked before it is saved. When an image is too small or the wrong shape, BookOrbit tries the next provider's cover. A wrong-shape image never replaces a cover the book already has; it only fills an empty one. **Make first everywhere** and **Make last everywhere** leave the Audiobook cover order alone, so audiobook sources stay first.
+
+An upgraded install starts its Audiobook cover rule from the old Cover rule: if you had turned cover fetching off or chosen **Fill missing**, that carries over.
 
 Two options below the field table are worth enabling for most setups:
 
@@ -59,7 +65,7 @@ Libraries inherit the global defaults. Expand a library's panel to override indi
 
 Every book gets a completeness score from 0 to 100. It shows on book cards as a quality indicator and is what auto-fetch uses to decide which books need attention.
 
-By default, title, authors, and cover carry the most weight (10 each), followed by description (8), ISBN-13 (7), and genres (6). Publisher, year, language, and page count contribute modestly. Series, subtitle, and series index are 0 by default - they're tracked but never penalize the score. You can adjust any weight directly in the UI.
+By default, title, authors, and cover carry the most weight (10 each; either cover counts), followed by description (8), ISBN-13 (7), and genres (6). Publisher, year, language, and page count contribute modestly. Series, subtitle, and series index are 0 by default - they're tracked but never penalize the score. You can adjust any weight directly in the UI.
 
 After adjusting weights, **Recalculate all** updates every book in the background. Score weights are global - there are no per-library overrides.
 
@@ -78,6 +84,8 @@ When enabled, **Trigger on import** queues a book for metadata the moment it ent
 | Never fetched | - |
 | Low score | Below 60 |
 | Missing fields | Description, Cover |
+
+**Cover** means the book has no cover at all. **Audiobook cover** is also available: it picks out books with audio, or a read-along EPUB, that have no Audiobook cover yet. It is off by default because it sends an Audible request for every such book.
 
 **Run for eligible books** queues all qualifying books immediately - useful for a first-time enrichment pass or after tightening the conditions. The button shows an estimated count as you adjust.
 

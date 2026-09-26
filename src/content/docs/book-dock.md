@@ -81,7 +81,7 @@ Use the workspace to check three things before finalizing: file identity, metada
 | **Tabs** | Filter by All, Pending, Ready, or Error. |
 | **Search** | Filters staged file names. It does not search every metadata field. |
 | **Current cover** | Cover extracted from the file. |
-| **New cover** | Cover from selected or fetched metadata. |
+| **New cover** | Cover from selected or fetched metadata. An audio file's fetched cover comes from the **Audiobook cover** field rule, which prefers square art. |
 | **Target** | Shows the destination preview. `Target: Unassigned` means no library/folder pair is set. |
 | **Match** | Confidence score for fetched provider metadata. |
 | **Apply** | Applies fetched metadata unless the row already has manual edits. |
@@ -110,7 +110,9 @@ Bulk **Apply Fetched** skips rows with manual edits so provider data does not ov
 
 Open a row to edit title, subtitle, authors, description, publisher, year, language, ISBN, series, genres, cover URL, and destination.
 
-You can also search metadata providers manually and apply selected fields through a diff view. Edits are saved to Book Dock and used during finalize; they do not modify the staged file itself.
+You can also search metadata providers manually and apply selected fields through a diff view. An audio file is searched as an audiobook and an ebook as a book, so each is offered art of its own shape. Edits are saved to Book Dock and used during finalize; they do not modify the staged file itself.
+
+Finalize saves the chosen cover as the cover for the file's kind: the Audiobook cover for an audio file, the Book cover otherwise. Adding an audiobook to a book that already has an ebook therefore keeps its Book cover.
 
 ---
 

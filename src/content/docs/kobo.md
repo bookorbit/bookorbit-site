@@ -128,6 +128,8 @@ BookOrbit keeps a per-user library snapshot so the Kobo receives deltas instead 
 | Book leaves all synced collections | A removal from the Kobo library. |
 | Synced collection membership changes | Updated Kobo tag membership. |
 
+The Kobo shows a book's Book cover. For a book that also has an audiobook, changing only its [Audiobook cover](/book-details#book-and-audiobook-covers) sends nothing to the Kobo. A book with no Book cover sends its Audiobook cover unchanged, without padding it to a portrait shape.
+
 Sync responses are paged, so a large change set may take several device sync passes in the same Kobo sync operation.
 
 Removing a book on the Kobo does not delete it from BookOrbit. If the book still belongs to a synced collection, BookOrbit can offer it again on a later sync.

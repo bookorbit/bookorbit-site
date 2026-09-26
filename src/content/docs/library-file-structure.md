@@ -140,7 +140,7 @@ Audiobooks/
     cover.jpg
 ```
 
-Both files become part of the same book record.
+Both files become part of the same book record, and the book gets two covers: a portrait Book cover and a square Audiobook cover. See [Books with an ebook and an audiobook](#books-with-an-ebook-and-an-audiobook) for where each comes from.
 
 ---
 
@@ -198,6 +198,29 @@ The file extension can be `jpg`, `jpeg`, `png`, `webp`, `gif`, or `bmp`. The **f
 | `front` | |
 
 Any other image in the folder - `back-cover.jpg`, `author.png`, `map.webp` - is ignored.
+
+A cover image is a fallback. When the book's own files carry embedded cover art, that art is used and the image is not. A new or changed cover image is picked up by the next scan, or shortly after the change when **Watch folders** is on. It can fill an empty cover or replace one that came from an earlier folder image, but it never replaces embedded art, a cover you uploaded, or a locked cover.
+
+#### Books with an ebook and an audiobook
+
+A folder that holds both ebook and audio files makes a book with two covers, a Book cover and an Audiobook cover (see [Book and Audiobook Covers](/book-details#book-and-audiobook-covers)). The same scan fills both, each from its own files:
+
+- The **Book cover** comes from the art embedded in the ebook that ranks highest in the library's format priority.
+- The **Audiobook cover** comes from the art embedded in the first audio track, by file name.
+
+A cover image fills only a cover whose files have no embedded art, and its shape decides which one:
+
+| Image shape | Fills |
+|-------------|-------|
+| Square: width within 10% of the height | The Audiobook cover |
+| Portrait: width under 85% of the height | The Book cover |
+| Anything in between, or wider than it is tall | Whichever cover is still empty, starting with the primary file's |
+
+So a portrait image never becomes the Audiobook cover, and a square image never becomes the Book cover. When several cover images qualify, BookOrbit takes the closest shape for each cover, then goes by file name.
+
+A [Storyteller read-aloud EPUB](/storyteller-read-aloud) also gets an Audiobook cover, because its narration counts as an audiobook. Only a square cover image fills it from the folder; the EPUB's own art is always its Book cover.
+
+A book with only one kind of file has one cover, and any recognized cover image can fill it, whatever its shape.
 
 ### Metadata sidecar files
 
@@ -267,7 +290,10 @@ Use literal names for folders and simple `*` wildcards for file patterns. Full-p
 
 - Confirm the cover filename is exactly one of: `cover`, `folder`, `thumbnail`, `artwork`, or `front` (with an image extension). Other image filenames are ignored.
 - Confirm the sidecar is in the same folder as the book file, not a parent or sibling folder.
-- If you added the sidecar after the initial import, run a manual **Scan** - the watcher may not trigger a full folder re-import for sidecar-only changes.
+- A cover image is used only when the book's files have no embedded cover art. To use it anyway, upload it from the book's cover editor.
+- In a folder with both an ebook and an audiobook, check the image's shape: a square image fills only the Audiobook cover, and a portrait image fills only the Book cover.
+- If you added an OPF after the initial import, run a manual **Scan** - the watcher does not re-import a folder for OPF-only changes.
+- If the book and its cover image were in the library before you upgraded to a version with separate Book and Audiobook covers, run **Refresh covers** from the library's `...` menu in **Settings > Libraries**. A normal scan only reads covers again for books whose files changed.
 
 ### Disc folders are creating separate books instead of one audiobook
 

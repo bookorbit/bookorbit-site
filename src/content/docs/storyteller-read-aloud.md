@@ -67,6 +67,16 @@ The iOS app can also send the narration from a read-along EPUB to Apple Watch. I
 
 Apple Watch plays the narration as an audiobook-style experience. It does not display the EPUB text or sentence highlighting on the Watch screen.
 
+## Covers
+
+Because its narration counts as an audiobook, a book with a read-along EPUB has two covers: a portrait Book cover and a square Audiobook cover. See [Book and Audiobook Covers](/book-details#book-and-audiobook-covers).
+
+- The EPUB's own cover art is always the Book cover.
+- The Audiobook cover is never copied from the EPUB. In a **Folder as Book** library, a square cover image in the book folder, such as the audiobook's `cover.jpg`, fills it on the next scan. You can also upload one, paste a URL, or search online on the **Audiobook** tile of the cover editor.
+- Until the book has an Audiobook cover, Read Along, EPUB narration, and the lock screen show the EPUB cover whole over a blurred copy of itself.
+
+If you also add a standalone audiobook, the art embedded in its first track becomes the Audiobook cover, as for any other audiobook, unless you uploaded one yourself.
+
 ## Kobo and KOReader
 
 Storyteller EPUBs can be very large because they carry the narration audio. BookOrbit can create a temporary audio-free EPUB for text-focused e-reader delivery. The original Storyteller file in the library is not changed.

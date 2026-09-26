@@ -57,7 +57,8 @@ Columns are first-class objects in the table - you can resize, reorder, and pin 
 | Sort Ascending / Descending | Applies or changes the sort for this column |
 | Clear Sort | Removes this column from the sort order |
 | Filter to rows with values / empty rows | Adds a quick filter scoped to whether this field has data |
-| Filter to present / missing files | Available on the Format and Cover columns |
+| Filter to present / missing files | Available on the Format column |
+| Filter to books with covers / missing covers | Available on the Cover column. Either a Book or an Audiobook cover counts. A third option filters to books missing an Audiobook cover |
 | Hide Column | Removes the column from view |
 | Pin Left / Pin Right | Locks the column to its edge so it stays visible while scrolling |
 | Unpin Column | Releases a pinned column back into the scrollable area |
@@ -141,6 +142,8 @@ The count badge on the left shows how many books are selected. The icons trigger
 | Exit | Closes selection mode |
 
 **Set field** in the more menu lets you bulk-write a single field - series name, publisher, language, published year, authors, genres, tags, or narrators - across all selected books at once. Leave the value blank to clear the field.
+
+**Re-extract cover** reads the cover art again from each selected book's files; a book with both an ebook and an audiobook gets both its [Book and Audiobook covers](/book-details#book-and-audiobook-covers) re-extracted. Locking all metadata, here or from a row's actions cell, includes both cover locks.
 
 ## Configuring the display
 

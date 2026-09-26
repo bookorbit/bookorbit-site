@@ -14,7 +14,7 @@ Library creation requires the `manage_libraries` permission. Users without it ca
 Most importantly, choose the folder from BookOrbit's point of view. Paths are resolved on the BookOrbit server, not on the computer running your browser. In Docker, use the mounted path inside the container, such as `/books/audiobooks`, rather than the Finder or Explorer path on the host.
 
 :::tip
-Create separate libraries when groups of books need different rules. An ebook library might prefer portrait covers and EPUBs, while an audiobook library can use square covers and place audio formats first.
+Create separate libraries when groups of books need different rules. An ebook library might prefer portrait covers and EPUBs, while an audiobook library can use square covers and place audio formats first. In a mixed library, the cover shape also picks which cover a book with both an ebook and an audiobook shows.
 :::
 
 ## Open The Wizard
@@ -41,7 +41,7 @@ Or open **Settings > Libraries** and select **Add Library**. On an empty instanc
 
 Start with a name that will still make sense in the sidebar a year from now: `Ebooks`, `Audiobooks`, `Comics`, or `Kids Books` are all good examples. The name must be unique. Pick an icon at the same time, because BookOrbit uses it anywhere the library is represented.
 
-Choose **Portrait** covers for ebooks and most mixed libraries. Choose **Square** for audiobook-only libraries with square artwork. You cannot continue until the library has both a name and an icon.
+Choose **Portrait** covers for ebooks and most mixed libraries. Choose **Square** for audiobook-only libraries with square artwork. The shape also decides which cover you see for a book that has both an ebook and an audiobook: a **Portrait** library shows its Book cover, and a **Square** library shows its Audiobook cover. Players and e-readers still get the cover that fits them; see [Book and Audiobook Covers](/book-details#book-and-audiobook-covers). You cannot continue until the library has both a name and an icon.
 
 ### 2. Show BookOrbit Where The Books Live
 
@@ -118,11 +118,11 @@ The final step is optional and is off by default. Leave it that way if you want 
 |--------|---------|-----------------|
 | **Rename files after metadata changes** | Off | Automatically renames physical files when relevant metadata changes, using the library naming pattern. |
 | **Write metadata to files** | Off | Automatically writes metadata into supported files when it changes. |
-| **Include cover image** | On | Includes the stored cover when the target format supports it. |
+| **Include cover image** | On | Includes the stored cover when the target format supports it. For a book with both an ebook and an audiobook, ebook files get the Book cover and audio files get the Audiobook cover; when that cover is missing, none is written. |
 | **EPUB** | On, 100 MB | Writes metadata into the OPF inside the EPUB archive. |
 | **PDF** | On, 100 MB | Writes PDF Info and XMP metadata. |
 | **Comic archives (CBX)** | Off, 500 MB | Writes `ComicInfo.xml` into CBZ and CB7 archives. CBR is imported but not written by this option. |
-| **Audio** | On, 500 MB | Embeds the stored cover into M4B, M4A, MP3, and FLAC files. |
+| **Audio** | On, 500 MB | Embeds the stored audiobook cover into M4B, M4A, MP3, and FLAC files. |
 
 Each file-size limit can be set from 1 MB to 10,000 MB. Keep backups before enabling file updates for a collection you want to preserve exactly as imported.
 
@@ -141,3 +141,5 @@ BookOrbit saves the library, adds its folders, starts a watcher when **Watch fol
 <img src="/images/getting-started/settings-libraries-list.webp" alt="Settings Libraries page with libraries, scan controls, watch status, and schedules" class="img-lg img-bordered" />
 
 Afterward, **Settings > Libraries** is the library's control room. Use **Scan All** to scan every library, **Scan** to scan one, and the `...` menu to edit the library, refresh covers, sync metadata to files, or delete it. The edit flow also adds an **Access** section, because access rules only become meaningful after the library exists.
+
+**Refresh covers** reads every book's cover art again from its files, both covers for a book with an ebook and an audiobook. Uploaded and locked covers stay as they are. Changing the cover shape in the edit flow switches which cover those books show while you browse, without reading any files again.
