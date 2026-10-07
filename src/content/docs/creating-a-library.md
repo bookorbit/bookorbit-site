@@ -118,13 +118,31 @@ The final step is optional and is off by default. Leave it that way if you want 
 |--------|---------|-----------------|
 | **Rename files after metadata changes** | Off | Automatically renames physical files when relevant metadata changes, using the library naming pattern. |
 | **Write metadata to files** | Off | Automatically writes metadata into supported files when it changes. |
-| **Include cover image** | On | Includes the stored cover when the target format supports it. For a book with both an ebook and an audiobook, ebook files get the Book cover and audio files get the Audiobook cover; when that cover is missing, none is written. |
+| **Include cover image** | On | Includes the stored cover when the target format supports it. For a book with both an ebook and an audiobook, ebook files get the Book cover and audio files get the Audiobook cover; when that cover is missing, none is written and the file keeps the artwork it already has. |
+| **Write into every file of a book** | Off | Also writes into a book's other book files, not just its main file. See [Books with more than one file](#books-with-more-than-one-file). |
 | **EPUB** | On, 100 MB | Writes metadata into the OPF inside the EPUB archive. |
+| **Read-along EPUB** | Off, 1,000 MB | Writes metadata into EPUBs with synced narration, such as Storyteller read-alongs. They carry their audio, so they are large and need more memory to rewrite; they follow this toggle and limit instead of the EPUB ones. |
 | **PDF** | On, 100 MB | Writes PDF Info and XMP metadata. |
 | **Comic archives (CBX)** | Off, 500 MB | Writes `ComicInfo.xml` into CBZ and CB7 archives. CBR is imported but not written by this option. |
-| **Audio** | On, 500 MB | Embeds the stored audiobook cover into M4B, M4A, MP3, and FLAC files. |
+| **Audio** | On, 500 MB | Writes tags such as title, authors, narrators, and series into M4B, M4A, MP3, and FLAC files, plus the Audiobook cover when **Include cover image** is on. |
 
 Each file-size limit can be set from 1 MB to 10,000 MB. Keep backups before enabling file updates for a collection you want to preserve exactly as imported.
+
+#### Books with more than one file
+
+By default BookOrbit writes into a book's main file only. An audiobook is the exception: every track of it is written. So an EPUB kept beside its M4B gets the new metadata, and the M4B does not.
+
+Turn on **Write into every file of a book** to write into the other files as well. Every book format in the book's folder is written, including a PDF that happens to sit there, so give a companion file such as a workbook its own folder if it should keep its own title and series: a sub-folder becomes a book of its own. Cover images and text files beside the book are never written. The format toggles and size limits still apply to each file on its own, so an oversized or switched-off file is skipped while the rest are written.
+
+Audio files take the book title when there is one of them, and track titles and numbers when the book is an audiobook made of several tracks. Tracks spread over disc folders such as `CD 1` and `CD 2` get the folder in their title, so `CD 2/01.mp3` becomes `CD 2 - 01`. When an ebook sits beside several audio files, BookOrbit cannot tell tracks from alternative editions, so each audio file keeps its own title and track number and receives the rest of the metadata.
+
+A book whose main file is a large read-along EPUB writes nothing until **Read-along EPUB** is on, because read-along EPUBs no longer follow the EPUB toggle. With **Write into every file of a book** on, its plain EPUB and audiobook are written either way.
+
+Writing replaces each file with a new copy, which keeps the file's permissions and, where BookOrbit is allowed to, its owner and group. A file that is hardlinked elsewhere, such as a torrent's seeding copy, is separated from that link: the library file gets the new metadata and the seeding copy keeps its original bytes, so the torrent stays valid. That separated file then uses its own disk space.
+
+Turning on the option does not rewrite your library by itself. Use **Sync metadata to files** from the library's `...` menu when you want existing books updated. Turning it off again only affects later writes; it does not undo files already written.
+
+Some formats cannot hold everything: KEPUB files are not written, a MOBI file gets no date when the book has only a publication year, and each book has one Book cover and one Audiobook cover, so two narrations of the same book share artwork.
 
 :::note
 The first two options control what BookOrbit does **automatically**. They are not a lock on the files themselves. A book's **Write to File & Rename** action on the [Edit Metadata](/book-details#edit-metadata) tab is an explicit per-book override and runs even with both options off. The per-format toggles and size limits below them apply in both cases.
