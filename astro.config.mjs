@@ -105,6 +105,8 @@ export default defineConfig({
           items: [
             { label: 'BookOrbit iOS Support', slug: 'support' },
             { label: 'Privacy Policy', slug: 'privacy' },
+            { label: 'BookOrbit Android Support', slug: 'android/support' },
+            { label: 'Android Privacy Policy', slug: 'android/privacy' },
           ],
         },
       ],
