@@ -135,6 +135,7 @@ Shelves are the horizontal book rows below the widgets. Each shelf shows up to 2
 | **Recently Added** | The latest books added across all your accessible libraries |
 | **Discover Something New** | A random selection from your library - reshuffled on each page load |
 | **Smart Scope** | Any saved Smart Scope from your sidebar, shown as a shelf row |
+| **Reading on this server** | Books other people on your server are reading now, with who is reading each. Lists only books you can open. See [Reading Together](/reading-together#who-is-reading). |
 
 ### Adding and removing shelves
 

@@ -123,6 +123,8 @@ Audiobooks/
 
 Recognized disc folder names (case-insensitive): `CD 1`, `Disc 2`, `Disk 3`, `Part A`, `Side IV`. The number can be a digit, letter, or roman numeral.
 
+Tracks play disc by disc: every track of `Disc 1`, then every track of `Disc 2`, with the disc folders in natural order (`Disc 2` before `Disc 10`). Tracks in different discs can share a name. A library scanned with an earlier version that played such tracks interleaved is put back in disc order by its next scan, and audiobook bookmarks move with their tracks.
+
 :::caution
 Only these specific patterns are treated as disc folders. Names like `Volume 1`, `Book 1`, or `Part One` (spelled out) are not recognized and will be imported as separate books instead of disc groupings. Rename them to `Part 1`, `Disc 1`, etc.
 :::
