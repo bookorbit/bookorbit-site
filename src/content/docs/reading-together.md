@@ -39,6 +39,7 @@ Notes may arrive a little late, but never early.
 | Your pace planner | Only you. |
 | A note shared with the people you passed the book to | Each person you passed it to with your notes, once they reach it. |
 | How far you have read, for someone who passed you a book | Nobody, unless you agree: then they hear when you reach their notes and when you finish. |
+| Your ballot when the club chooses its next book | Nobody. Only the count, round by round, is shown. |
 | Poll answers | Members who answered the same poll, as counts. Predictions stay sealed until each member's debrief. |
 | Your rating in a club debrief | Members who finished the book by reading it and have rated it too. |
 | Your profile picture | Other readers on the server, once you appear in reading together: in a club, shown as reading a book, or as the author of a shared note or reply. Everyone else sees your initials. |
@@ -107,6 +108,16 @@ If you would rather not show your exact position, open the members list from the
 ### Your pace
 
 On a scheduled read, a ring on the club page shows how much you need to read to stay on track: about how many minutes a day to reach the next due date, or how far behind you are if a section is overdue. The estimate uses how fast you have been reading this book, or your recent reading of other books before you have started. Only you see it.
+
+### Choosing the next book
+
+The host can let the club choose what to read next with **Choose the next book together** on the club page. A round has three stages, and the host moves it from one to the next:
+
+1. **Nominating**: each member nominates up to two books, with a note if they like. A book must be one every member can open. When the host can request books, members can also search for books the server does not have yet.
+2. **Voting**: each member ranks the books they would read, best first. Ballots are secret, and you can change yours until voting closes.
+3. **Decided**: the host closes voting. The book with the most first choices wins if more than half of the counted ballots chose it; otherwise the book with the fewest drops out and its ballots count for their next choice, until one book has a majority. Everyone sees the count round by round, but not who ranked what.
+
+The winning book goes onto the club's list, or starts if the club is not reading anything. A winner the server does not have is requested by the host and joins the list when it arrives. The host can cancel a round, and start a new one at any time.
 
 ### Leaving and closing
 
@@ -194,7 +205,7 @@ To hide a single book, choose **Hide my reading of this book** from the **⋯** 
 
 ## Notifications
 
-Reading together has its own **Clubs** notification category. You are notified when you are invited to a club, when a club starts a book, when a reading section is due, when someone replies to your note, when notes from other readers unlock as you read, when someone passes you a book, and, if they agreed, when someone you passed a book to reaches your notes or finishes it. Turn the category off in your notification settings if you do not want them.
+Reading together has its own **Clubs** notification category. You are notified when you are invited to a club, when a club starts a book, when a reading section is due, when someone replies to your note, when notes from other readers unlock as you read, when your club starts choosing its next book, opens voting, or picks one, when someone passes you a book, and, if they agreed, when someone you passed a book to reaches your notes or finishes it. Turn the category off in your notification settings if you do not want them.
 
 ## For admins
 
