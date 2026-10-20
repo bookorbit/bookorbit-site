@@ -32,7 +32,7 @@ flowchart TB
 
 I used to keep two files for every book: a plain EPUB to read, and a single M4B to listen to. Two files, two positions, and a small daily tax of remembering how far along I was in the other one.
 
-BookOrbit has always read EPUB3. What it did not have until **v3.0.0** was read-along: an EPUB3 whose narration audio is mapped to the text by a media overlay, so listening and reading are the same position in the same file. Once that landed, I rebuilt most of my library with [Storyteller](/storyteller-read-aloud), which takes an EPUB and an audiobook and produces one read-along EPUB3.
+BookOrbit has always read EPUB3. What it did not have until **v3.0.0** was read-along: an EPUB3 whose narration audio is mapped to the text by a media overlay, so listening and reading are the same position in the same file. Once that landed, I rebuilt most of my library with [Storyteller](/storyteller-read-aloud), which takes an EPUB and an audiobook and produces one read-along EPUB3. BookOrbit can now do that step itself as well; see [Creating a Read-Aloud](/creating-a-read-aloud).
 
 So my books now hold three files:
 
@@ -117,6 +117,7 @@ For manual transfers without the plugin, the web app's download menu has a **KOR
 ## Related pages
 
 - [Storyteller Read-Aloud Books](/storyteller-read-aloud) - what the file contains and how every client uses it
+- [Creating a Read-Aloud](/creating-a-read-aloud) - make the file from an EPUB and an audiobook inside BookOrbit
 - [KOReader Plugin](/koreader-plugin) - install, catalog, and sync controls
 - [KOReader Sync](/koreader) - what is exchanged, and three-way sync with Kobo
 - [Kobo Sync](/kobo) - if you read on the Kobo's own reader instead of KOReader

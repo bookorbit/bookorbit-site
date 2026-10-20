@@ -41,6 +41,7 @@ The **Files** tab lists every file attached to the book. It is the best place to
 | **Download** | Downloads the selected file when you have download permission. |
 | **Primary** | Marks the file used by the main **Read** button on the Details tab. |
 | **View sync log** | Appears when metadata has been written back to files and shows recent write results. |
+| **Create read-aloud** | Builds a read-aloud EPUB from the book's EPUB and audiobook. Shown only when a worker is set up and you have permission. See [Creating a Read-Aloud](/creating-a-read-aloud). |
 
 BookOrbit chooses the reader by file type: eBook formats open in the eBook reader, PDFs in the PDF reader, comics in the comics reader, and audio files in the audiobook player. Reader defaults and per-book reader settings are covered in [Reader](/reader).
 

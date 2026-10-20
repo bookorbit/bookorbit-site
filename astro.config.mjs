@@ -67,6 +67,7 @@ export default defineConfig({
             { label: 'Table View', slug: 'table-view' },
             { label: 'Reader', slug: 'reader' },
             { label: 'Storyteller Read-Aloud', slug: 'storyteller-read-aloud' },
+            { label: 'Creating a Read-Aloud', slug: 'creating-a-read-aloud' },
             { label: 'Annotations & Highlights', slug: 'annotations' },
             { label: 'Reading Together', slug: 'reading-together' },
             { label: 'Display', slug: 'appearance' },

@@ -92,6 +92,7 @@ Permissions are grouped in the account editor.
 | **Upload books** | Add files through Book Dock. |
 | **Edit metadata** | Edit book and author metadata, covers, and entities. |
 | **Delete books** | Permanently remove books from accessible libraries. |
+| **Generate read-aloud books** | Create a read-aloud EPUB from a book's EPUB and audiobook. Also needs **Upload books**. See [Creating a Read-Aloud](/creating-a-read-aloud). |
 
 ### Devices & access
 

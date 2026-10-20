@@ -7,6 +7,8 @@ A Storyteller EPUB3 is a complete read-aloud book. It contains the book text, th
 
 You only need the Storyteller EPUB to use Read Along in BookOrbit. A separate audiobook and a plain EPUB are optional.
 
+Do not have one yet? BookOrbit can build a read-aloud EPUB itself from a plain EPUB and an audiobook already on a book. See [Creating a Read-Aloud](/creating-a-read-aloud).
+
 :::note[One file is enough]
 Add the Storyteller `.epub`, scan the library, and open that file to read or listen. You do not need to extract its audio or add another copy of the book.
 :::
