@@ -130,7 +130,30 @@ The requester is notified, under **Read-aloud generation** in notification setti
 
 ## Setting up the worker
 
-For whoever runs the server. The worker prepares audio, runs the speech model, matches the text and builds the EPUB. It reads libraries read-only and writes only to its own folder. Both sides share one secret: generate it with `openssl rand -hex 32`. `READ_ALOUD_WORKER_TOKEN_FILE` works in place of the token variable, like [other secrets](/installation#secrets-from-files).
+For whoever runs the server. The worker prepares audio, runs the speech model, matches the text and builds the EPUB. It reads libraries read-only and writes only to its own folder.
+
+BookOrbit does not do this work inside the API server. The server sends jobs to one worker over HTTP, and the worker can run in either of these ways:
+
+| Worker | Best for | Runtime |
+|--------|----------|---------|
+| **Docker** | A normal self-hosted deployment, including Linux servers, NAS devices and VPS hosts. | CPU only in the supplied image. |
+| **Native** | An Apple Silicon Mac where generation speed matters. | MLX on Metal when `READ_ALOUD_CTC_DEVICE=auto`. |
+
+Choose one worker for a deployment. The Docker image and the native command run the same worker code; the server only knows its URL. Docker is the portable path, while the native path exists because Docker Desktop cannot pass the Mac's Metal GPU into a Linux container.
+
+:::note[Opt-in happens at three levels]
+The operator configures a worker for the BookOrbit instance. An administrator grants **Generate read-aloud books** to selected accounts; the Standard permission preset does not include it. An authorized person then explicitly starts a job on an eligible book. Nothing is generated automatically.
+:::
+
+### The shared token
+
+The server and worker authenticate with one random secret. Generate it once:
+
+```bash
+openssl rand -hex 32
+```
+
+`<shared-token>` in the examples is a placeholder. Replace it with that generated value on both sides. It is not a BookOrbit user token, and the values must match exactly. `READ_ALOUD_WORKER_TOKEN_FILE` works in place of the token variable, like [other secrets](/installation#secrets-from-files).
 
 ### With Docker
 
@@ -147,7 +170,9 @@ READ_ALOUD_WORKER_IMAGE=ghcr.io/bookorbit/bookorbit-read-aloud-worker:latest
 docker compose up -d --wait
 ```
 
-The image runs on the CPU. It mounts your library at `/books` (read-only) and `data/app/read-aloud` for job folders, models and temporary files. Keep that folder on persistent storage: the first job in each language downloads its model (about 190 MB for English) from Storyteller's model registry, which needs outbound HTTPS once.
+The image runs on the CPU. `READ_ALOUD_CTC_DEVICE=auto` resolves to CPU inside this Linux container; setting it to `mlx` cannot expose the Mac's Metal GPU. The supplied image does not contain the CUDA runtime either.
+
+It mounts your library at `/books` (read-only) and `data/app/read-aloud` for job folders, models and temporary files. Keep that folder on persistent storage: the first job in each language downloads its model (about 190 MB for English) from Storyteller's model registry, which needs outbound HTTPS once.
 
 **Libraries in other folders.** The worker only reads folders in `READ_ALOUD_LIBRARY_ROOTS` (comma-separated, default `/books`). For a library mounted elsewhere, mount it into the worker read-only at the same path and list it:
 
@@ -162,9 +187,11 @@ services:
 READ_ALOUD_LIBRARY_ROOTS=/books,/audiobooks
 ```
 
+The Compose setting `READ_ALOUD_LIBRARY_ROOTS: ${READ_ALOUD_LIBRARY_ROOTS:-/books}` means "use the configured value, or `/books` when it is unset or empty." It controls which folders the worker may read; it does not select CPU or GPU.
+
 ### Natively, for Apple Silicon
 
-Docker Desktop on a Mac cannot reach the GPU. To use it through MLX, run the worker natively. You need Node.js 24 or later, pnpm, and `ffmpeg` with `ffprobe` version 7 or newer (`brew install ffmpeg`). The worker refuses to start with an older one.
+Docker Desktop on a Mac cannot reach the GPU. To use it through MLX, run the worker natively. This path is simplest when the BookOrbit server also runs natively on the same Mac. You need Node.js 24 or later, pnpm, and `ffmpeg` with `ffprobe` version 7 or newer (`brew install ffmpeg`). The worker refuses to start with an older one.
 
 From a checkout of the BookOrbit repository:
 
@@ -176,17 +203,30 @@ pnpm --filter @bookorbit/read-aloud-worker build
 READ_ALOUD_WORKER_TOKEN=<shared-token> \
 READ_ALOUD_LIBRARY_ROOTS=/path/to/library \
 READ_ALOUD_WORK_ROOT=/path/to/app-data/read-aloud/jobs \
+READ_ALOUD_CTC_DEVICE=auto \
 pnpm --filter @bookorbit/read-aloud-worker start
 ```
 
-The worker must see book files at the same paths as the server, and its job folder must be the server's `<APP_DATA_PATH>/read-aloud/jobs`. Point the server at it:
+The native worker does not read the server's `.env` file and is not started by `pnpm dev`. The variables above belong to the process that launches the worker. Keep that command running in a separate terminal, or configure it as a macOS background service.
+
+The worker must see book files at the same absolute paths as the server, and its job folder must be the server's `<APP_DATA_PATH>/read-aloud/jobs`. Point the server at it with the same token:
 
 ```dotenv
 READ_ALOUD_WORKER_URL=http://127.0.0.1:8787
 READ_ALOUD_WORKER_TOKEN=<shared-token>
 ```
 
-A native worker listens on `127.0.0.1` only. To reach it from elsewhere, set `READ_ALOUD_WORKER_HOST` and keep the port off untrusted networks; the token is the only protection.
+A native worker listens on `127.0.0.1` only. When it starts on an Apple Silicon Mac with `auto`, its health response reports `configuredDevice: auto` and `device: mlx`; MLX uses Metal underneath.
+
+Running the BookOrbit server in Docker while running this worker on the Mac is an advanced setup, not a drop-in replacement. `127.0.0.1` inside the app container is the container itself, and the server's `/books/...` paths must exist under the same spelling on the Mac. Unless both networking and identical paths are deliberately arranged, use the Docker worker with a Dockerized server.
+
+To reach a native worker from another process or machine, set `READ_ALOUD_WORKER_HOST` and keep the port off untrusted networks; the shared token is the only protection.
+
+### What STAlign and Ghost Story do
+
+BookOrbit fixes the model family to QuartzNet15x5. The selected narration language chooses its weights, for example `quartznet15x5_en` for English. The device setting chooses where those weights run; it does not choose a different speech model.
+
+STAlign prepares the audio and EPUB, asks Ghost Story to generate speech probabilities, then matches those probabilities to the existing EPUB text and writes the media-overlay EPUB. Ghost Story resolves, downloads and loads the language-specific model through MLX or ONNX Runtime. The model is not transcribing the book; it supplies timing information for alignment.
 
 ### Where the model runs
 
