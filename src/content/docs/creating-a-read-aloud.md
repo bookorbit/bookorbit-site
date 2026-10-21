@@ -22,7 +22,7 @@ flowchart LR
 ## Before you start
 
 - **A worker is running.** Matching is heavy, so a separate *read-aloud worker* does it, not the BookOrbit server. Whoever runs your server sets it up once; see [Setting up the worker](#setting-up-the-worker). Without one, the button does not appear.
-- **You have the permission.** **Generate read-aloud books** (`library_generate_read_aloud`), which also needs **Upload books**. Superusers have it already. See [Users & Permissions](/users#content).
+- **You have the permission.** **Generate read-aloud books** (`library_generate_read_aloud`), which also needs **Upload books**. Replacing an existing read-aloud also needs **Delete books**. Superusers have all three. See [Users & Permissions](/users#content).
 - **The book has both halves.** A plain EPUB and audiobook files on the same book, in a **Folder as Book** library (a **File as Book** library never offers the feature; see [Library File Structure](/library-file-structure#audiobook-with-companion-ebook)). An existing read-aloud EPUB cannot be the source, so the plain EPUB has to stay on the book if you ever want to regenerate.
 
 The narration must be a recording of the same text. An abridged audiobook or a different edition still produces a result, but with gaps; that is what [review](#when-it-needs-your-eyes) is for.
@@ -35,7 +35,7 @@ Open the book, go to **Files**, and press **Create read-aloud**.
 
 The button is hidden when no worker is configured or the book can never qualify (no audiobook, or a **File as Book** library). When it cannot work right now, it stays visible but inert and a line under the bar says why. Two of those reasons need a fix outside the book:
 
-- **The worker can't reach this library's folder.** Mount the folder into the worker and list it in `READ_ALOUD_LIBRARY_ROOTS`.
+- **The worker can't reach this library's folder.** Mount the folder into the worker and list it in `READ_ALOUD_LIBRARY_ROOTS`. A listed folder that was only mounted late, for example by an automount, is picked up once the worker can read it, with no restart.
 - **This library doesn't accept EPUB files.** Add EPUB to the library's **Allowed formats** under **Settings > Libraries > Edit > Scanner**.
 
 One job takes at most 2,000 audio files, and a book runs one job at a time.
@@ -50,6 +50,8 @@ One job takes at most 2,000 audio files, and a book runs one job at a time.
 
 - **Replace** swaps the old file in place, for everyone who can open the book, and only after the new one passes its checks. Reading positions, sessions and highlights carry over. This is the default when BookOrbit made the old file (**Made by BookOrbit**). With several existing read-alouds, each is offered for replacement.
 - **Keep both** adds the new one as another file. This is the default for an imported file (**Imported**, for example from Storyteller), so it is never overwritten by surprise.
+
+A replaced file's old content is gone for good, so replacing needs **Delete books**, the same as deleting a file. Without it, the dialog only offers adding the new one as another file. The permission is checked again when the output is published: if whoever publishes it no longer has **Delete books**, a new file is added instead and the job's activity log says so.
 
 **Audiobook.** Tracks are used in the book's own order. With several tracks, **Change order** lets you reorder them or skip one.
 
@@ -78,13 +80,13 @@ A **Read-aloud** card appears above the file list and keeps going if you leave t
 | **Check** | The result is validated before anything touches your library. |
 | **Publish** | The EPUB is added to the book. |
 
-A job waiting its turn shows how many are ahead; the worker does one at a time. The first job in a language also downloads its speech model. **Details** opens the activity log, the first place to look if something stalls. **Cancel generation** stops at the next safe point and adds nothing.
+A job waiting its turn shows how many are ahead; the worker does one at a time. The first job in a language also downloads its speech model. **Details** opens the activity log, the first place to look if something stalls. **Cancel generation** stops at the next safe point and adds nothing. Once the output is being added to the book, the job can no longer be cancelled, including after a server restart interrupted that step.
 
 On an Apple Silicon Mac with the native worker, a 7-hour audiobook took about three minutes in testing. The CPU-only Docker worker is slower, and long books can take hours there.
 
 Do not move or replace the EPUB or the audio while a job runs; it fails with **A selected file changed after the job started**.
 
-Only the person who started a job and superusers can cancel, retry, publish or discard it. Other people who hold **Generate read-aloud books** and can open the book see that it is running; everyone else sees no card at all.
+Only the person who started a job and superusers can cancel, retry, re-sync, publish or discard it. Other people who hold **Generate read-aloud books** and can open the book see that it is running; everyone else sees no card at all.
 
 ## When it needs your eyes
 
@@ -124,7 +126,9 @@ From here the file is an ordinary read-aloud EPUB: Read Along on the web and iOS
 
 ## When it fails
 
-The card says why, and the activity log has the detail. **Retry** continues from the last finished step; the work is kept for 7 days. **Start over** reopens the dialog with the same choices. After a worker or server restart, a running job resumes from its last finished step by itself.
+The card says why, and the activity log has the detail. **Retry** continues from the last finished step; failed work is kept for 7 days. **Start over** reopens the dialog with the same choices.
+
+A restart does not lose a running job. After a worker restart, the job resumes from its last finished step by itself. After a server restart, the server picks the job up again, and if the worker is still running it, the server takes that run back instead of starting another. A job interrupted 4 times this way fails instead, keeping its work for **Retry**.
 
 The requester is notified, under **Read-aloud generation** in notification settings, when a job is ready, needs review, has a review about to expire, or fails.
 
@@ -132,18 +136,23 @@ The requester is notified, under **Read-aloud generation** in notification setti
 
 For whoever runs the server. The worker prepares audio, runs the speech model, matches the text and builds the EPUB. It reads libraries read-only and writes only to its own folder.
 
-BookOrbit does not do this work inside the API server. The server sends jobs to one worker over HTTP, and the worker can run in either of these ways:
-
-| Worker | Best for | Runtime |
-|--------|----------|---------|
-| **Docker** | A normal self-hosted deployment, including Linux servers, NAS devices and VPS hosts. | CPU only in the supplied image. |
-| **Native** | An Apple Silicon Mac where generation speed matters. | MLX on Metal when `READ_ALOUD_CTC_DEVICE=auto`. |
-
-Choose one worker for a deployment. The Docker image and the native command run the same worker code; the server only knows its URL. Docker is the portable path, while the native path exists because Docker Desktop cannot pass the Mac's Metal GPU into a Linux container.
+BookOrbit does not do this work inside the API server. The server sends jobs to one worker over HTTP, and the worker runs either in **Docker** or **natively** on the host. Choose one for a deployment. Both run the same worker code, and the server only knows its URL.
 
 :::note[Opt-in happens at three levels]
 The operator configures a worker for the BookOrbit instance. An administrator grants **Generate read-aloud books** to selected accounts; the Standard permission preset does not include it. An authorized person then explicitly starts a job on an eligible book. Nothing is generated automatically.
 :::
+
+### Which setup for my hardware
+
+| Your hardware | Worker | Where the model runs |
+|---------------|--------|----------------------|
+| Linux server, NAS or VPS | [Docker](#with-docker) | CPU. |
+| Apple Silicon Mac | [Native](#natively-for-apple-silicon) | MLX on the Mac's Metal GPU. Docker Desktop cannot pass that GPU into a Linux container, which is why the native path exists. |
+| Intel Mac or Windows | [Docker](#with-docker) | CPU. No native Windows worker is documented. |
+| arm64 board, such as a Raspberry Pi | [Docker](#with-docker), arm64 image | CPU. Expect it to be slow. |
+| NVIDIA GPU | [Docker](#with-docker) | CPU, because the Docker image has no CUDA. A native Linux x64 worker has a `cuda` setting (CUDA 12 and cuDNN 9), but the project has not tested or measured it. |
+
+Docker is the portable path. The native worker is simplest when the BookOrbit server also runs natively on the same Mac; pairing it with a server in Docker is an advanced setup, described below. On the CPU, long books can take hours; the one measured figure is under [While it works](#while-it-works).
 
 ### The shared token
 
@@ -153,7 +162,7 @@ The server and worker authenticate with one random secret. Generate it once:
 openssl rand -hex 32
 ```
 
-`<shared-token>` in the examples is a placeholder. Replace it with that generated value on both sides. It is not a BookOrbit user token, and the values must match exactly. `READ_ALOUD_WORKER_TOKEN_FILE` works in place of the token variable, like [other secrets](/installation#secrets-from-files).
+`<shared-token>` in the examples is a placeholder. Replace it with that generated value on both sides. It is not a BookOrbit user token, and the values must match exactly.
 
 ### With Docker
 
@@ -170,7 +179,7 @@ READ_ALOUD_WORKER_IMAGE=ghcr.io/bookorbit/bookorbit-read-aloud-worker:latest
 docker compose up -d --wait
 ```
 
-The image runs on the CPU. `READ_ALOUD_CTC_DEVICE=auto` resolves to CPU inside this Linux container; setting it to `mlx` cannot expose the Mac's Metal GPU. The supplied image does not contain the CUDA runtime either.
+The image runs on the CPU, and `READ_ALOUD_CTC_DEVICE=auto` resolves to CPU inside it. Leave it there: the image contains neither CUDA nor a GPU driver for WebGPU, and a Linux container cannot reach a Mac's Metal GPU, so `cuda`, `webgpu` or `mlx` stops the Docker worker at startup instead of running on the CPU.
 
 It mounts your library at `/books` (read-only) and `data/app/read-aloud` for job folders, models and temporary files. Keep that folder on persistent storage: the first job in each language downloads its model (about 190 MB for English) from Storyteller's model registry, which needs outbound HTTPS once.
 
@@ -187,7 +196,27 @@ services:
 READ_ALOUD_LIBRARY_ROOTS=/books,/audiobooks
 ```
 
-The Compose setting `READ_ALOUD_LIBRARY_ROOTS: ${READ_ALOUD_LIBRARY_ROOTS:-/books}` means "use the configured value, or `/books` when it is unset or empty." It controls which folders the worker may read; it does not select CPU or GPU.
+The Compose setting `READ_ALOUD_LIBRARY_ROOTS: ${READ_ALOUD_LIBRARY_ROOTS:-/books}` means "use the configured value, or `/books` when it is unset or empty." It controls which folders the worker may read; it does not select CPU or GPU. Changing the mounts or this list means recreating the worker with `docker compose up -d`.
+
+The worker keeps checking which listed folders it can read while it runs. A folder that was not readable yet, such as a network share mounted after the worker started, is logged and left out, then becomes usable once it is readable, without a restart. Health checks reuse their answer for about 5 seconds, every job checks again, and a folder that does not answer within about 2 seconds, such as a hung mount, is left out of that check.
+
+**Keeping the token in a file.** To keep the secret out of `.env`, set `READ_ALOUD_WORKER_TOKEN_FILE` instead of `READ_ALOUD_WORKER_TOKEN`, like [other secrets](/installation#secrets-from-files). Compose passes the same path to the app and the worker, and each reads the file when it starts, so mount the file into both containers at that path, readable by `PUID`:
+
+```yaml
+services:
+  app:
+    volumes:
+      - ./secrets/read-aloud-worker-token:/run/secrets/read-aloud-worker-token:ro
+  read-aloud-worker:
+    volumes:
+      - ./secrets/read-aloud-worker-token:/run/secrets/read-aloud-worker-token:ro
+```
+
+```dotenv
+READ_ALOUD_WORKER_TOKEN_FILE=/run/secrets/read-aloud-worker-token
+```
+
+The file holds only the token; a trailing newline is fine. Setting both variables, or a file a container cannot read, stops that container at startup.
 
 ### Natively, for Apple Silicon
 
@@ -207,6 +236,8 @@ READ_ALOUD_CTC_DEVICE=auto \
 pnpm --filter @bookorbit/read-aloud-worker start
 ```
 
+`READ_ALOUD_LIBRARY_ROOTS` takes a comma-separated list. For a single folder, `READ_ALOUD_LIBRARY_ROOT=/path/to/library` works too; when both are set, `READ_ALOUD_LIBRARY_ROOTS` is used. Compose always sets `READ_ALOUD_LIBRARY_ROOTS`, so the single-folder form is only for a native worker.
+
 The native worker does not read the server's `.env` file and is not started by `pnpm dev`. The variables above belong to the process that launches the worker. Keep that command running in a separate terminal, or configure it as a macOS background service.
 
 The worker must see book files at the same absolute paths as the server, and its job folder must be the server's `<APP_DATA_PATH>/read-aloud/jobs`. Point the server at it with the same token:
@@ -220,7 +251,7 @@ A native worker listens on `127.0.0.1` only. When it starts on an Apple Silicon 
 
 Running the BookOrbit server in Docker while running this worker on the Mac is an advanced setup, not a drop-in replacement. `127.0.0.1` inside the app container is the container itself, and the server's `/books/...` paths must exist under the same spelling on the Mac. Unless both networking and identical paths are deliberately arranged, use the Docker worker with a Dockerized server.
 
-To reach a native worker from another process or machine, set `READ_ALOUD_WORKER_HOST` and keep the port off untrusted networks; the shared token is the only protection.
+To reach a native worker from another process or machine, set `READ_ALOUD_WORKER_HOST` and keep the port off untrusted networks; the shared token is the only protection. `PORT` changes the port from 8787.
 
 ### What STAlign and Ghost Story do
 
@@ -237,10 +268,12 @@ STAlign prepares the audio and EPUB, asks Ghost Story to generate speech probabi
 | `auto` | MLX on native Apple Silicon, otherwise CPU. |
 | `cpu` | Everywhere; the only option in the Docker image. |
 | `mlx` | Native macOS on Apple Silicon. |
-| `cuda` | Native Linux x64 with CUDA 12 and cuDNN 9; never chosen by `auto`. |
+| `cuda` | Native Linux x64 with CUDA 12 and cuDNN 9; never chosen by `auto`. Not tested by the project. |
 | `webgpu` | Experimental; not available on Linux arm64. |
 
-An explicit setting the host cannot run stops the worker at startup instead of quietly falling back to the CPU.
+An explicit setting the host cannot run stops the worker at startup instead of quietly falling back to the CPU. With `cuda` or `webgpu`, the worker also opens a tiny bundled model on that device at startup and refuses to start, with the reason in its log, if ONNX Runtime cannot use it.
+
+The worker's health response reports its version (the release for the Docker image, the package version for a native worker), the configured device, the device in use, whether that device was checked at startup, the library folders it can read, and the free space in its data folder. The version is also on the worker's first log line.
 
 ### Disk space
 
@@ -252,4 +285,8 @@ A run needs about four times the size of the audio, plus seven times the EPUB, p
 
 **Almost everything landed in review.** Check the language, then the edition. A different or abridged recording will not line up with the EPUB, and no setting fixes that.
 
-**The native worker will not start.** Check the log: an `ffmpeg` or `ffprobe` older than version 7 is refused at startup, as is a `READ_ALOUD_CTC_DEVICE` the host cannot run.
+**The worker can't reach this library's folder.** Check that the folder is mounted into the worker at the same path the server uses and listed in `READ_ALOUD_LIBRARY_ROOTS`. If it is listed and only mounted late, nothing needs restarting: the worker picks it up within seconds of it becoming readable. Its log says when a listed folder is not readable, and again when it is back.
+
+**The worker will not start.** Check its log. It refuses to start when `READ_ALOUD_CTC_DEVICE` names a device the host cannot run, including `cuda` or `webgpu` when ONNX Runtime cannot open that device; set it back to `auto`. A native worker also refuses an `ffmpeg` or `ffprobe` older than version 7. In Docker, setting both `READ_ALOUD_WORKER_TOKEN` and `READ_ALOUD_WORKER_TOKEN_FILE`, or a token file the container cannot read, stops it too.
+
+**The worker needs an update.** The server and worker speak a versioned protocol, and this worker's does not match the server's. Run a worker from the same BookOrbit release as the server: pull the image again, or rebuild a native worker from a matching checkout. The worker's version is in its health response and on its first log line.
