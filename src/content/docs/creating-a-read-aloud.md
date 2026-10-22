@@ -3,6 +3,10 @@ title: "Creating a Read-Aloud"
 description: "Turn an EPUB and an audiobook you already own into one read-aloud EPUB, with BookOrbit matching the narration to the text for you."
 ---
 
+:::caution[Not available yet]
+Creating a read-aloud in BookOrbit is part of a pending release and is not available in the current version.
+:::
+
 Some books you own twice: the EPUB you read on the train and the audiobook you listen to while you cook. Your place in one means nothing in the other.
 
 A **read-aloud EPUB** is the same book as one file: the text, the narration, and a timing map that says which sentence is spoken when. The sentence being read lights up as it plays, and stopping the audio to read puts you exactly where the narrator left off. [Storyteller Read-Aloud Books](/storyteller-read-aloud) covers what that file does on every device.
