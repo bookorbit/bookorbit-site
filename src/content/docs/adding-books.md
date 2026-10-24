@@ -49,7 +49,7 @@ Up to three files transfer in parallel. Each file shows an individual progress b
 The maximum file size is **500 MB per file**. The browser validates size and format before the upload begins, so unsupported or oversized files are rejected immediately with an error in the queue.
 
 :::caution
-If the target library has **Allowed formats** configured, uploading a file of an excluded format fails with `This library does not allow .X files`. The restriction is enforced by the library settings, not the dialog itself.
+If the target library imports only some formats (**Only these** under **Import**), uploading a file of another format fails with `This library does not allow .X files`. The restriction is enforced by the library settings, not the dialog itself.
 :::
 
 ### After upload
@@ -162,16 +162,16 @@ The scanner also skips:
 
 - Files and folders whose names start with `.` (hidden files)
 - Symbolic links to files or directories
-- Names matching the library's **Exclude patterns**
+- Names matching the library's **Skip files matching** patterns
 - Folders that return a permission denied error
 - Paths longer than 4,096 characters
 
 ### Settings changes and full rescans
 
-If you change a library's **Allowed formats**, **Scan mode**, **Exclude patterns**, or **Format priority** after the initial scan, BookOrbit detects the settings change and forces a full rescan the next time any scan runs for that library - even if only a few files changed.
+If you change a library's **Import** formats, **Skip files matching** patterns, **Primary file** order, or **Book details come from** order after the initial scan, BookOrbit detects the settings change and forces a full rescan the next time any scan runs for that library - even if only a few files changed.
 
 :::caution
-Restricting **Allowed formats** after books already exist in the library can cause those books to be marked missing on the next scan if their files are in a now-excluded format.
+Restricting **Import** to fewer formats after books already exist in the library can cause those books to be marked missing on the next scan if their files are in a now-excluded format.
 :::
 
 ### Docker path notes

@@ -111,12 +111,12 @@ A book gets both covers when:
 
 | Where | Which cover |
 |-------|-------------|
-| Library grid, lists, table, shelves, search, the dashboard, and the cover on **Details** | Follows the library's cover shape. A **Square** library shows the Audiobook cover and a **Portrait** library shows the Book cover. When that one is missing, the other is shown. |
+| Library grid, lists, table, shelves, search, the dashboard, and the cover on **Details** | Follows the book's primary file: the Audiobook cover when an audio file leads, and the Book cover otherwise, a read-aloud EPUB included. When that one is missing, the other is shown. |
 | Audiobook player, Read Along and text-to-speech players, the lock screen, and media controls | The Audiobook cover. Without one, the Book cover is shown whole over a blurred, enlarged copy of itself instead of being cropped. |
 | Kobo, KOReader, and OPDS | The Book cover. A book with only an Audiobook cover sends that image unchanged. |
 | Covers written into files | The Book cover goes into ebook files and the Audiobook cover into audio files. A cover is never written into a file of the other kind. |
 
-The cover shape is chosen when the library is created and can be changed by editing the library. See [Creating a Library](/creating-a-library#1-give-the-library-a-name).
+Which file leads comes from the library's **Primary file** order. The library's **Grid shape**, **Tall cells** or **Square cells**, sets only the shape of its grid tiles, so every tile in a grid has the same shape; a cover that does not match the tile follows your [Cover display mode](/appearance#book-covers). Lists, the cover on **Details**, and other places that show one book at a time use the cover's own shape. Both settings can be changed by editing the library; see [Creating a Library](/creating-a-library#library).
 
 When a library is scanned, each cover comes from the art embedded in its own files: the Book cover from the ebook, and the Audiobook cover from the first audio track. A folder image such as `cover.jpg` fills a cover only when those files have no art of their own. A read-along EPUB's own art is always its Book cover, so its Audiobook cover fills only from a square folder image or from the cover editor. See [Cover images](/library-file-structure#cover-images) for the full rules.
 
@@ -125,7 +125,7 @@ When a library is scanned, each cover comes from the art embedded in its own fil
 :::note[Upgrading from an earlier version]
 Existing covers are kept. For a book with both an ebook and an audiobook, the existing cover becomes its Book or Audiobook cover depending on its shape, and BookOrbit then extracts the other one from the book's files. This runs in the background after startup and picks up where it stopped if BookOrbit restarts. A locked cover stays locked, because its lock is copied to the new audiobook cover lock.
 
-A few visible changes are expected. A book whose EPUB had no cover art but whose M4B did now has a cover. In a **Portrait** library, a book with both media whose cover was square art now shows its ebook cover while you browse; the player keeps the square art. Folder images such as `folder.jpg` are now used when a book's files have no embedded art, which gives covers to many multi-track MP3 audiobooks. The background job handles this for books with both media; for other books already in the library, run **Refresh covers** from the library's `...` menu in **Settings > Libraries**.
+A few visible changes are expected. A book whose EPUB had no cover art but whose M4B did now has a cover. A book with both media whose cover was square art now shows its ebook cover while you browse when an ebook is its primary file; the player keeps the square art. Folder images such as `folder.jpg` are now used when a book's files have no embedded art, which gives covers to many multi-track MP3 audiobooks. The background job handles this for books with both media; for other books already in the library, run **Refresh covers** from the library's `...` menu in **Settings > Libraries**.
 :::
 
 ## Cover Editing
@@ -258,7 +258,7 @@ The selected cover is locked. On a book with two covers, each tile has its own l
 
 ### The library shows the other cover
 
-For a book with both an ebook and an audiobook, the grid, lists, and **Details** show the cover that matches the library's cover shape: the Book cover in a **Portrait** library, the Audiobook cover in a **Square** library. Change the shape under **Settings > Libraries > Edit**, or edit the cover that is shown. Players and e-readers are not affected.
+For a book with both an ebook and an audiobook, the grid, lists, and **Details** show the cover of its primary file: the Audiobook cover when an audio file leads, the Book cover otherwise. To show the other one, move its format up in the library's **Primary file** order under **Settings > Libraries > Edit > Metadata**, which also changes the file **Read** opens; saving the new order rescans the library. Or edit the cover that is shown. Players and e-readers are not affected.
 
 ### The player shows a blurred portrait cover
 

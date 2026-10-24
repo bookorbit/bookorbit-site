@@ -1,7 +1,10 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro'
+// starlight-image-zoom only injects this when MarkdownContent is not overridden, so render it here.
+import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro'
 ---
 
+<ImageZoom />
 <Default>
   <slot />
   <script>

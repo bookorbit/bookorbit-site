@@ -13,10 +13,12 @@ Every library has a **scan mode** chosen during setup. That mode must match how 
 | Scan mode | What it creates | Use when |
 |-----------|-----------------|----------|
 | **Folder as Book** | One book per folder. All files inside are grouped together. | Almost always. Required for audiobooks, multi-format books, and any library with cover or OPF sidecar files. |
-| **File as Book** | One book per file. Folder structure is ignored. | Only for a flat ebook dump with no sidecar files and no multi-format grouping needed. |
+| **File as Book** | One book per file. Folders only group files, and can name their series. | A flat ebook dump with no sidecar files, or comics and manga kept in one folder per series. |
 
 :::tip
-**For ebooks and comics**, Folder as Book is always the safe default - files with different names in the same folder are imported as separate books.
+**For ebooks**, Folder as Book is the safe default. Give every book its own folder: all the files in one book folder become one book, whatever their names.
+
+**For comics and manga** kept in one folder per series, the layout Komga and Kavita use, choose File as Book and turn on **Folders are series**. See [Comics](#comics).
 
 **For audiobooks**, Folder as Book requires that each audiobook has its own dedicated folder. If any subfolder contains audio files, BookOrbit treats that entire folder as one audiobook - all tracks merged together, regardless of their names. See the [Audiobooks](#audiobooks) section below.
 :::
@@ -38,7 +40,7 @@ Ebooks/
     cover.jpg
 ```
 
-If you have the same book in multiple formats, put them all in the same folder. BookOrbit groups them into one book and uses the library's **Format priority** to decide which is primary. You can read in any available format from the book detail view.
+If you have the same book in multiple formats, put them all in the same folder. BookOrbit groups them into one book and uses the library's **Primary file** order to decide which is primary. You can read in any available format from the book detail view.
 
 ```
 Ebooks/
@@ -148,23 +150,82 @@ Both files become part of the same book record, and the book gets two covers: a 
 
 ## Comics
 
-Use **Folder as Book**. One folder per title or issue.
+Comics and manga come in two layouts. Pick the scan mode that matches yours.
 
-### Single-volume or graphic novel
+### One folder per series (Komga and Kavita layout)
+
+Most comic and manga collections keep one folder per series and one file per issue, volume or chapter. This is the layout Komga, Kavita and Mylar use.
 
 ```
 Comics/
-  Watchmen/
-    Watchmen.cbz
-    cover.jpg
-  Batman - Year One/
-    Batman - Year One.cbr
-    cover.jpg
+  Marvel/
+    Deadpool (2016)/
+      Deadpool 001 (2016).cbz
+      Deadpool 002 (2016).cbz
+  Saga/
+    Saga #01.cbz
+    Saga #02.cbz
+  One Piece/
+    One Piece v01.cbz
+    One Piece c1001.cbz
+  Watchmen.cbz
 ```
 
-### Multi-issue series
+When you create the library, choose **Series folders** in the **Scanning** section. It is not a mode of its own: it sets **File as Book**, which decides what one book is (a single file, as in Komga and Kavita), and turns on **Folders are series** in the **Series** card, which decides which series the book belongs to.
 
-Give each issue its own folder so they appear as individual books in the library. Use zero-padded issue numbers in folder and file names to keep them in order.
+<img src="/images/library-file-structure/series-folders-layout.webp" alt="Scanning section of a new library with the Series folders layout selected and Folders are series turned on" class="img-lg img-bordered" />
+
+Every file becomes its own book, and:
+
+- The folder a file sits in becomes its series. A year in parentheses stays part of the name, so `Batman (2011)` and `Batman (2016)` remain two series. Release tags in square or curly brackets are left out: `One Piece [Digital]`, `[Group] One Piece` and `One Piece {Viz}` all name the series `One Piece`.
+- The number in the file name becomes the book's place in the series: `#12`, `012`, `v01`, `Vol. 1`, `T01`, `c1001`, `Chapter 5`, a leading `01 - `, and Japanese, Chinese and Korean markers such as `第1話`, `12巻`, `01화` and `3권`. A chapter or issue number wins over a volume number in the same name.
+- A folder that only groups files is skipped and the folder above it names the series: `Volume 05 (2005)`, `Part 1`, `Season 2` and a bare year such as `1986`. Files in a `Specials`, `Extras`, `Annuals`, `Bonus` or `_oneshots` folder inside a series folder join that series without a number, so an annual never takes issue #1's place.
+- Files at the top of the library folder, like `Watchmen.cbz` above, keep the series their own metadata gives them.
+- A series named in a file's `ComicInfo.xml` still comes first, unless you move **Regex** above **Tags in the book file** in the **Metadata** section. The exception is the same name without the year: a file tagged `Batman` inside `Batman (2016)/` joins `Batman (2016)`.
+
+A publisher or genre folder above the series folders is fine. Point the library at the folder that holds the series folders, not at a single series folder: files at the top of the library get no series from their folder. Folders are series is a set of path rules; open **Configure** next to **Regex** in the **Metadata** section to see them, test a path, or start from them and adjust. Libraries that use the rules unchanged follow later improvements to them automatically; edited rules are yours and stay as they are.
+
+<img src="/images/library-file-structure/folders-are-series-preset.webp" alt="Configure regex metadata dialog with the Folders are series rules and a Use these rules button" class="img-lg img-bordered" />
+
+Type a path into the preview to see what the rules make of it before you move any files:
+
+<img src="/images/library-file-structure/folders-are-series-preview.webp" alt="Regex preview for a manga chapter path, matching the series Spice and Wolf with series number 11" class="img-lg img-bordered" />
+
+:::tip
+Turning Folders are series on in an existing library does not change the books already in it, because a scan only re-reads files that changed. Save the library, then use **Apply rules to existing books** in the **Metadata** section. It writes only the series and number the rules decide, keeps locked fields, and leaves titles, descriptions and everything else alone. Turning the switch off later keeps the series already set; it only stops new ones.
+:::
+
+When you edit an existing File as Book library, the **Series** card sits under the layout, which is set at creation:
+
+<img src="/images/library-file-structure/series-folders-existing-library.webp" alt="Scanning section of an existing File as Book library with the Series card and Folders are series turned on" class="img-lg img-bordered" />
+
+**Apply rules to existing books** sits under the sources in the **Metadata** section and reports what it changed:
+
+<img src="/images/library-file-structure/apply-rules-existing-books.webp" alt="Book details come from list with the Apply rules to existing books button and a summary of the books processed" class="img-lg img-bordered" />
+
+#### When the folders are not tidy
+
+The folders decide, so the result is only as tidy as the tree. BookOrbit does not guess around a layout; it names every series after a folder by the same rules, so the result is predictable and fixed by fixing the folders. Common surprises:
+
+| Layout | What you get | Fix |
+|--------|--------------|-----|
+| Several series loose in one folder, `Comics/Batman 001.cbz` and `Comics/Superman 001.cbz` | One series called `Comics` | Give each series its own folder |
+| The same folder name in two places, `Marvel/Batman/` and `DC/Batman/` | One merged `Batman` series | Add the start year: `Batman (1940)`, `Batman (2016)` |
+| Runs nested under one title without years, `Supergirl/Volume 05/` | One `Supergirl` series with two issue #1s | Name the run folders `Supergirl (2005)`, `Supergirl (2011)` |
+| An extra folder level, `Maison Ikkoku/Collector's Edition/` | A series called `Collector's Edition` | Rename the folder, or move the files up |
+| A volume and a chapter, or an annual, with the same number in one folder | Two books at the same place in the series | Move annuals and specials into a `Specials`, `Annuals` or `Extras` folder inside the series folder; they join the series without a number |
+| A file name with no number | A book in the series with no number | Add the number to the file name |
+| A folder of loose images instead of an archive | Not imported | Pack each chapter or issue as a CBZ |
+
+After fixing folders, run **Apply rules to existing books** to bring the books already in the library up to date. **Configure** in the **Metadata** section can test any path before you move files.
+
+:::note
+Folders are series and Apply rules to existing books need BookOrbit v3.6.0 or later.
+:::
+
+### One folder per issue
+
+**Folder as Book** treats every folder as one book, so a folder that holds a whole series becomes a single book. Use it for comics only when each issue has a folder of its own, for example because it carries a cover image or an OPF file beside it.
 
 ```
 Comics/
@@ -173,13 +234,12 @@ Comics/
       The Sandman 001.cbz
     The Sandman 002/
       The Sandman 002.cbz
-    The Sandman 003/
-      The Sandman 003.cbz
+  Watchmen/
+    Watchmen.cbz
+    cover.jpg
 ```
 
-:::tip
-If you want the whole series as one browseable run, use BookOrbit's **Series** field and **series index** rather than trying to group issues into one folder. The series view collapses them into one entry in the grid automatically.
-:::
+Use zero-padded issue numbers in folder and file names to keep them in order, and set each book's **Series** field and series index to group the issues. The series view collapses them into one entry in the grid.
 
 ---
 
@@ -226,7 +286,7 @@ A book with only one kind of file has one cover, and any recognized cover image 
 
 ### Metadata sidecar files
 
-Files with extension `.opf` or `.nfo` in the same folder are read as metadata sidecars. Whether they take precedence over embedded metadata depends on the library's **Source precedence** order, set on the Metadata step during library creation.
+Files with extension `.opf` or `.nfo` in the same folder are read as metadata sidecars. Whether they take precedence over embedded metadata depends on the library's **Book details come from** order in its **Metadata** section.
 
 ---
 
@@ -255,7 +315,7 @@ Deep nesting works, but it adds maintenance overhead that BookOrbit's built-in t
 
 ## Exclude patterns
 
-If your library folder contains non-book directories or files you want the scanner to ignore, add exclude patterns on the library's **Scanner** step. Patterns are matched against the **file or folder name only** - not the full path.
+If your library folder contains non-book directories or files you want the scanner to ignore, add them under **Skip files matching** in the library's **Scanning** section. Patterns are matched against the **file or folder name only** - not the full path.
 
 | Pattern | What it skips |
 |---------|---------------|
@@ -272,7 +332,7 @@ Use literal names for folders and simple `*` wildcards for file patterns. Full-p
 
 ## Tips and tricks
 
-**Set your scan mode before importing.** Changing from File as Book to Folder as Book (or vice versa) after books are already imported forces a full rescan and can change which files are treated as books vs sidecars. Choose the right mode during library creation.
+**Choose the layout before importing.** How files become books is set when the library is created and cannot be changed afterwards, because switching would turn the same files into different books. To use another layout, create a new library for the folder.
 
 **Multiple formats in one folder are always better than separate libraries.** If you have both EPUB and MOBI versions of a book, keep them in the same folder. BookOrbit shows them as one book with multiple available formats.
 

@@ -52,7 +52,7 @@ Browser uploads are limited to **500 MB per file**. Larger files should be copie
 | Comics | CBZ, CBR, CB7 |
 | Audiobooks | M4B, MP3, M4A, OPUS, OGG, FLAC |
 
-The target library's **Allowed formats** are checked during finalize, not while the file is staged.
+The formats the target library imports (**Import** in its **Scanning** section) are checked during finalize, not while the file is staged.
 
 ---
 
@@ -222,7 +222,7 @@ Set a destination before finalizing, or choose a default destination in the fina
 
 ### Finalize says the library does not allow this format
 
-The selected library's **Allowed formats** excludes the file extension. Choose another library or update the library Scanner settings.
+The selected library does not import this file's format. Choose another library, or add the format under **Import** in the library's **Scanning** section.
 
 ### Finalize found a duplicate
 
