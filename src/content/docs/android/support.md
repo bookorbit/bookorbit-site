@@ -27,8 +27,8 @@ Yearly subscriptions are managed in [Google Play subscriptions](https://play.goo
 
 ## Crash reports
 
-The app sends crash reports, with private details removed, so problems can be fixed. Turn them off at any time in the app's Settings.
+The app does not send crash reports. When a problem needs fixing, a bug report with the app's build number and the steps that reproduce it is the most useful thing to send.
 
 ## Privacy
 
-Read the [BookOrbit Android Privacy Policy](/android/privacy) for details about on-device data, self-hosted servers, Google Play purchases, crash reports, and optional network services.
+Read the [BookOrbit Android Privacy Policy](/android/privacy) for details about on-device data, self-hosted servers, Google Play purchases, and optional network services.

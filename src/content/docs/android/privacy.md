@@ -1,9 +1,9 @@
 ---
 title: "Android Privacy Policy"
-description: "How the BookOrbit Android app handles account data, library content, purchases, crash reports, and optional network services."
+description: "How the BookOrbit Android app handles account data, library content, purchases, and optional network services."
 ---
 
-Effective October 15, 2026.
+Effective November 10, 2026.
 
 BookOrbit is a client for a self-hosted reading server. The Android app keeps your library, reading activity, and account data under the control of you and your BookOrbit server administrator. BookOrbit does not sell personal information, show advertising, or track you across apps or websites.
 
@@ -16,7 +16,6 @@ The app may handle the following data to provide its features:
 - Sign-in tokens needed to keep you signed in
 - Library metadata, reading progress, annotations, bookmarks, journal entries, activity, downloads, uploads, and playback state
 - Purchase status for BookOrbit Premium
-- Crash reports, unless you turn them off
 
 Sign-in tokens are encrypted on the phone with a key held in the Android Keystore, which never leaves it. Offline books, audiobooks, covers, widget data, and preferences are kept in the app's private storage. The app excludes all of its data from Android's cloud backup and device-to-device transfer, so a new phone signs in again and syncs from your server.
 
@@ -40,11 +39,7 @@ See [Google's privacy policy](https://policies.google.com/privacy) and [RevenueC
 
 ## Crash reports
 
-The app uses Firebase Crashlytics, a Google service, to report crashes and moments when the app stops responding, so they can be fixed. A report contains the type of error and where in the app's code it happened, the app version, the device model, the Android version, and an identifier Firebase creates for this installation of the app.
-
-Before a report is sent, the app removes the error's message, which is where a server address, file name, or identifier could otherwise appear. Reports never include your account, server address, books, or reading.
-
-Crash reports are on by default. Turn them off at any time in the app's Settings. See [Firebase's privacy information](https://firebase.google.com/support/privacy) for Google's practices.
+The app does not collect or send crash reports. On a phone with Android's usage and diagnostics sharing turned on, Google Play may give the developer crash and responsiveness statistics for the app through Android vitals. That data comes from Google under the phone's own settings, and the app adds nothing to it.
 
 ## Optional network services
 
@@ -68,7 +63,7 @@ Each of these services may receive ordinary network information, such as your IP
 
 ## Diagnostics
 
-Apart from crash reports, the app writes diagnostic notes only to the phone's own system log, in a fixed wording that leaves out server addresses, names, file names, and identifiers. Nothing in that log is uploaded by BookOrbit.
+The app writes diagnostic notes only to the phone's own system log, in a fixed wording that leaves out server addresses, names, file names, and identifiers. Nothing in that log is uploaded by BookOrbit.
 
 ## Children
 
