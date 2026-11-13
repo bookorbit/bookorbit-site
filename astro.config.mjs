@@ -52,7 +52,6 @@ export default defineConfig({
         },
         {
           label: 'Building Your Library',
-          collapsed: true,
           items: [
             { label: 'Library File Structure', slug: 'library-file-structure' },
             { label: 'Book Dock', slug: 'book-dock' },
@@ -62,7 +61,6 @@ export default defineConfig({
         },
         {
           label: 'Browsing & Reading',
-          collapsed: true,
           items: [
             { label: 'Dashboard', slug: 'dashboard' },
             { label: 'Book Details & Viewer', slug: 'book-details' },
