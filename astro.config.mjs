@@ -52,6 +52,7 @@ export default defineConfig({
         },
         {
           label: 'Building Your Library',
+          collapsed: true,
           items: [
             { label: 'Library File Structure', slug: 'library-file-structure' },
             { label: 'Book Dock', slug: 'book-dock' },
@@ -61,6 +62,7 @@ export default defineConfig({
         },
         {
           label: 'Browsing & Reading',
+          collapsed: true,
           items: [
             { label: 'Dashboard', slug: 'dashboard' },
             { label: 'Book Details & Viewer', slug: 'book-details' },
@@ -71,6 +73,16 @@ export default defineConfig({
             { label: 'Annotations & Highlights', slug: 'annotations' },
             { label: 'Reading Together', slug: 'reading-together' },
             { label: 'Display', slug: 'appearance' },
+          ],
+        },
+        {
+          label: 'AI Features',
+          items: [
+            { label: 'What is AI in BookOrbit?', slug: 'ai/overview' },
+            { label: 'Setting Up AI', slug: 'ai/connect-a-provider' },
+            { label: 'Story Guides', slug: 'ai/story-guides' },
+            { label: 'Constellations & Reading Help', slug: 'ai/ios' },
+            { label: 'Photo Scans', slug: 'ai/photo-scans' },
           ],
         },
         {
