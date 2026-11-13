@@ -7,11 +7,11 @@
   margin-inline: auto;
 }
 
-.img-xs { max-width: 260px; }
-.img-sm { max-width: 320px; }
-.img-md { max-width: 480px; }
-.img-lg { max-width: 700px; }
-.img-xl { max-width: 900px; }
+.img-xs { max-width: min(260px, 100%); }
+.img-sm { max-width: min(320px, 100%); }
+.img-md { max-width: min(480px, 100%); }
+.img-lg { max-width: min(700px, 100%); }
+.img-xl { max-width: min(900px, 100%); }
 
 .img-bordered {
   border: 1px solid var(--docs-border);
