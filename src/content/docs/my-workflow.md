@@ -1,5 +1,5 @@
 ---
-title: "How I Use BookOrbit"
+title: "A Day with BookOrbit"
 description: "The BookOrbit author's own setup: one read-along EPUB3 per book, listened to on iPhone and Apple Watch, read on KOReader and the web reader, with one shared reading position."
 ---
 
