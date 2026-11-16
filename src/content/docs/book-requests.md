@@ -69,8 +69,8 @@ The eleven states, in the order a healthy request passes through them:
 | **Searching** | Sources are being queried for a release. |
 | **Grabbed** | A release was handed to a download client. |
 | **Downloading** | The transfer is running. |
-| **Importing** | The finished file is passing through the Book Dock. |
-| **Needs review** | The imported file did not match the request closely enough, and is waiting in the Book Dock. |
+| **Importing** | The finished file is passing through the Library Dock. |
+| **Needs review** | The imported file did not match the request closely enough, and is waiting in the Library Dock. |
 | **Available** | Filed into the library. This is the end of the road. |
 | **Rejected** | An approver said no. |
 | **Cancelled** | The requester or an approver stopped it. |
@@ -137,8 +137,8 @@ Behind those five steps:
 
 1. The release goes to the highest-priority enabled download client supporting that delivery method (torrents go to a torrent client, NZBs go to NZBGet), tagged with that client's category so BookOrbit only ever acts on its own downloads.
 2. BookOrbit polls for progress. Nothing is moved while the transfer runs.
-3. When it completes, the finished file is **hardlinked** into the Book Dock, so it occupies no extra disk. For torrents, the file keeps seeding from the client's download folder; for NZBs, duplicate disk usage is avoided while files stay in NZBGet. Across filesystems a hardlink is impossible, and BookOrbit copies instead, which does use the space twice.
-4. The Book Dock reads the file's title and author, so it can be named and filed correctly.
+3. When it completes, the finished file is **hardlinked** into the Library Dock, so it occupies no extra disk. For torrents, the file keeps seeding from the client's download folder; for NZBs, duplicate disk usage is avoided while files stay in NZBGet. Across filesystems a hardlink is impossible, and BookOrbit copies instead, which does use the space twice.
+4. The Library Dock reads the file's title and author, so it can be named and filed correctly.
 5. If import checking is on, the file is scored against the request. Anything clearing the threshold is filed into the destination library and the request goes to **Available**.
 6. Everyone who asked for the book is notified.
 
@@ -148,9 +148,9 @@ Sources that hand over a plain file rather than a torrent or NZB - LibriVox, Pro
 
 Step 5 guards against the thing that goes wrong most often: a release that says it is one book and is another. The check compares what landed against what was asked for - title, author, ISBN - and scores it out of 100.
 
-This is a different question from the one the Book Dock's confidence column answers, which is whether the file's embedded metadata agrees with what providers returned for it. Ask for *Dune*, receive *Dune Messiah*, and both sides agree perfectly on *Dune Messiah*: high confidence, wrong book. The request check is what catches it.
+This is a different question from the one the Library Dock's match score answers, which is whether the file's embedded metadata agrees with what providers returned for it. Ask for *Dune*, receive *Dune Messiah*, and both sides agree perfectly on *Dune Messiah*: high confidence, wrong book. The request check is what catches it.
 
-Below the threshold, nothing is filed. The request moves to **Needs review**, the file waits in the Book Dock, and the drawer shows a **Why this is waiting** panel with the requested and imported values side by side and a verdict on each field. From there, **File it anyway** files it exactly as a passing score would have, and **Discard this import** clears the files out of the Book Dock and marks the request failed. Discarding leaves the files in the download client; stop or delete them separately if you want them gone.
+Below the threshold, nothing is filed. The request moves to **Needs review**, the file waits in the Library Dock, and the drawer shows a **Why this is waiting** panel with the requested and imported values side by side and a verdict on each field. From there, **File it anyway** files it exactly as a passing score would have, and **Discard this import** clears the files out of the Library Dock and marks the request failed. Discarding leaves the files in the download client; stop or delete them separately if you want them gone.
 
 The threshold is forgiving on purpose: subtitles, series suffixes and translated editions all cost points, and a false hold costs one click while a false pass puts the wrong book in somebody's library.
 
@@ -164,7 +164,7 @@ BookOrbit reads client statistics back: the **Download client** section of the d
 
 ### Closing a request by hand
 
-None of the above is compulsory. A moderator can close any request against a book already in the library, or a file already sitting in the Book Dock, by searching for it from the request drawer. The requester is notified exactly as they would be if BookOrbit had fetched it. This is the whole workflow for an instance that has no sources and wants none.
+None of the above is compulsory. A moderator can close any request against a book already in the library, or a file already sitting in the Library Dock, by searching for it from the request drawer. The requester is notified exactly as they would be if BookOrbit had fetched it. This is the whole workflow for an instance that has no sources and wants none.
 
 ## Setting up the plumbing
 
@@ -225,7 +225,7 @@ Three settings are worth understanding first:
 
 **Category** tags every download BookOrbit adds, so it only ever acts on its own downloads. For qBittorrent and NZBGet, the category is set on the task. Transmission has no categories, so the category becomes a subfolder of its download directory instead; Deluge needs its Label plugin switched on.
 
-**Use hardlinks** is on by default, avoiding duplicate disk usage when files are imported into the Book Dock. For torrents, it keeps the release seeding from the download directory; for NZBs, it avoids storing the extracted files twice. It only works when the client's download folder and the Book Dock are on the same filesystem, and **Test hardlink** verifies that rather than leaving you to find out later.
+**Use hardlinks** is on by default, avoiding duplicate disk usage when files are imported into the Library Dock. For torrents, it keeps the release seeding from the download directory; for NZBs, it avoids storing the extracted files twice. It only works when the client's download folder and the Library Dock are on the same filesystem, and **Test hardlink** verifies that rather than leaving you to find out later.
 
 **Path mappings** translate the paths the client reports into paths BookOrbit can open, and at least one is required on every client: the mapping also declares the directory BookOrbit may import from. When both see the same files at the same paths, map the download directory to itself.
 
@@ -340,11 +340,11 @@ BookOrbit uploads NZBs to NZBGet over its JSON-RPC API. BookOrbit does not commu
 
 ### Downloads finish but nothing lands in the library
 
-Check import checks first: the request is probably at **Needs review**, with the file waiting in the Book Dock and a panel explaining why. A request with no destination library is refused before downloading, and says so.
+Check import checks first: the request is probably at **Needs review**, with the file waiting in the Library Dock and a panel explaining why. A request with no destination library is refused before downloading, and says so.
 
 ### Imports use twice the disk
 
-The download folder and the Book Dock are on different filesystems, so hardlinking is impossible and BookOrbit copies. **Test hardlink** in the client editor confirms it.
+The download folder and the Library Dock are on different filesystems, so hardlinking is impossible and BookOrbit copies. **Test hardlink** in the client editor confirms it.
 
 ### BookOrbit cannot see the finished file
 

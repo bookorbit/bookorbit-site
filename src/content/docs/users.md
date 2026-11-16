@@ -89,7 +89,7 @@ Permissions are grouped in the account editor.
 | Permission | What it allows |
 |------------|----------------|
 | **Download books** | Download book files and open them in the reader. |
-| **Upload books** | Add files through Book Dock. |
+| **Upload books** | Upload files straight into a library. Without it, Library Dock uploads wait for a dock manager to file them. |
 | **Edit metadata** | Edit book and author metadata, covers, and entities. |
 | **Delete books** | Permanently remove books from accessible libraries. |
 | **Generate read-aloud books** | Create a read-aloud EPUB from a book's EPUB and audiobook. Also needs **Upload books**. See [Creating a Read-Aloud](/creating-a-read-aloud). |
@@ -104,7 +104,7 @@ Permissions are grouped in the account editor.
 | **Readwise sync** | Connect and sync Readwise. |
 | **StoryGraph sync** | Connect and sync StoryGraph. |
 | **OPDS access** | Browse and download through OPDS-compatible apps. |
-| **Book Dock** | Open the Book Dock upload workspace. |
+| **Library Dock** | Open the Library Dock, upload into it, and review and file your own uploads. |
 
 ### Email
 
@@ -118,6 +118,7 @@ Permissions are grouped in the account editor.
 | Permission | What it allows |
 |------------|----------------|
 | **Manage libraries** | Create, edit, and delete libraries and their scan settings. |
+| **Manage Library Dock** | See every Library Dock file, change dock settings, and turn library docks on and off. |
 | **Metadata config** | Configure metadata providers, field rules, and enrichment. |
 | **Manage icons** | Manage the custom icons available in the app. |
 | **App settings** | Change instance-wide application settings. |

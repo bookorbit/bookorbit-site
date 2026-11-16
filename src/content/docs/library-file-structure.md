@@ -336,7 +336,7 @@ Use literal names for folders and simple `*` wildcards for file patterns. Full-p
 
 **Multiple formats in one folder are always better than separate libraries.** If you have both EPUB and MOBI versions of a book, keep them in the same folder. BookOrbit shows them as one book with multiple available formats.
 
-**Keep the Book Dock folder separate from your library folders.** The Book Dock staging folder is managed internally by BookOrbit. Adding it as a library folder will cause duplicate imports.
+**Keep the Library Dock folder separate from your library folders.** The dock folder is managed by BookOrbit, and BookOrbit refuses to save a library whose folder sits inside it or contains it.
 
 ---
 

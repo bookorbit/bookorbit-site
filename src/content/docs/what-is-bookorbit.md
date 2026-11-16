@@ -36,7 +36,7 @@ A widget-based dashboard gives you an at-a-glance view of your reading life: cur
 | **KOReader** | Two-way reading progress sync |
 | **OPDS** | Private OPDS catalog for any compatible reader app |
 | **Email delivery** | Send books directly to Kindle or any email-based delivery workflow |
-| **Book Dock** | Upload staging area - edit and validate metadata before finalizing into a library |
+| **Library Dock** | Staging area for incoming files - review metadata before filing, or give a library its own dock that files for you |
 | **OIDC / SSO** | Connect multiple providers simultaneously (Authelia, Keycloak, Authentik, and others) |
 
 ## Built for self-hosting

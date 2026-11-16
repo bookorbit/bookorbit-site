@@ -1,15 +1,15 @@
 ---
 title: "Adding Books"
-description: "Upload books, stage them in Book Dock, or import files directly from a library folder."
+description: "Upload books, stage them in the Library Dock, or import files directly from a library folder."
 ---
 
 
-There are three ways to get books into BookOrbit: uploading through the browser, using Book Dock, or copying files directly into a library folder on the server. Each method suits a different workflow.
+There are three ways to get books into BookOrbit: uploading through the browser, using the Library Dock, or copying files directly into a library folder on the server. Each method suits a different workflow.
 
 | Method | Best for |
 |--------|----------|
 | **Upload dialog** | Quick browser uploads of individual files straight into a library |
-| **Book Dock** | Staged ingestion with metadata review before finalizing into a library |
+| **Library Dock** | Staged ingestion with metadata review before filing into a library, or a dock per library that files for you |
 | **Copy to folder** | Bulk transfers via SCP, rsync, or shared drives when you have direct server access |
 
 ## 1. Upload Dialog
@@ -107,13 +107,13 @@ If a file with the same name already exists at the resolved destination path, th
 
 Rename the file before uploading, choose a different destination folder, or delete the existing file first.
 
-## 2. Book Dock
+## 2. Library Dock
 
-Book Dock is a dedicated staging area that sits between incoming files and your libraries. Files land in Book Dock first, metadata is extracted and optionally fetched from providers, and then you review and finalize each file into the library of your choice.
+The Library Dock is a staging area that sits between incoming files and your libraries. Files land in the dock first, metadata is extracted and optionally fetched from providers, and then you review and file each one into the library of your choice.
 
-Use Book Dock when you want to verify covers and metadata before books appear in your library, or when you want auto-finalize to handle the whole pipeline hands-free.
+Use the Library Dock when you want to verify covers and metadata before books appear in your library. A library can also have its own dock: a folder that files whatever lands in it into that library, hands-free with auto-file on.
 
-See the [Book Dock](/book-dock) documentation for full details.
+See the [Library Dock](/book-dock) documentation for full details.
 
 ## 3. Copying Files Directly to a Library Folder
 

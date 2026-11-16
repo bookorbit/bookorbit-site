@@ -110,7 +110,7 @@ Search for **bookorbit** and install it. Fill in:
 - **JWT Secret** and **Setup Bootstrap Token** - generate your own random values
 - **PUID / PGID** - match the user/group that owns your Books Folder
 
-Less commonly changed variables (Book Dock path, fix-permissions toggle, Node heap size, log level) are available under the template's **Show more settings...** section.
+Less commonly changed variables (Library Dock path, fix-permissions toggle, Node heap size, log level) are available under the template's **Show more settings...** section.
 
 :::tip[Using a custom Docker network instead]
 To reach the database by container name rather than IP, open the Unraid terminal and run:
@@ -152,7 +152,7 @@ PGID=1000
 BOOKS_HOST_PATH=/mnt/media/books
 ```
 
-Your `BOOKS_HOST_PATH` must be readable by that user. It must also be writable if you want BookOrbit to upload books, finalize Book Dock files, or write metadata back to files.
+Your `BOOKS_HOST_PATH` must be readable by that user. It must also be writable if you want BookOrbit to upload books, file Library Dock books, or write metadata back to files.
 
 To check who owns your book folder:
 
@@ -180,7 +180,7 @@ Common signs of a permission issue:
 
 - A scan finishes but finds no books
 - Uploads fail when saving into `/books`
-- Book Dock cannot finalize files
+- The Library Dock cannot file books
 - Logs mention `EACCES`, `permission denied`, or `not writable`
 
 ## External Database
@@ -238,7 +238,7 @@ docker compose up -d
 | `BOOKORBIT_FIX_PERMISSIONS` | No | `true` | Set to `false` if your platform manages `/data` ownership externally |
 | `NODE_MAX_OLD_SPACE_SIZE` | No | `2048` in `.env` | Node.js heap limit in MB. Use `auto` for container-aware detection or raise it for very large libraries |
 | `LIBRARY_BROWSE_ROOT` | No | `/` | Root shown by the library folder picker. Set to `/books` to hide other container folders |
-| `BOOK_DOCK_PATH` | No | `/data/book-dock` | Book Dock staging folder inside the container |
+| `BOOK_DOCK_PATH` | No | `/data/book-dock` | Library Dock folder inside the container; library docks live in its `_libraries` folder |
 | `DATABASE_URL` | No | Built from bundled Postgres settings | Full PostgreSQL connection string for an external database |
 | `POSTGRES_HOST` | No | `postgres` | Database hostname. Override when using an external DB |
 | `POSTGRES_PORT` | No | `5432` | Database port |
