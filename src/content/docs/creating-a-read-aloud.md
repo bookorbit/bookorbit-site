@@ -35,7 +35,7 @@ Open the book, go to **Files**, and press **Create read-aloud**.
 
 The button is hidden when no worker is configured or the book can never qualify (no audiobook, or a **File as Book** library). When it cannot work right now, it stays visible but inert and a line under the bar says why. Two of those reasons need a fix outside the book:
 
-- **The worker can't reach this library's folder.** Mount the folder into the worker and list it in `READ_ALOUD_LIBRARY_ROOTS`. A listed folder that was only mounted late, for example by an automount, is picked up once the worker can read it, with no restart.
+- **The worker can't reach this library's folder.** Mount the folder into the worker and list it in `READ_ALOUD_LIBRARY_ROOTS`. If the worker sees a different path, add a [path map](#run-the-worker-on-another-computer). A listed folder that was only mounted late, for example by an automount, is picked up once the worker can read it, with no restart.
 - **This library doesn't accept EPUB files.** Add EPUB to the library's **Allowed formats** under **Settings > Libraries > Edit > Scanner**.
 
 One job takes at most 2,000 audio files, and a book runs one job at a time.
@@ -152,7 +152,7 @@ The operator configures a worker for the BookOrbit instance. An administrator gr
 | arm64 board, such as a Raspberry Pi | [Docker](#with-docker), arm64 image | CPU. Expect it to be slow. |
 | NVIDIA GPU | [Docker](#with-docker) | CPU, because the Docker image has no CUDA. A native Linux x64 worker has a `cuda` setting (CUDA 12 and cuDNN 9), but the project has not tested or measured it. |
 
-Docker is the portable path. The native worker is simplest when the BookOrbit server also runs natively on the same Mac; pairing it with a server in Docker is an advanced setup, described below. On the CPU, long books can take hours; the one measured figure is under [While it works](#while-it-works).
+Docker is the portable path. A native worker can also run on a [separate computer](#run-the-worker-on-another-computer), including an Apple Silicon Mac paired with a Dockerized server. On the CPU, long books can take hours; the one measured figure is under [While it works](#while-it-works).
 
 ### The shared token
 
@@ -240,7 +240,7 @@ pnpm --filter @bookorbit/read-aloud-worker start
 
 The native worker does not read the server's `.env` file and is not started by `pnpm dev`. The variables above belong to the process that launches the worker. Keep that command running in a separate terminal, or configure it as a macOS background service.
 
-The worker must see book files at the same absolute paths as the server, and its job folder must be the server's `<APP_DATA_PATH>/read-aloud/jobs`. Point the server at it with the same token:
+The worker needs access to the same book files and the server's `<APP_DATA_PATH>/read-aloud/jobs` folder. If the paths differ, use the [path map](#run-the-worker-on-another-computer). For a native server on the same machine, point it at the worker with the same token:
 
 ```dotenv
 READ_ALOUD_WORKER_URL=http://127.0.0.1:8787
@@ -249,9 +249,43 @@ READ_ALOUD_WORKER_TOKEN=<shared-token>
 
 A native worker listens on `127.0.0.1` only. When it starts on an Apple Silicon Mac with `auto`, its health response reports `configuredDevice: auto` and `device: mlx`; MLX uses Metal underneath.
 
-Running the BookOrbit server in Docker while running this worker on the Mac is an advanced setup, not a drop-in replacement. `127.0.0.1` inside the app container is the container itself, and the server's `/books/...` paths must exist under the same spelling on the Mac. Unless both networking and identical paths are deliberately arranged, use the Docker worker with a Dockerized server.
+For a server in Docker, `127.0.0.1` inside the app container is the container itself. Configure networking and shared folders as described below, even when the Mac is the Docker host.
 
 To reach a native worker from another process or machine, set `READ_ALOUD_WORKER_HOST` and keep the port off untrusted networks; the shared token is the only protection. `PORT` changes the port from 8787.
+
+### Run the worker on another computer
+
+This example runs BookOrbit in Docker on one computer and a native worker on another, such as an Apple Silicon Mac. The worker needs network access to the server's library and job folders, and BookOrbit needs to reach the worker over HTTP. Use a private, trusted network or a protected tunnel: the worker's HTTP connection is not encrypted, and the shared token is its only authentication.
+
+1. Share the library folder and `data/app/read-aloud` from the BookOrbit host. Mount both shares on the worker computer. The worker needs read access to the library and read/write access to the shared read-aloud folder; BookOrbit must also be able to read and write the job files. These must be the same files on both machines, not separate copies. Arrange for the shares to be mounted when the worker runs.
+2. On the worker computer, install the prerequisites and build a checkout from the same BookOrbit release as the server, following [Natively, for Apple Silicon](#natively-for-apple-silicon). Generate the [shared token](#the-shared-token) once.
+3. Start the worker with paths for your mounts. In this example, the app container sees the library at `/books` and its data at `/data`, as in the standard Compose file. Replace the worker paths with the actual mount points:
+
+   ```bash
+   READ_ALOUD_WORKER_TOKEN=<shared-token> \
+   READ_ALOUD_WORKER_HOST=0.0.0.0 \
+   READ_ALOUD_PATH_MAP=/books=/path/to/mounts/books,/data/read-aloud=/path/to/mounts/read-aloud \
+   READ_ALOUD_LIBRARY_ROOTS=/path/to/mounts/books \
+   READ_ALOUD_WORK_ROOT=/path/to/mounts/read-aloud/jobs \
+   READ_ALOUD_TMP_DIR=/path/to/local/scratch \
+   READ_ALOUD_CTC_DEVICE=auto \
+   pnpm --filter @bookorbit/read-aloud-worker start
+   ```
+
+4. In the BookOrbit deployment's `.env`, use the worker computer's reachable address and the same token. Do not enable the `read-aloud` Compose profile for this setup; that profile starts a separate local worker. Preserve any other profiles you use.
+
+   ```dotenv
+   READ_ALOUD_WORKER_URL=http://<worker-address>:8787
+   READ_ALOUD_WORKER_TOKEN=<shared-token>
+   ```
+
+   Recreate the app with `docker compose up -d --wait`. Allow port 8787 through the worker computer's firewall only from the trusted server or network. If the worker uses a different `PORT`, use that port in the URL. The address must be reachable from the app container, not just the Docker host.
+
+`READ_ALOUD_PATH_MAP` is a comma-separated list of `server-path=worker-path` pairs. Use the paths inside the app container on the left, and the worker's mount paths on the right. Add a pair and a local `READ_ALOUD_LIBRARY_ROOTS` entry for each additional library mount. Each side of a pair must be an absolute path; neither can be a filesystem root, and a path cannot appear twice on the same side. The longest matching server path wins. Paths without a match are used as written, so identical paths need no mapping. The worker reports mapped folders back under the server's names.
+
+`READ_ALOUD_WORK_ROOT` must point to the `jobs` folder in that same shared read-aloud folder. `READ_ALOUD_TMP_DIR` is a separate local folder on the worker, outside the library and job folders. It keeps temporary EPUB extraction off the network share, where removing many small files over SMB can fail. The worker clears its own `read-aloud-worker` subfolder there at startup. Model files are cached on the worker computer, and the first job in each language needs outbound HTTPS.
+
+Check the worker log for startup errors, then open an eligible book's **Files** tab in BookOrbit. If the worker or library is unavailable, check the address, token, firewall, mounted shares, permissions and path map. A listed library that becomes readable after startup is picked up without a restart.
 
 ### What STAlign and Ghost Story do
 
@@ -285,7 +319,7 @@ A run needs about four times the size of the audio, plus seven times the EPUB, p
 
 **Almost everything landed in review.** Check the language, then the edition. A different or abridged recording will not line up with the EPUB, and no setting fixes that.
 
-**The worker can't reach this library's folder.** Check that the folder is mounted into the worker at the same path the server uses and listed in `READ_ALOUD_LIBRARY_ROOTS`. If it is listed and only mounted late, nothing needs restarting: the worker picks it up within seconds of it becoming readable. Its log says when a listed folder is not readable, and again when it is back.
+**The worker can't reach this library's folder.** Check that the folder is mounted into the worker, listed in `READ_ALOUD_LIBRARY_ROOTS`, and mapped with `READ_ALOUD_PATH_MAP` if its path differs from the server's. If it is listed and only mounted late, nothing needs restarting: the worker picks it up within seconds of it becoming readable. Its log says when a listed folder is not readable, and again when it is back.
 
 **The worker will not start.** Check its log. It refuses to start when `READ_ALOUD_CTC_DEVICE` names a device the host cannot run, including `cuda` or `webgpu` when ONNX Runtime cannot open that device; set it back to `auto`. A native worker also refuses an `ffmpeg` or `ffprobe` older than version 7. In Docker, setting both `READ_ALOUD_WORKER_TOKEN` and `READ_ALOUD_WORKER_TOKEN_FILE`, or a token file the container cannot read, stops it too.
 
