@@ -14,6 +14,7 @@ Story guides power **Constellations** in the BookOrbit app for iPhone. [Constell
 - **A provider is connected and Story guides is switched on.** See [Setting Up AI](/ai/connect-a-provider).
 - **You have the permission.** **Build story guides** (`library_generate_story_guide`). Administrators with **App settings** manage everyone's guides.
 - **The book has a text file.** A guide is read from an EPUB, KEPUB, MOBI or AZW file. PDFs, comics and audiobooks do not get one. The book must not be too short, and must be shorter than the **Longest book** limit, which is 400,000 words unless an administrator changed it.
+- **The book is in English.** Story guides are currently built for English books only. A book in any other language does not show the **Story guide** card, even when its text reads fine and a provider is connected. Other languages will be opened up once guide quality has been tested for them; this page will say so when that happens.
 
 ## Building one
 
