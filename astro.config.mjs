@@ -88,6 +88,7 @@ export default defineConfig({
           items: [
             { label: 'Collections', slug: 'collections' },
             { label: 'Smart Scopes', slug: 'smart-scopes' },
+            { label: 'Editions', slug: 'book-editions' },
             { label: 'Metadata', slug: 'metadata' },
           ],
         },

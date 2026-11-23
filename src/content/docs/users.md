@@ -90,7 +90,7 @@ Permissions are grouped in the account editor.
 |------------|----------------|
 | **Download books** | Download book files and open them in the reader. |
 | **Upload books** | Upload files straight into a library. Without it, Library Dock uploads wait for a dock manager to file them. |
-| **Edit metadata** | Edit book and author metadata, covers, and entities. |
+| **Edit metadata** | Edit book and author metadata, covers, and entities, and group books as [editions](/book-editions). |
 | **Delete books** | Permanently remove books from accessible libraries. |
 | **Generate read-aloud books** | Create a read-aloud EPUB from a book's EPUB and audiobook. Also needs **Upload books**. See [Creating a Read-Aloud](/creating-a-read-aloud). |
 

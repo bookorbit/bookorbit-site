@@ -21,6 +21,7 @@ The **Details** tab is the main book viewer. It brings the cover, identity, read
 | **Read status** | Marks the book as Unread, Reading, Finished, or another configured status. |
 | **Metadata score** | Shows how complete the book metadata is. Click it to see the score breakdown and jump to editing weak fields. |
 | **Format badges** | Show every attached format. The dot marks the primary format. |
+| **Editions** | Lists the book's other editions under the title, when it has some. See [Editions](/book-editions). |
 | **Provider links** | Open the saved provider record, such as Google Books, Goodreads, Amazon, Hardcover, Open Library, or iTunes. |
 | **Progress bars** | Show reading progress per file, so an EPUB, PDF, and MOBI copy can each keep its own position. |
 | **Discovery rows** | Surface books by the same author, in the same series, or similar to the current book. |
@@ -92,7 +93,7 @@ The form covers core book metadata, provider identifiers, and format-specific fi
 | Group | Fields |
 |-------|--------|
 | **Core** | Title, subtitle, authors, genres, tags, rating, description |
-| **Publishing** | Publisher, year, language, page count |
+| **Publishing** | Publisher, edition name, year, first published, language, page count |
 | **Series** | Series name and index |
 | **Identifiers** | ISBN-13, ISBN-10, Google Books, Goodreads, Amazon, Hardcover, Open Library, iTunes, Audible, ComicVine |
 | **Audiobooks** | Narrators, duration, abridged |
