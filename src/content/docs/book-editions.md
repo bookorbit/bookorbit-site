@@ -5,7 +5,7 @@ description: "Group the ebook, audiobook, translations and other printings of on
 
 You own *Jurassic Park* four times: the EPUB you read years ago, the Scott Brick audiobook in your audiobook library, the 1990 first printing and a Spanish translation. Without editions, the library shows four books, each with its own progress, and your statistics say you finished it twice when you read it and then listened to it.
 
-**Editions** group those records as one book. Each edition keeps its own page, files, metadata, cover and reading progress. Lists show the book once, the book page lists every edition under the title, and finished-book counts count the book once.
+**Editions** group those records as one book. Each edition keeps its own page, files, metadata, cover and reading progress. Lists show the book once, every edition's page lists all of them, and finished-book counts count the book once.
 
 :::note
 Editions need BookOrbit v3.10.0 or later. From v3.7.0, the same grouping is called **Link** (**Link with another book...**), and books linked there are editions after the update, with nothing to redo. The iPhone app shows editions once it is updated to a version that has them; an older app lists every edition as a book of its own.
@@ -23,18 +23,29 @@ An edition is a separate book record. A format is another file inside one record
 | The same edition in another file type, such as a MOBI beside the EPUB | Add the file to the book as a format |
 | Two records of the same edition that should become one | Merge them with **Merge with another book...** |
 
-A book's own files are listed in the **Formats** card on its page. Editions are listed under the title.
+A book's own files are listed in the **Formats** card on its page. Its editions are listed on the **Editions** tab further down.
 
 ---
 
 ## Group Editions
 
-<img src="/images/book-editions/group-as-editions-sheet.webp" alt="Editions of one book sheet with Japanese Gothic typed into Search all libraries, the audiobook from the Audiobooks library ticked, and the Group 2 editions button" class="img-lg img-bordered" />
+<img src="/images/book-editions/add-edition-suggestions.webp" alt="Editions of one book sheet for Japanese Gothic: under Suggested editions, the Natalie Naudus audiobook from the Audiobooks library is ticked and marked Other format and Same title and author, above the Group 2 editions button" class="img-lg img-bordered" />
 
 1. Open the page of one edition. It becomes the main edition.
-2. Open the **⋮** menu beside the reading buttons and choose **Add edition...**.
-3. Search all libraries by title or author, and tick the other editions.
+2. Open the **⋮** menu beside the reading buttons and choose **Add edition...**. On a book that already has editions, the **Add edition** button on its **Editions** tab does the same.
+3. Tick a book under **Suggested editions**, or search all libraries by title or author and tick it in the results.
 4. Click **Group 2 editions** (the count follows your choice).
+
+**Suggested editions** offers up to eight books from libraries you can edit that look like other editions of this one. Each is marked with what it is and why it matched:
+
+| Label | Meaning |
+|-------|---------|
+| **Other format** | The audiobook of an ebook, or the ebook of an audiobook. |
+| **Other edition** | Another ebook, or another audiobook, that differs in ISBN, Hardcover edition, narrator, publisher or year. |
+| **Same work on Hardcover or Open Library** | Both books match the same work on Hardcover or Open Library. |
+| **Same title and author** | Both books have the same title and share an author or narrator. |
+
+A book that matches both ways says **Same work, title and author**. Copies of the same edition are not suggested, and neither are pairs marked **Not editions** in [Duplicate Books](#find-editions-you-already-have).
 
 To group from a list, select the books, open **More actions** in the selection bar and choose **Group as editions...**. Select each book yourself: the action is not offered when the selection is every book matching a filter.
 
@@ -44,7 +55,7 @@ A few rules apply:
 - A group holds up to 10 editions, across any libraries.
 - Adding a book that already belongs to a group brings that whole group in, and its main edition stays the main one.
 
-To manage a group later, open any edition and use the **⋮** menu:
+To manage a group later, open any edition and use the **⋮** menu, or the **⋮** menu on a row of the [Editions tab](#compare-editions):
 
 | Action | What it does |
 |--------|--------------|
@@ -55,9 +66,9 @@ To manage a group later, open any edition and use the **⋮** menu:
 
 ## Switch Between Editions
 
-<img src="/images/book-editions/edition-strip.webp" alt="Jurassic Park book page with an Editions row under the title: the current 25th Anniversary Edition with EPUB and M4B badges and a check mark, Scott Brick's M4B at 42%, Plaza & Janés 2019 and Alfred A. Knopf 1990" class="img-lg img-bordered" />
+<img src="/images/book-editions/edition-strip.webp" alt="Jurassic Park book page with an Editions row under the title: the current 25th Anniversary Edition with M4B and EPUB badges at 82%, and an All 4 editions button" class="img-lg img-bordered" />
 
-Every edition's page shows an **Editions** row under the title. Each entry shows the edition's formats and its name, and your own progress in it: a percentage while you are reading, a check mark once you have finished. The edition you are on is highlighted. Click another to open its page.
+Every edition's page shows an **Editions** row under the title. It holds the edition you are on, with its formats, its name and your own progress in it: a percentage while you are reading, a check mark once you have finished. **All 4 editions** (the count follows the group) opens the **Editions** tab, which lists them all.
 
 BookOrbit names each edition with the first of these that it has:
 
@@ -68,7 +79,23 @@ BookOrbit names each edition with the first of these that it has:
 
 When two editions would get the same name, the library is added to both.
 
-The main edition comes first, then editions you have read, most recent first, then ebooks before audiobooks, newest first. The row shows four editions and a **+** button for the rest. You only see editions in libraries you have access to. An edition whose files are missing is marked with a warning sign.
+### Compare editions
+
+<img src="/images/book-editions/editions-table.webp" alt="Editions tab for Jurassic Park listing four editions: 25th Anniversary Edition marked Main and Viewing, reading at 82%; the Scott Brick audiobook at 42%; Plaza & Janés 2019, titled Parque Jurásico, not started; and Alfred A. Knopf 1990, not started" class="img-xl img-bordered" />
+
+On a book with editions, the **Editions** tab comes first among the tabs below the book's details. Each row is one edition:
+
+| Column | What it shows |
+|--------|---------------|
+| **Edition** | The edition's name and library. **Main** marks the main edition and **Viewing** the page you are on. When an edition's title differs, such as a translation, its title is shown beside the library. |
+| **Format** | The edition's file formats. |
+| **Published** | Its year and publisher. |
+| **Narrated by** | Its narrators, for an audiobook. |
+| **Your reading** | Your percentage while you are reading, **Finished** with the month you finished, or **Not started**. An edition whose files are missing says **Files missing**. |
+
+Click a row to open that edition. Its **⋮** menu has **Open edition**, **Make main edition** and **Remove from editions**, as your permissions allow. On a narrow screen, each row shows the name, formats, year and your progress.
+
+The main edition comes first, then editions you have read, most recent first, then ebooks before audiobooks, newest first. You only see editions in libraries you have access to.
 
 ---
 
