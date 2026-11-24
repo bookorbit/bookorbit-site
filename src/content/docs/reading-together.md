@@ -1,15 +1,15 @@
 ---
 title: "Reading Together"
-description: "Read books with other people on your server: clubs, buddy reads, passing a book on, shared notes, reactions, and who is reading what, all fenced so nothing ahead of you is ever shown."
+description: "Not yet released: read books with other people on your server through clubs, buddy reads, passing a book on, shared notes, reactions, and who is reading what, all fenced so nothing ahead of you is ever shown."
 ---
+
+:::caution[Not released yet]
+Reading Together is in internal testing and is not part of any BookOrbit release. The clubs, settings, shelf, and permissions described on this page do not appear in the app yet, and nothing needs to be turned on or off to get them. This page describes the feature as it is built for its first release and may change before then.
+:::
 
 Everyone on a BookOrbit server reads the same copy of a book, so that copy can carry notes from everyone who has read it, like a paperback passed between friends. Reading together builds on that: clubs and buddy reads for reading a book at the same time, passing a book on to one person with a note, shared notes and reactions left in the book for whoever reads it next, and a way to see who else on the server is reading it.
 
 All of it is cooperative. There are no rankings or leaderboards, and nothing leaves your server.
-
-:::note
-Reading together is in the web app. The iOS and Android apps do not show clubs, passed books, shared notes, reactions, or other readers yet; everything you do in the web app still works alongside them.
-:::
 
 ## The spoiler fence
 

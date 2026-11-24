@@ -125,7 +125,6 @@ Permissions are grouped in the account editor.
 | **Manage users** | Create, edit, and delete accounts; assign library access and permissions. Shared-account creation and magic-link management require superuser access. |
 | **View user activity** | Open Account Activity and view authentication data and voluntarily shared reading insights. |
 | **View audit log** | Read the audit log of user and system actions. |
-| **Moderate shared notes** | Hide shared notes and replies from other readers. See [Reading Together](/reading-together#for-admins). |
 
 ### Notifications and restrictions
 
@@ -133,7 +132,6 @@ Permissions are grouped in the account editor.
 |------------|----------------|
 | **Notifications** | View and manage in-app notifications. |
 | **Demo restricted** | Marks an account as demo-restricted, which blocks selected settings and operations. |
-| **No social features** | Hides clubs, shared notes, reactions, and reading presence from the account, and hides the account from everyone else. See [Reading Together](/reading-together). |
 
 ## Superuser vs. regular user
 

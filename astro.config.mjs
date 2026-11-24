@@ -69,7 +69,11 @@ export default defineConfig({
             { label: 'Storyteller Read-Aloud', slug: 'storyteller-read-aloud' },
             { label: 'Creating a Read-Aloud', slug: 'creating-a-read-aloud' },
             { label: 'Annotations & Highlights', slug: 'annotations' },
-            { label: 'Reading Together', slug: 'reading-together' },
+            {
+              label: 'Reading Together',
+              slug: 'reading-together',
+              badge: { text: 'Not released', variant: 'caution' },
+            },
             { label: 'Display', slug: 'appearance' },
           ],
         },
